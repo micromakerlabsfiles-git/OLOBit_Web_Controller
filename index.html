@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OLO Bit Web Controller</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* --- CORE THEME (From OLO PHP) --- */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #004d3d 0%, #002920 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #00ffd5; 
+            --terminal-bg: #000000;
+            --terminal-text: #2ed573;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: #e8f0f2;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            padding-bottom: 50px;
+        }
+
+        /* --- GLASS CARDS --- */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        /* --- BUTTONS --- */
+        .btn-elegant {
+            background: linear-gradient(45deg, #00b894 0%, #00cec9 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-weight: 600;
+            color: #000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 206, 201, 0.3);
+        }
+        .btn-elegant:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 206, 201, 0.5);
+            color: #000;
+        }
+
+        /* --- FORM ELEMENTS --- */
+        .form-control, .form-select {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(0, 0, 0, 0.5);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.2rem rgba(0, 255, 213, 0.25);
+            color: white;
+        }
+        
+        /* --- IMAGE CHECKBOXES (From form.css) --- */
+        .form-check.image-bg {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 5px 0;
+            transition: all 0.2s ease;
+            min-height: 100px;
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        .form-check.image-bg::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.2));
+            z-index: 1;
+        }
+        .form-check.image-bg label, .form-check.image-bg input {
+            position: relative;
+            z-index: 2;
+        }
+        .form-check.image-bg:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.3);
+        }
+        /* Checked State */
+        .form-check.image-bg:has(input:checked) {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 255, 213, 0.3);
+        }
+        .form-check-label {
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,1);
+            font-size: 0.9rem;
+        }
+        .gif-checkbox { 
+            width: 18px; height: 18px; 
+            margin-right: 8px;
+        }
+
+        /* --- SERIAL MONITOR (From BOBO) --- */
+        .log-container {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: var(--terminal-bg);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 0;
+            overflow: hidden;
+        }
+        .log-header {
+            background: #1a1a1a;
+            padding: 8px 15px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .log-content {
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            color: var(--terminal-text);
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+        }
+        .log-line { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 2px 0; }
+        .log-tx { color: #00cec9; } /* Outgoing */
+        .log-rx { color: #2ed573; } /* Incoming */
+        .log-sys { color: #f0932b; } /* System */
+
+        /* --- UTILS --- */
+        .status-dot {
+            width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px;
+            background: #444;
+        }
+        .status-dot.connected { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        #loadingOverlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); z-index: 9999;
+            justify-content: center; align-items: center; flex-direction: column;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="loadingOverlay">
+    <div class="spinner-border text-info" style="width: 3rem; height: 3rem;" role="status"></div>
+    <p class="mt-3 text-white">Connecting to OLO Bit...</p>
+</div>
+
+<div id="connectScreen" class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="row w-100 align-items-center">
+        <div class="col-md-6 text-center text-md-start">
+            <h1 class="display-4 fw-bold mb-4" style="color: var(--accent);">OLO Bit <span style="font-size: 0.5em; opacity: 0.7; color: white;">Web Controller</span></h1>
+            <p class="lead text-secondary mb-4">Manage GIFs, Audio, and Hardware settings directly from your browser via USB.</p>
+            
+            <div class="glass-card p-5 text-center">
+                <button id="connectBtn" class="btn btn-elegant btn-lg w-100 mb-3">
+                    <i class="fas fa-plug me-2"></i> Connect Device
+                </button>
+                <small class="text-muted"><i class="fab fa-chrome"></i> Requires Chrome, Edge, or Opera</small>
+            </div>
+        </div>
+        <div class="col-md-6 text-center">
+             <div style="font-size: 10rem; opacity: 0.2;"><i class="fas fa-robot"></i></div>
+        </div>
+    </div>
+</div>
+
+<div id="controllerScreen" style="display: none;" class="fade-in pt-3">
+    
+    <nav class="navbar navbar-expand-lg glass-card mx-3 p-3 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <span class="status-dot connected"></span>
+            <span class="fw-bold h5 mb-0">OLO Bit Connected</span>
+        </div>
+        <div class="d-flex gap-3">
+            <span class="badge bg-secondary d-flex align-items-center"><i class="fas fa-microchip me-2"></i> MAC: <span id="macValue" class="ms-1">--:--:--</span></span>
+            <span class="badge bg-warning text-dark d-flex align-items-center"><i class="fas fa-tag me-2"></i> Ver: <span id="verValue" class="ms-1">1.0</span></span>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4">
+        
+        <ul class="nav nav-pills mb-4 justify-content-center" id="mainTabs" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-gifs"><i class="fas fa-images me-2"></i>GIFs</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-audio"><i class="fas fa-music me-2"></i>Audio</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-chronos"><i class="fas fa-clock me-2"></i>Chronos</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-hardware"><i class="fas fa-cogs me-2"></i>Hardware</button></li>
+        </ul>
+
+        <div class="row mb-4 justify-content-center">
+            <div class="col-auto">
+                <button id="resetBtn" class="btn btn-danger me-2"><i class="fas fa-power-off me-2"></i>Reboot</button>
+                <button id="saveBtn" class="btn btn-elegant"><i class="fas fa-save me-2"></i>Save All Settings</button>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            
+            <div class="tab-pane fade show active" id="tab-gifs">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="glass-card p-4">
+                            <h5 class="mb-3 text-info"><i class="fas fa-sliders-h me-2"></i>Playback Settings</h5>
+                            
+                            <label>Speed: <span id="gif_speedValue" class="text-accent">0</span></label>
+                            <input type="range" class="form-range" id="gif_speed" min="50" max="200" value="100">
+
+                            <label class="mt-3">Delay (Seconds): <span id="gif_delayValue" class="text-accent">5</span></label>
+                            <input type="range" class="form-range" id="gif_delay" min="0" max="60" value="5">
+
+                            <div class="form-check form-switch mt-3">
+                                <input class="form-check-input" type="checkbox" id="isInverted">
+                                <label class="form-check-label">Negative Colors (Inverted)</label>
+                            </div>
+
+                            <hr class="border-secondary">
+                            
+                            <h5 class="mb-3 text-info"><i class="fas fa-hand-pointer me-2"></i>Triggers</h5>
+                            
+                            <div class="mb-2">
+                                <label class="small text-muted">DEFAULT GIF</label>
+                                <select class="form-select" id="gif_default"></select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="small text-muted">STARTUP GIF</label>
+                                <select class="form-select" id="gif_intro"></select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="small text-muted">SINGLE TAP</label>
+                                <select class="form-select trigger-select" id="gif_touch"></select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="small text-muted">DOUBLE TAP</label>
+                                <select class="form-select trigger-select" id="gif_double_touch"></select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="small text-muted">LONG PRESS</label>
+                                <select class="form-select trigger-select" id="gif_long_touch"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="glass-card p-4">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h5 class="text-info"><i class="fas fa-th me-2"></i>Active Playlist</h5>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-light me-1" onclick="toggleAllGifs(true)">Select All</button>
+                                    <button class="btn btn-sm btn-outline-light" onclick="toggleAllGifs(false)">Clear</button>
+                                </div>
+                            </div>
+                            <div class="row" id="gifGrid">
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-audio">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                         <div class="glass-card p-3">
+                            <i class="fas fa-info-circle text-info me-2"></i> 
+                            To use SD card sounds, use paths like <code>/gifs/filename.wav</code>. Format: 8-16bit WAV.
+                         </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="glass-card p-4">
+                            <h5 class="text-info mb-3">System Sounds</h5>
+                            
+                            <label class="small text-muted">STARTUP MELODY</label>
+                            <div class="input-group mb-3">
+                                <textarea class="form-control font-monospace" id="intro_sound" rows="2"></textarea>
+                                <button class="btn btn-secondary" onclick="previewSound('intro_sound')"><i class="fas fa-play"></i></button>
+                            </div>
+
+                            <label class="small text-muted">NOTIFICATION</label>
+                            <div class="input-group mb-3">
+                                <textarea class="form-control font-monospace" id="notification_sound" rows="2"></textarea>
+                                <button class="btn btn-secondary" onclick="previewSound('notification_sound')"><i class="fas fa-play"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="glass-card p-4">
+                            <h5 class="text-info mb-3">Interaction Sounds</h5>
+                            
+                            <label class="small text-muted">SINGLE TAP</label>
+                            <div class="input-group mb-3">
+                                <textarea class="form-control font-monospace" id="touch_sound" rows="2"></textarea>
+                                <button class="btn btn-secondary" onclick="previewSound('touch_sound')"><i class="fas fa-play"></i></button>
+                            </div>
+
+                            <label class="small text-muted">DOUBLE TAP</label>
+                            <div class="input-group mb-3">
+                                <textarea class="form-control font-monospace" id="double_touch_sound" rows="2"></textarea>
+                                <button class="btn btn-secondary" onclick="previewSound('double_touch_sound')"><i class="fas fa-play"></i></button>
+                            </div>
+                            
+                            <label class="small text-muted">LONG PRESS</label>
+                            <div class="input-group mb-3">
+                                <textarea class="form-control font-monospace" id="long_touch_sound" rows="2"></textarea>
+                                <button class="btn btn-secondary" onclick="previewSound('long_touch_sound')"><i class="fas fa-play"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-chronos">
+                <div class="glass-card p-4 mw-600 mx-auto" style="max-width: 600px;">
+                    <h5 class="text-info mb-4">Time & Connectivity</h5>
+                    
+                    <div class="mb-4">
+                        <label>Notification Duration: <span id="notifDurationValue">5</span>s</label>
+                        <input type="range" class="form-range" id="notifDuration" min="1" max="10" value="5">
+                    </div>
+
+                    <div class="mb-4">
+                        <label>Bluetooth Auto-off: <span id="bluetooth_auto_offValue">5</span> min</label>
+                        <input type="range" class="form-range" id="bluetooth_auto_off" min="0" max="30" value="5">
+                        <small class="text-muted d-block">Set to 0 to keep Bluetooth always on.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Bluetooth Name</label>
+                        <input type="text" class="form-control" id="bluetoothName" value="OLO Bit">
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-hardware">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="glass-card p-4 h-100">
+                            <h5 class="text-info mb-3">Screen (I2C)</h5>
+                            <div class="mb-2">
+                                <label>Driver</label>
+                                <select class="form-select" id="display_type">
+                                    <option value="ssd1306">SSD1306</option>
+                                    <option value="sh1106">SH1106</option>
+                                </select>
+                            </div>
+                            <div class="mb-2"><label>SCL Pin</label><input type="number" class="form-control" id="scl_pin"></div>
+                            <div class="mb-2"><label>SDA Pin</label><input type="number" class="form-control" id="sda_pin"></div>
+                            <div class="mb-2">
+                                <label>Orientation</label>
+                                <select class="form-select" id="is_flip_mode">
+                                    <option value="0">Normal</option>
+                                    <option value="1">Flipped 180°</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="glass-card p-4 h-100">
+                            <h5 class="text-info mb-3">Audio</h5>
+                            <div class="mb-3">
+                                <label>Type</label>
+                                <select class="form-select" id="use_sound">
+                                    <option value="0">Off</option>
+                                    <option value="1">Buzzer (Passive)</option>
+                                    <option value="2">I2S DAC (Amplifier)</option>
+                                </select>
+                            </div>
+
+                            <div id="grp_buzzer" style="display:none;">
+                                <div class="mb-2"><label>Buzzer Pin</label><input type="number" class="form-control" id="buzzer_pin"></div>
+								<hr class="border-secondary">
+                            <div class="mb-2"><label>Touch Pin</label><input type="number" class="form-control" id="touch_pin"></div>
+                            </div>
+
+                            <div id="grp_i2s" style="display:none;">
+                                <div class="mb-2"><label>LRCK Pin</label><input type="number" class="form-control" id="I2S_LRCK_PIN"></div>
+                                <div class="mb-2"><label>BCLK Pin</label><input type="number" class="form-control" id="I2S_BCK_PIN"></div>
+                                <div class="mb-2"><label>DIN Pin</label><input type="number" class="form-control" id="I2S_DATA_PIN"></div>
+                                <div class="mb-2">
+                                    <label>Volume</label>
+                                    <input type="range" class="form-range" id="volume" min="0" max="10" oninput="document.getElementById('volVal').innerText=this.value">
+                                    <div class="text-end small"><span id="volVal">5</span>/10</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="glass-card p-4 h-100">
+                            <h5 class="text-info mb-3">SD Card & Touch</h5>
+                            <div class="mb-2">
+                                <label>Use SD Card</label>
+                                <select class="form-select" id="useSD">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6"><label class="small">SCK</label><input type="number" class="form-control form-control-sm" id="SD_SCK"></div>
+                                <div class="col-6"><label class="small">MISO</label><input type="number" class="form-control form-control-sm" id="SD_MISO"></div>
+                                <div class="col-6"><label class="small">MOSI</label><input type="number" class="form-control form-control-sm" id="SD_MOSI"></div>
+                                <div class="col-6"><label class="small">CS</label><input type="number" class="form-control form-control-sm" id="SD_CS"></div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <div class="card mt-4 mb-5 border-0 bg-transparent">
+            <h5 class="text-light mb-2"><i class="fas fa-terminal me-2"></i>Serial Monitor</h5>
+            <div class="log-container">
+                <div class="log-header">
+                    <span class="text-muted small">BAUD: 115200</span>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="clearLog()">Clear Log</button>
+                </div>
+                <div class="log-content" id="serialLog">
+                    <div class="log-line log-sys">Ready to connect...</div>
+                </div>
+            </div>
+            <div class="mt-2 d-flex">
+                <input type="text" id="manualCmd" class="form-control me-2" placeholder="Send manual command..." onkeypress="if(event.key==='Enter') sendManual()">
+                <button class="btn btn-secondary" onclick="sendManual()">Send</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script>
+    // --- 1. CONFIGURATION DATA ---
+    const gifData = {
+        "suzuki": "Suzuki", "angry": "Tanjiro", "angry2": "Pretentious", "angry3": "Purple Flame",
+        "bee": "Bee", "cry": "Crying Smile", "cry2": "Crying", "cuoi_khinh_bi": "Awkward Laugh",
+        "chong_mat": "Rotation", "mac_dinh": "Default", "demon_slayer": "Nezuko", "den_giao_thong": "Road Rage",
+        "den_pha": "Headlights", "devil_eyes": "GTR Rain", "distracted": "Distracted", "egg": "Cookie",
+        "gian_du": "Angry", "hand_some": "Banana", "happy_2": "Laugh", "hat_xi": "Sneeze",
+        "hat_xi_2": "Big Sneeze", "hehe": "Smirk", "intro": "MML", "keep_it_up": "Keep it up",
+        "leu_leu": "Raspberry", "love": "Love", "love2": "Dumb Love", "music": "Music",
+        "neon": "Neon", "noname": "Pinky", "nheo_mat": "Distracted 2", "nhin_ben_phai": "Look Right",
+        "nhin_ben_trai": "Look Left", "nhin_xuong": "Look Down", "police": "Police", "pong": "Pong",
+        "rain": "Rain", "sakura": "Sakura", "samurai": "Blade", "scared": "Accel", "sleepy": "Sleepy",
+        "smile": "Smile", "speed": "Revs", "star": "Stars", "sung_nuoc": "Hadouken Miss",
+        "sung_nuoc_2": "Hadouken Hit", "turbo": "Turbo", "thong_long": "Tsurikawa", "thu_nho": "Breaking",
+        "up_size_down": "Upside down", "UwU": "UwU", "wheels": "Equip", "speed2": "Speed 2",
+        "yelling": "Yelling", "car": "Car", "speed3": "Speed 3"
+    };
+
+    const specialTriggers = [
+        {val: "show_clock", txt: "Show/Hide Clock"},
+        {val: "bluetooth", txt: "Toggle Bluetooth"},
+        {val: "next_gif", txt: "Next GIF"},
+    ];
+
+    // --- 2. SERIAL VARIABLES ---
+    let port, writer, reader;
+    let keepReading = false;
+
+    // --- 3. INIT UI ---
+    window.onload = function() {
+        initGifUI();
+        
+        // Listeners for ranges
+        document.querySelectorAll('input[type=range]').forEach(input => {
+            input.addEventListener('input', (e) => {
+                const span = document.getElementById(e.target.id + 'Value');
+                if(span) span.textContent = e.target.value;
+            });
+        });
+    };
+
+    function initGifUI() {
+        const grid = document.getElementById('gifGrid');
+        const defaultSel = document.getElementById('gif_default');
+        const introSel = document.getElementById('gif_intro');
+        const triggerSels = document.querySelectorAll('.trigger-select');
+
+        triggerSels.forEach(sel => {
+            specialTriggers.forEach(t => sel.add(new Option(t.txt, t.val)));
+        });
+
+        let index = 0;
+        for (const [key, label] of Object.entries(gifData)) {
+            const col = document.createElement('div');
+            col.className = 'col-6 col-md-4 col-lg-3 p-1';
+            const bgUrl = `assets/${label}.png`;
+            
+            col.innerHTML = `
+                <div class="form-check image-bg" style="background-image: url('${bgUrl}');" onclick="document.getElementById('chk_${key}').click()">
+                    <input class="form-check-input gif-checkbox" type="checkbox" id="chk_${key}" value="${index}" onchange="updateGifBinary()">
+                    <label class="form-check-label text-white text-shadow">${label}</label>
+                </div>
+            `;
+            grid.appendChild(col);
+
+            let opt = new Option(label, key);
+            defaultSel.add(opt.cloneNode(true));
+            introSel.add(opt.cloneNode(true));
+            triggerSels.forEach(sel => sel.add(opt.cloneNode(true)));
+            index++;
+        }
+    }
+
+    function toggleAllGifs(state) {
+        document.querySelectorAll('.gif-checkbox').forEach(cb => cb.checked = state);
+        updateGifBinary();
+    }
+
+    function updateGifBinary() {
+        const cbs = document.querySelectorAll('.gif-checkbox');
+        let bin = '';
+        cbs.forEach(cb => bin += cb.checked ? '1' : '0');
+        sendData('gif_selected_bin', bin);
+    }
+
+    // --- 4. AUDIO ENGINE (Restored from index.php) ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    const notesFreq = {
+        "B0": 31, "C1": 33, "CS1": 35, "D1": 37, "DS1": 39, "E1": 41,
+        "F1": 44, "FS1": 46, "G1": 49, "GS1": 52, "A1": 55, "AS1": 58, "B1": 62,
+        "C2": 65, "CS2": 69, "D2": 73, "DS2": 78, "E2": 82, "F2": 87, "FS2": 93,
+        "G2": 98, "GS2": 104, "A2": 110, "AS2": 117, "B2": 123,
+        "C3": 131, "CS3": 139, "D3": 147, "DS3": 156, "E3": 165, "F3": 175, "FS3": 185,
+        "G3": 196, "GS3": 208, "A3": 220, "AS3": 233, "B3": 247,
+        "C4": 262, "CS4": 277, "D4": 294, "DS4": 311, "E4": 330, "F4": 349, "FS4": 370,
+        "G4": 392, "GS4": 415, "A4": 440, "AS4": 466, "B4": 494,
+        "C5": 523, "CS5": 554, "D5": 587, "DS5": 622, "E5": 659, "F5": 698, "FS5": 740,
+        "G5": 784, "GS5": 831, "A5": 880, "AS5": 932, "B5": 988,
+        "C6": 1047, "CS6": 1109, "D6": 1175, "DS6": 1245, "E6": 1319, "F6": 1397, "FS6": 1480,
+        "G6": 1568, "GS6": 1661, "A6": 1760, "AS6": 1865, "B6": 1976,
+        "C7": 2093, "CS7": 2217, "D7": 2349, "DS7": 2489, "E7": 2637, "F7": 2794, "FS7": 2960,
+        "G7": 3136, "GS7": 3322, "A7": 3520, "AS7": 3729, "B7": 3951,
+        "C8": 4186, "CS8": 4435, "D8": 4699, "DS8": 4978
+    };
+
+    function playNote(freq, duration, rest) {
+        return new Promise(resolve => {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'square'; // Matches ESP32 tone type
+            oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            setTimeout(() => {
+                oscillator.stop();
+                setTimeout(resolve, rest); // Wait for rest time
+            }, duration);
+        });
+    }
+
+    function parseNoteInput(input) {
+        const notes = [];
+        const raw = input.trim();
+
+        if (!raw.includes(' ')) {
+            // Compact format (e.g., C4100D4100)
+            let i = 0;
+            while (i < raw.length) {
+                let note = "", duration = "";
+                let tryNote = raw.substr(i, 3);
+                if (notesFreq[tryNote]) {
+                    note = tryNote; i += 3;
+                } else {
+                    tryNote = raw.substr(i, 2);
+                    if (notesFreq[tryNote]) {
+                        note = tryNote; i += 2;
+                    } else {
+                        break;
+                    }
+                }
+                while (i < raw.length && /\d/.test(raw[i])) {
+                    duration += raw[i]; i++;
+                }
+                notes.push({ note, duration: parseInt(duration), rest: 0 });
+            }
+        } else {
+            // Space separated format (Note Duration Rest)
+            const rawParts = raw.split(/\s+/);
+            let i = 0;
+            while (i < rawParts.length) {
+                const note = rawParts[i];
+                const duration = parseInt(rawParts[i + 1]);
+                let rest = 0;
+                if (!isNaN(duration)) {
+                    const restCandidate = rawParts[i + 2];
+                    if (restCandidate && /^\d+$/.test(restCandidate)) {
+                        rest = parseInt(restCandidate);
+                    }
+                    notes.push({ note, duration, rest });
+                    i += /^\d+$/.test(restCandidate) ? 3 : 2;
+                } else {
+                    i++;
+                }
+            }
+        }
+        return notes;
+    }
+
+    async function previewSound(textareaId) {
+        // Resume context if suspended (browser policy)
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
+
+        const content = document.getElementById(textareaId).value.trim();
+        const notes = parseNoteInput(content);
+
+        for (const item of notes) {
+            const freq = notesFreq[item.note];
+            if (freq) {
+                await playNote(freq, item.duration, item.rest);
+            } else {
+                // If note not found, just wait duration
+                await new Promise(res => setTimeout(res, item.duration + item.rest));
+            }
+        }
+    }
+
+    // --- 5. SERIAL LOGIC ---
+
+    async function connect() {
+        if (!navigator.serial) {
+            alert("Web Serial not supported. Please use Chrome/Edge.");
+            return;
+        }
+
+        try {
+            port = await navigator.serial.requestPort();
+            await port.open({ baudRate: 115200 });
+
+            const textEncoder = new TextEncoderStream();
+            writer = textEncoder.writable.getWriter();
+            textEncoder.readable.pipeTo(port.writable);
+
+            document.getElementById('connectScreen').style.display = 'none';
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            keepReading = true;
+            readLoop();
+
+            log("Connected! Fetching settings...", "sys");
+            setTimeout(() => sendData('set', 'get'), 1500);
+            
+            setTimeout(() => {
+                const now = Math.floor(Date.now() / 1000);
+                const tzOffset = new Date().getTimezoneOffset() * 60; 
+                sendData('time', now - tzOffset); 
+                
+                document.getElementById('loadingOverlay').style.display = 'none';
+                const screen = document.getElementById('controllerScreen');
+                screen.style.display = 'block';
+                screen.scrollIntoView({ behavior: 'smooth' });
+                
+            }, 3000);
+
+        } catch (e) {
+            console.error(e);
+            alert("Connection Failed: " + e);
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+    }
+
+    async function readLoop() {
+        const textDecoder = new TextDecoderStream();
+        const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+        reader = textDecoder.readable.getReader();
+
+        try {
+            while (keepReading) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                if (value) handleSerialData(value);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            reader.releaseLock();
+        }
+    }
+
+    let serialBuffer = "";
+    function handleSerialData(text) {
+        log(text, "rx");
+        serialBuffer += text;
+        const lines = serialBuffer.split('\n');
+        serialBuffer = lines.pop(); 
+
+        for (const line of lines) {
+            if (line.trim()) parseCommand(line.trim());
+        }
+    }
+
+    function parseCommand(line) {
+        const parts = line.split(':');
+        if (parts.length < 2) return;
+        
+        const key = parts[0].trim();
+        const val = parts.slice(1).join(':').trim(); 
+
+        switch(key) {
+            case 'MAC': document.getElementById('macValue').innerText = val; break;
+            case 'version': document.getElementById('verValue').innerText = val; break;
+            
+            // GIF
+            case 'gif_speed': setVal('gif_speed', val); setText('gif_speedValue', val); break;
+            case 'gif_delay': 
+                const sec = Math.floor(parseInt(val)/1000);
+                setVal('gif_delay', sec); 
+                setText('gif_delayValue', sec); 
+                break;
+            case 'isInverted': document.getElementById('isInverted').checked = (val === '1' || val === 'true'); break;
+            case 'gif_default': setVal('gif_default', val); break;
+            case 'gif_intro': setVal('gif_intro', val); break;
+            case 'gif_touch': setVal('gif_touch', val); break;
+            case 'gif_double_touch': setVal('gif_double_touch', val); break;
+            case 'gif_long_touch': setVal('gif_long_touch', val); break;
+            
+            case 'gif_selected': 
+                const cbs = document.querySelectorAll('.gif-checkbox');
+                for(let i=0; i<cbs.length; i++) {
+                    if(val[i]) cbs[i].checked = (val[i] === '1');
+                }
+                break;
+
+            // Audio
+            case 'intro_sound': setVal('intro_sound', val); break;
+            case 'notification_sound': setVal('notification_sound', val); break;
+            case 'touch_sound': setVal('touch_sound', val); break;
+            case 'double_touch_sound': setVal('double_touch_sound', val); break;
+            case 'long_touch_sound': setVal('long_touch_sound', val); break;
+
+            // Chronos
+            case 'notifDuration': setVal('notifDuration', val); setText('notifDurationValue', val); break;
+            case 'bluetooth_auto_off': setVal('bluetooth_auto_off', val); setText('bluetooth_auto_offValue', val); break;
+            case 'bluetoothName': setVal('bluetoothName', val); break;
+
+            // Hardware
+            case 'display_type': setVal('display_type', val); break;
+            case 'scl_pin': setVal('scl_pin', val); break;
+            case 'sda_pin': setVal('sda_pin', val); break;
+            case 'is_flip_mode': setVal('is_flip_mode', val); break;
+            case 'use_sound': 
+                setVal('use_sound', val); 
+                toggleAudioSettings(val);
+                break;
+            case 'buzzer_pin': setVal('buzzer_pin', val); break;
+            case 'I2S_LRCK_PIN': setVal('I2S_LRCK_PIN', val); break;
+            case 'I2S_BCK_PIN': setVal('I2S_BCK_PIN', val); break;
+            case 'I2S_DATA_PIN': setVal('I2S_DATA_PIN', val); break;
+            case 'volume': setVal('volume', val); setText('volVal', val); break;
+            case 'useSD': setVal('useSD', val === 'true' ? '1' : '0'); break;
+            case 'SD_SCK': setVal('SD_SCK', val); break;
+            case 'SD_MISO': setVal('SD_MISO', val); break;
+            case 'SD_MOSI': setVal('SD_MOSI', val); break;
+            case 'SD_CS': setVal('SD_CS', val); break;
+            case 'touch_pin': setVal('touch_pin', val); break;
+        }
+    }
+
+    // --- 6. UTILS & SENDING ---
+
+    async function sendData(key, value) {
+        if(!writer) return;
+        
+        const isSound = ['intro_sound','touch_sound','double_touch_sound','long_touch_sound','notification_sound'].includes(key);
+        
+        if (isSound && value.length > 200) {
+            const chunkSz = 200;
+            for (let i = 0; i < value.length; i += chunkSz) {
+                const chunk = value.substring(i, i + chunkSz);
+                const cmdKey = (i === 0) ? key : `${key}_cont`;
+                await writeLine(`${cmdKey}:${chunk}`);
+                await new Promise(r => setTimeout(r, 100)); 
+            }
+            await writeLine(`${key}_end:`);
+        } else {
+            await writeLine(`${key}:${value}`);
+        }
+    }
+
+    async function writeLine(str) {
+        if(!writer) return;
+        await writer.write(str + "\n");
+        log(str, "tx");
+    }
+
+    function setVal(id, val) {
+        const el = document.getElementById(id);
+        if(el) {
+            if(el.type === 'checkbox') el.checked = (val == 1 || val == 'true');
+            else el.value = val;
+        }
+    }
+    
+    function setText(id, txt) {
+        const el = document.getElementById(id);
+        if(el) el.innerText = txt;
+    }
+
+    function toggleAudioSettings(val) {
+        document.getElementById('grp_buzzer').style.display = (val === '1') ? 'block' : 'none';
+        document.getElementById('grp_i2s').style.display = (val === '2') ? 'block' : 'none';
+    }
+
+    function log(msg, type) {
+        const box = document.getElementById('serialLog');
+        const line = document.createElement('div');
+        line.className = `log-line log-${type}`;
+        
+        const time = new Date().toLocaleTimeString().split(' ')[0];
+        const prefix = type === 'tx' ? '>> ' : (type === 'rx' ? '<< ' : '[SYS] ');
+        
+        line.innerText = `[${time}] ${prefix}${msg}`;
+        box.appendChild(line);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function clearLog() {
+        document.getElementById('serialLog').innerHTML = '';
+    }
+
+    function sendManual() {
+        const cmd = document.getElementById('manualCmd').value;
+        if(cmd) {
+            writeLine(cmd);
+            document.getElementById('manualCmd').value = '';
+        }
+    }
+
+    // --- 7. EVENT LISTENERS ---
+    document.getElementById('connectBtn').addEventListener('click', connect);
+    
+    document.getElementById('saveBtn').addEventListener('click', () => {
+        sendData('set', 'save');
+        alert("Settings Saved!");
+    });
+    
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        if(confirm("Reboot device?")) sendData('set', 'reset');
+    });
+
+    document.getElementById('gif_speed').onchange = (e) => sendData('gif_speed', e.target.value);
+    document.getElementById('gif_delay').onchange = (e) => sendData('gif_delay', e.target.value * 1000);
+    document.getElementById('isInverted').onchange = (e) => sendData('isInverted', e.target.checked);
+    document.getElementById('gif_default').onchange = (e) => sendData('gif_default', e.target.value);
+    document.getElementById('gif_intro').onchange = (e) => sendData('gif_intro', e.target.value);
+    document.getElementById('gif_touch').onchange = (e) => sendData('gif_touch', e.target.value);
+    document.getElementById('gif_double_touch').onchange = (e) => sendData('gif_double_touch', e.target.value);
+    document.getElementById('gif_long_touch').onchange = (e) => sendData('gif_long_touch', e.target.value);
+
+    ['intro_sound','notification_sound','touch_sound','double_touch_sound','long_touch_sound'].forEach(id => {
+        document.getElementById(id).addEventListener('blur', (e) => sendData(id, e.target.value));
+    });
+
+    document.getElementById('notifDuration').onchange = (e) => sendData('notifDuration', e.target.value);
+    document.getElementById('bluetooth_auto_off').onchange = (e) => sendData('bluetooth_auto_off', e.target.value);
+    document.getElementById('bluetoothName').onchange = (e) => sendData('bluetoothName', e.target.value);
+
+    document.getElementById('display_type').onchange = (e) => sendData('display_type', e.target.value);
+    document.getElementById('scl_pin').onchange = (e) => sendData('scl_pin', e.target.value);
+    document.getElementById('sda_pin').onchange = (e) => sendData('sda_pin', e.target.value);
+    document.getElementById('is_flip_mode').onchange = (e) => sendData('is_flip_mode', e.target.value);
+    
+    document.getElementById('use_sound').onchange = (e) => {
+        sendData('use_sound', e.target.value);
+        toggleAudioSettings(e.target.value);
+    };
+    
+    document.getElementById('buzzer_pin').onchange = (e) => sendData('buzzer_pin', e.target.value);
+    document.getElementById('I2S_LRCK_PIN').onchange = (e) => sendData('I2S_LRCK_PIN', e.target.value);
+    document.getElementById('I2S_BCK_PIN').onchange = (e) => sendData('I2S_BCK_PIN', e.target.value);
+    document.getElementById('I2S_DATA_PIN').onchange = (e) => sendData('I2S_DATA_PIN', e.target.value);
+    document.getElementById('volume').onchange = (e) => sendData('volume', e.target.value);
+
+    document.getElementById('useSD').onchange = (e) => sendData('useSD', e.target.value);
+    document.getElementById('SD_SCK').onchange = (e) => sendData('SD_SCK', e.target.value);
+    document.getElementById('SD_MISO').onchange = (e) => sendData('SD_MISO', e.target.value);
+    document.getElementById('SD_MOSI').onchange = (e) => sendData('SD_MOSI', e.target.value);
+    document.getElementById('SD_CS').onchange = (e) => sendData('SD_CS', e.target.value);
+    document.getElementById('touch_pin').onchange = (e) => sendData('touch_pin', e.target.value);
+</script>
+</body>
+</html>
