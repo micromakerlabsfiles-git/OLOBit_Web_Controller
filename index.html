@@ -363,7 +363,10 @@
 								<hr class="border-secondary">
                             <div class="mb-2"><label>Touch Pin</label><input type="number" class="form-control" id="touch_pin"></div>
                             </div>
-
+							<div class="form-check form-switch mt-3">
+    <input class="form-check-input" type="checkbox" id="hourly_chime">
+    <label class="form-check-label">Enable Hourly Chime</label>
+</div>
                             <div id="grp_i2s" style="display:none;">
                                 <div class="mb-2"><label>LRCK Pin</label><input type="number" class="form-control" id="I2S_LRCK_PIN"></div>
                                 <div class="mb-2"><label>BCLK Pin</label><input type="number" class="form-control" id="I2S_BCK_PIN"></div>
@@ -673,11 +676,11 @@
         
         const key = parts[0].trim();
         const val = parts.slice(1).join(':').trim(); 
-
+		
         switch(key) {
             case 'MAC': document.getElementById('macValue').innerText = val; break;
             case 'version': document.getElementById('verValue').innerText = val; break;
-            
+            case 'hourly_chime': document.getElementById('hourly_chime').checked = (val === '1'); break;
             // GIF
             case 'gif_speed': setVal('gif_speed', val); setText('gif_speedValue', val); break;
             case 'gif_delay': 
@@ -807,7 +810,7 @@
     // --- 7. EVENT LISTENERS ---
     document.getElementById('connectBtn').addEventListener('click', connect);
 	document.getElementById('custom_title').onchange = (e) => sendData('custom_title', e.target.value);
-    
+    document.getElementById('hourly_chime').onchange = (e) => sendData('hourly_chime', e.target.checked ? '1' : '0');
     document.getElementById('saveBtn').addEventListener('click', () => {
         sendData('set', 'save');
         alert("Settings Saved!");
