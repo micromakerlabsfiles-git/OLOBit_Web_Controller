@@ -239,8 +239,10 @@
                 <div class="row">
                     <div class="col-12 mb-3">
                          <div class="glass-card p-3">
-                            <i class="fas fa-info-circle text-info me-2"></i> 
-                            To use SD card sounds, use paths like <code>/gifs/filename.wav</code>. Format: 8-16bit WAV.
+                            <a href="music.html" class="btn btn-elegant mb-3" target="_blank">
+    <i class="fas fa-music me-2"></i>
+    <span>Composing tools</span>
+</a>
                          </div>
                     </div>
                     
@@ -333,6 +335,16 @@
                             </div>
                         </div>
                     </div>
+					<div class="col-md-4">
+						<div class="glass-card p-4 h-100">
+							<h5 class="text-info mb-3"><i class="fas fa-terminal me-2"></i>Personalization</h5>
+							<div class="mb-3">
+								<label class="small text-muted">BOOTING TEXT</label>
+								<input type="text" class="form-control" id="custom_title" maxlength="32" placeholder="e.g., OLO BIT STARTING...">
+								<small class="text-muted">Shown during device startup.</small>
+							</div>
+						</div>
+					</div>
 
                     <div class="col-md-4">
                         <div class="glass-card p-4 h-100">
@@ -365,25 +377,6 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <div class="glass-card p-4 h-100">
-                            <h5 class="text-info mb-3">SD Card</h5>
-                            <div class="mb-2">
-                                <label>Use SD Card</label>
-                                <select class="form-select" id="useSD">
-                                    <option value="0">No</option>
-                                    <option value="1">Yes</option>
-                                </select>
-                            </div>
-                            <div class="row g-2">
-                                <div class="col-6"><label class="small">SCK</label><input type="number" class="form-control form-control-sm" id="SD_SCK"></div>
-                                <div class="col-6"><label class="small">MISO</label><input type="number" class="form-control form-control-sm" id="SD_MISO"></div>
-                                <div class="col-6"><label class="small">MOSI</label><input type="number" class="form-control form-control-sm" id="SD_MOSI"></div>
-                                <div class="col-6"><label class="small">CS</label><input type="number" class="form-control form-control-sm" id="SD_CS"></div>
-                            </div>
-                            
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -698,7 +691,7 @@
             case 'gif_touch': setVal('gif_touch', val); break;
             case 'gif_double_touch': setVal('gif_double_touch', val); break;
             case 'gif_long_touch': setVal('gif_long_touch', val); break;
-            
+            case 'custom_title': setVal('custom_title', val); break;
             case 'gif_selected': 
                 const cbs = document.querySelectorAll('.gif-checkbox');
                 for(let i=0; i<cbs.length; i++) {
@@ -813,6 +806,7 @@
 
     // --- 7. EVENT LISTENERS ---
     document.getElementById('connectBtn').addEventListener('click', connect);
+	document.getElementById('custom_title').onchange = (e) => sendData('custom_title', e.target.value);
     
     document.getElementById('saveBtn').addEventListener('click', () => {
         sendData('set', 'save');
