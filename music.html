@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OLO Bit | MIDI Composer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- GREY & ORANGE THEME --- */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #ff793f; 
+            --terminal-bg: #1e272e;
+            --terminal-text: #ff793f;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: #d1d8e0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            padding-bottom: 50px;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--accent);
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+
+        .btn-elegant {
+            background: linear-gradient(45deg, #ff793f 0%, #ff5252 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 25px;
+            font-weight: 600;
+            color: #fff !important;
+            box-shadow: 0 4px 15px rgba(255, 121, 63, 0.3);
+        }
+
+        /* PIANO STYLING */
+        .piano-container { position: relative; padding: 40px 0; overflow-x: auto; text-align: center;}
+        .piano-keys { display: inline-flex; position: relative; }
+        .piano-key {
+            width: 45px;
+            height: 180px;
+            margin: 1px;
+            border: 1px solid #000;
+            cursor: pointer;
+            border-radius: 0 0 8px 8px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+            transition: 0.1s;
+        }
+        .white-key { background: #f8f9fa; color: #333; z-index: 1; }
+        .black-key { 
+            background: #1e272e; 
+            color: #fff; 
+            width: 32px; 
+            height: 110px; 
+            margin-left: -17px; 
+            margin-right: -17px; 
+            z-index: 2; 
+            font-size: 10px;
+        }
+        .piano-key.active {
+            background: var(--accent) !important;
+            box-shadow: 0 0 20px var(--accent);
+            transform: translateY(2px);
+        }
+
+        .output-area {
+            background: var(--terminal-bg) !important;
+            border: 1px solid #3d3d3d;
+            color: var(--terminal-text) !important;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .note-display {
+            background: var(--accent);
+            color: #000;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="row mb-5 text-center">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold" style="color: var(--accent);">OLO Bit MIDI <span class="text-white">Composer</span></h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <div class="glass-card">
+                <div class="card-header"><i class="fas fa-piano me-2"></i>Virtual Piano</div>
+                <div class="piano-container">
+                    <div class="note-display" id="noteDisplay">--</div>
+                    <div class="piano-keys" id="pianoKeys"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="glass-card p-4">
+                <h5 class="text-info mb-3">Controls</h5>
+                <button class="btn btn-elegant w-100 mb-3" onclick="$('#midiFileInput').click()">
+                    <i class="fas fa-file-upload me-2"></i>Upload MIDI File
+                </button>
+                <input type="file" id="midiFileInput" class="d-none" accept=".mid,.midi">
+                
+                <label class="small text-muted">Playback Speed: <span id="speedValue" class="text-white">100%</span></label>
+                <input type="range" class="form-range mb-3" id="speedSlider" min="50" max="250" value="100">
+
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-warning w-100" id="playBtn">Preview</button>
+                    <button class="btn btn-outline-danger w-100" id="stopBtn">Stop</button>
+                    <button class="btn btn-outline-light w-100" id="clearBtn">Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="glass-card p-4">
+                <h5 class="text-info mb-3">ESP32 Code</h5>
+                <textarea class="form-control output-area" id="outputArea" rows="6" readonly></textarea>
+                <button class="btn btn-elegant w-100 mt-3" id="copyBtn">Copy Sequence</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.27/build/Midi.min.js"></script>
+<script>
+    const freqs = {
+        'C3':130,'CS3':138,'D3':146,'DS3':155,'E3':164,'F3':174,'FS3':185,'G3':196,'GS3':207,'A3':220,'AS3':233,'B3':246,
+        'C4':261,'CS4':277,'D4':293,'DS4':311,'E4':329,'F4':349,'FS4':369,'G4':392,'GS4':415,'A4':440,'AS4':466,'B4':493,
+        'C5':523,'CS5':554,'D5':587,'DS5':622,'E5':659,'F5':698,'FS5':740,'G5':783,'GS5':830,'A5':880,'AS5':932,'B5':987,
+        'C6':1046,'CS6':1108,'D6':1174,'DS6':1244,'E6':1318,'F6':1396,'FS6':1479,'G6':1567,'GS6':1661,'A6':1760,'AS6':1864,'B6':1975
+    };
+
+    let audioCtx = null;
+    let currentNotes = [];
+    let isPlaying = false;
+    let playTimeout;
+
+    function initPiano() {
+        const whiteNotes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+        const blackNotes = ['CS', 'DS', null, 'FS', 'GS', 'AS', null];
+        const container = $('#pianoKeys');
+
+        [3, 4, 5, 6].forEach(octave => {
+            const group = $('<div class="d-flex position-relative"></div>');
+            whiteNotes.forEach(n => {
+                group.append(`<div class="piano-key white-key" data-note="${n}${octave}"><small>${n}${octave}</small></div>`);
+            });
+            const blacks = $('<div class="position-absolute d-flex" style="top:0; left:28px;"></div>');
+            blackNotes.forEach(n => {
+                if(n) blacks.append(`<div class="piano-key black-key" data-note="${n}${octave}"><small>${n}</small></div>`);
+                else blacks.append('<div style="width:47px"></div>');
+            });
+            group.append(blacks);
+            container.append(group);
+        });
+    }
+
+    function playTone(note, dur) {
+        // Unlock Audio Context on first click
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freqs[note] || 440, audioCtx.currentTime);
+        
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur/1000);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur/1000);
+
+        const key = $(`.piano-key[data-note="${note}"]`);
+        key.addClass('active');
+        setTimeout(() => key.removeClass('active'), dur);
+        $('#noteDisplay').text(note).fadeIn(100).fadeOut(500);
+    }
+
+    $(document).ready(function() {
+        initPiano();
+
+        $(document).on('click', '.piano-key', function() {
+            const note = $(this).data('note');
+            playTone(note, 200);
+            currentNotes.push({note: note, duration: 200, rest: 50});
+            updateOutput();
+        });
+
+        $('#midiFileInput').change(function(e) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const midi = new Midi(e.target.result);
+                currentNotes = [];
+                midi.tracks[0].notes.forEach(n => {
+                    currentNotes.push({note: n.name.replace('#','S'), duration: Math.round(n.duration*1000), rest: 20});
+                });
+                updateOutput();
+            };
+            reader.readAsArrayBuffer(e.target.files[0]);
+        });
+
+        function updateOutput() {
+            const speed = $('#speedSlider').val() / 100;
+            let out = currentNotes.map(n => `${n.note} ${Math.round(n.duration/speed)} ${Math.round(n.rest/speed)}`).join(' ');
+            $('#outputArea').val(out);
+        }
+
+        $('#playBtn').click(function() {
+            if(isPlaying) return;
+            isPlaying = true;
+            let i = 0;
+            const speed = $('#speedSlider').val() / 100;
+            function step() {
+                if(i >= currentNotes.length || !isPlaying) { isPlaying = false; return; }
+                const n = currentNotes[i];
+                playTone(n.note, n.duration/speed);
+                playTimeout = setTimeout(step, (n.duration + n.rest)/speed);
+                i++;
+            }
+            step();
+        });
+
+        $('#stopBtn').click(() => { isPlaying = false; clearTimeout(playTimeout); });
+        $('#clearBtn').click(() => { currentNotes = []; $('#outputArea').val(''); });
+        $('#speedSlider').on('input', function() { $('#speedValue').text($(this).val()+'%'); updateOutput(); });
+        $('#copyBtn').click(() => { navigator.clipboard.writeText($('#outputArea').val()); alert('Copied!'); });
+    });
+</script>
+</body>
+</html>
