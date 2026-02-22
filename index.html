@@ -406,21 +406,71 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 <script>
     // --- 1. CONFIGURATION DATA ---
-    const gifData = {
-        "suzuki": "suzuki","tech": "car logo","angry": "Tanjiro", "angry2": "Pretentious", "angry3": "Purple Flame",
-        "bee": "Bee", "cry": "Crying Smile", "cry2": "Crying", "cuoi_khinh_bi": "Awkward Laugh",
-        "chong_mat": "Rotation", "mac_dinh": "Default", "demon_slayer": "Nezuko", "den_giao_thong": "Road Rage",
-        "den_pha": "Headlights", "devil_eyes": "GTR Rain", "distracted": "Distracted", "egg": "Cookie",
-        "gian_du": "Angry", "hand_some": "Banana", "happy_2": "Laugh", "hat_xi": "Sneeze",
-        "hat_xi_2": "Big Sneeze", "hehe": "Smirk", "intro": "MML", "keep_it_up": "Keep it up",
-        "leu_leu": "Raspberry", "love": "Love", "love2": "Dumb Love", "music": "Music",
-        "neon": "Neon", "noname": "Pinky", "nheo_mat": "Distracted 2", "nhin_ben_phai": "Look Right",
-        "nhin_ben_trai": "Look Left", "nhin_xuong": "Look Down", "police": "Police", "pong": "Pong",
-        "rain": "Rain", "sakura": "Sakura", "samurai": "Blade", "scared": "Accel", "sleepy": "Sleepy",
-        "smile": "Smile", "speed": "Revs", "star": "Stars", "sung_nuoc": "Hadouken Miss",
-        "sung_nuoc_2": "Hadouken Hit", "turbo": "Turbo", "thong_long": "Tsurikawa", "thu_nho": "Breaking",
-        "up_size_down": "Upside down", "UwU": "UwU", "wheels": "Equip", "speed2": "Speed 2",
-        "yelling": "Yelling", "car": "Car", "speed3": "Speed 3"
+	
+	    /*"cuoi": "Laugh",             // Added: Mapping to Laugh.png
+        "khoc": "Crying",            // Added: Mapping to Crying.png
+        "ngac_nhien": "Yelling",     // Added: Mapping to Yelling.png
+        "ngap": "Sleepy",            // Added: Mapping to Sleepy.png
+        "squint": "Smirk",           // Added: Mapping to Smirk.png*/
+const gifData = {
+        "suzuki": "suzuki",
+        "carlogo": "Carlogo",
+        "angry": "Angry", 
+        "angry2": "Pretentious", 
+        "angry3": "Purple Flame", 
+        "bee": "Bee", 
+        "cry": "Crying Smile", 
+        "cry2": "Crying", 
+
+        "cuoi_khinh_bi": "Awkward Laugh",
+        "chong_mat": "Rotation", 
+        "mac_dinh": "Default", 
+        "demon_slayer": "Nezuko", 
+        "den_giao_thong": "Road Rage",
+        "den_pha": "Headlights", 
+        "devil_eyes": "GTR Rain", 
+        "distracted": "Distracted", 
+        "egg": "Cookie",
+        "gian_du": "Angry", 
+        "hand_some": "Banana", 
+        "happy_2": "Laugh", 
+        "hat_xi": "Sneeze",
+        "hat_xi_2": "Big Sneeze", 
+        "hehe": "Smirk", 
+        "intro": "MML", 
+        "keep_it_up": "Keep it up",
+        "leu_leu": "Raspberry", 
+        "love": "Love", 
+        "love2": "Dumb Love", 
+        "music": "Music",
+        "neon": "Neon", 
+        "noname": "Pinky", 
+        "nheo_mat": "Distracted 2", 
+        "nhin_ben_phai": "Look right", 
+        "nhin_ben_trai": "Look left", 
+        "nhin_xuong": "Look down", 
+        "police": "Police", 
+        "pong": "Pong",
+        "rain": "rain", 
+        "sakura": "Sakura", 
+        "samurai": "Blade", 
+        "scared": "Accel", 
+        "sleepy": "Sleepy",
+        "smile": "Smile", 
+        "speed": "Revs", 
+        "star": "Stars", 
+        "sung_nuoc": "Hadouken Miss",
+        "sung_nuoc_2": "Hadouken Hit", 
+        "turbo": "Turbo", 
+        "thong_long": "Tsurikawa", 
+        "thu_nho": "Breaking",
+        "up_size_down": "Upside down", 
+        "UwU": "UwU", 
+        "wheels": "Equip", 
+        "speed2": "Speed 2",
+        "yelling": "Yelling", 
+        "car": "Car", 
+        "speed3": "Speed 3"
     };
 
     const specialTriggers = [
@@ -684,10 +734,20 @@
             // GIF
             case 'gif_speed': setVal('gif_speed', val); setText('gif_speedValue', val); break;
             case 'gif_delay': 
-                const sec = Math.floor(parseInt(val)/1000);
-                setVal('gif_delay', sec); 
-                setText('gif_delayValue', sec); 
-                break;
+					const delayMs = parseInt(val);
+					const delaySec = Math.floor(delayMs / 1000);
+					
+					// Update the slider position (0-60)
+					const delayInput = document.getElementById('gif_delay');
+					if (delayInput) {
+						delayInput.value = delaySec;
+					}
+					// Update the text label (e.g., "5")
+					const delayLabel = document.getElementById('gif_delayValue');
+					if (delayLabel) {
+						delayLabel.innerText = delaySec;
+					}
+					break;
             case 'isInverted': document.getElementById('isInverted').checked = (val === '1' || val === 'true'); break;
             case 'gif_default': setVal('gif_default', val); break;
             case 'gif_intro': setVal('gif_intro', val); break;
