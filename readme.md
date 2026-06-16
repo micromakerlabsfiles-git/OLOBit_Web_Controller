@@ -36,4 +36,3 @@ The integrated flasher on the main page of the controller uses the official **ES
 4. ESP Web Tools will fetch `manifest.json` and the `.bin` files from the server, put the chip into ROM bootloader mode, flash them sequentially, and automatically perform a reset once finished.
 
 ---
-
