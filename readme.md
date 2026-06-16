@@ -23,10 +23,10 @@ To build your own OLO Bit device using an **ESP32-C3 Super Mini** development bo
 
 ## 2. Web Serial Firmware Flasher
 
-The integrated **Flasher** tab uses the official **ESP Web Tools** framework to download and flash firmware directly to the ESP32-C3 via USB using a `manifest.json` definition file.
+The integrated flasher on the main page of the controller uses the official **ESP Web Tools** framework to download and flash firmware directly to the ESP32-C3 via USB.
 
 ### Prerequisites
-1. Ensure the main controller folder contains the following files in the same directory as `index.html`:
+1. Ensure the following files are in the same folder as `index.html`:
    - `manifest.json` (Describes flashing offsets and binary paths)
    - `bootloader.bin` (Flashing offset: `0x0`)
    - `partitions.bin` (Flashing offset: `0x8000`)
@@ -35,28 +35,19 @@ The integrated **Flasher** tab uses the official **ESP Web Tools** framework to 
 3. Open this web page in Chrome, Edge, or Opera.
 
 ### How to Flash
-1. Navigate to the **Flasher** tab.
-2. Click **Program Firmware**.
-3. A modal popup managed by ESP Web Tools will appear. Follow the prompts by clicking **Connect**.
-4. Select the serial port corresponding to your device (usually listed as *USB JTAG/serial debug unit* or *ESP32-C3*) and click **Connect**.
-5. ESP Web Tools will fetch `manifest.json` and the `.bin` files from the server, put the chip into ROM bootloader mode, flash them sequentially, and automatically perform a reset once finished.
-
-> [!IMPORTANT]
-> Because ESP Web Tools relies on standard `fetch()` calls to load the manifest and binaries, running the HTML page directly using the `file://` protocol will fail due to browser security/CORS restrictions. 
-> To test or run the controller locally:
-> 1. Open a terminal in the `Webcontroller V1` directory.
-> 2. Start a simple local server: `python -m http.server 8000` (or your preferred local dev server).
-> 3. Open your browser and navigate to: `http://localhost:8000`.
+1. On the main connection screen, click **Program Firmware**.
+2. A modal popup managed by ESP Web Tools will appear. Click **Connect**.
+3. Select the serial port corresponding to your device (usually listed as *USB JTAG/serial debug unit* or *ESP32-C3*) and click **Connect**.
+4. ESP Web Tools will fetch `manifest.json` and the `.bin` files from the server, put the chip into ROM bootloader mode, flash them sequentially, and automatically perform a reset once finished.
 
 ---
 
 ## 3. How to Host on GitHub Pages
 
-You can easily host this Web Controller as a free, public tool for your users using GitHub Pages.
+You can host this Web Controller as a free, public tool for your users using GitHub Pages.
 
 ### Step 1: Create a GitHub Repository
-1. Log into your GitHub account.
-2. Create a new public repository (e.g., named `olobit-controller`).
+1. Log into your GitHub account and create a new public repository (e.g., named `olobit-controller`).
 
 ### Step 2: Upload Files
 Upload all contents of the `Webcontroller V1` directory to the repository:
@@ -77,6 +68,3 @@ Ensure all files are placed directly in the repository root folder.
 ### Step 4: Access Your Tool
 Within 1–2 minutes, GitHub will host the page. The URL will be in the format:
 `https://<your-username>.github.io/<repository-name>/`
-
-> [!IMPORTANT]
-> The Web Serial API strictly requires a secure context (`HTTPS`) to run. GitHub Pages serves your site over HTTPS by default, which ensures that the connection and flashing tools work perfectly.

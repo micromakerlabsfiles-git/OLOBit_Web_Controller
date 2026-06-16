@@ -134,6 +134,15 @@
                 <button id="connectBtn" class="btn btn-elegant btn-lg w-100 mb-3">
                     <i class="fas fa-plug me-2"></i> Connect Device
                 </button>
+                
+                <esp-web-install-button manifest="manifest.json" class="d-block mb-3">
+                    <button slot="activate" class="btn btn-elegant btn-lg w-100">
+                        <i class="fas fa-bolt me-2"></i> Program Firmware
+                    </button>
+                    <span slot="unsupported" class="text-danger small d-block mt-2"><i class="fas fa-exclamation-triangle"></i> Browser Web Serial not supported. Please use Chrome, Edge, or Opera.</span>
+                    <span slot="not-allowed" class="text-warning small d-block mt-2"><i class="fas fa-exclamation-triangle"></i> HTTPS connection required for Web Serial.</span>
+                </esp-web-install-button>
+                
                 <small class="text-muted"><i class="fab fa-chrome"></i> Requires Chrome, Edge, or Opera</small>
             </div>
         </div>
@@ -163,7 +172,6 @@
             <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-audio"><i class="fas fa-music me-2"></i>Audio</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-chronos"><i class="fas fa-clock me-2"></i>Chronos</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-hardware"><i class="fas fa-cogs me-2"></i>Hardware</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-flasher"><i class="fas fa-bolt me-2"></i>Flasher</button></li>
         </ul>
 
         <div class="row mb-4 justify-content-center">
@@ -387,45 +395,7 @@
                 </div>
             </div>
 
-            <!-- FLASHER TAB -->
-            <div class="tab-pane fade" id="tab-flasher">
-                <div class="glass-card p-4 mw-600 mx-auto" style="max-width: 600px;">
-                    <h5 class="text-info mb-4"><i class="fas fa-bolt me-2"></i>Web Serial Firmware Flasher</h5>
-                    
-                    <p class="text-secondary small">
-                        This tool flashes the firmware directly from the browser to your ESP32-C3 OLO Bit device.
-                        It uses the official <strong>ESP Web Tools</strong> framework to download and flash the latest firmware.
-                    </p>
 
-                    <div class="mb-4">
-                        <label class="form-label text-white">Files to program:</label>
-                        <ul class="list-group list-group-flush bg-transparent">
-                            <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between align-items-center">
-                                <span>1. Bootloader (<code>bootloader.bin</code>)</span>
-                                <span class="badge bg-secondary">Address: 0x0</span>
-                            </li>
-                            <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between align-items-center">
-                                <span>2. Partition Table (<code>partitions.bin</code>)</span>
-                                <span class="badge bg-secondary">Address: 0x8000</span>
-                            </li>
-                            <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between align-items-center">
-                                <span>3. App Firmware (<code>firmware.bin</code>)</span>
-                                <span class="badge bg-secondary">Address: 0x10000</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="text-center">
-                        <esp-web-install-button manifest="manifest.json">
-                            <button slot="activate" class="btn btn-elegant btn-lg w-100 mb-3" id="flashButtonSlot">
-                                <i class="fas fa-bolt me-2"></i> Program Firmware
-                            </button>
-                            <span slot="unsupported" class="text-danger small d-block mb-3"><i class="fas fa-exclamation-triangle"></i> Browser Web Serial not supported. Please use Chrome, Edge, or Opera.</span>
-                            <span slot="not-allowed" class="text-warning small d-block mb-3"><i class="fas fa-exclamation-triangle"></i> HTTPS connection required for Web Serial.</span>
-                        </esp-web-install-button>
-                    </div>
-                </div>
-            </div>
 
         </div> 
         
