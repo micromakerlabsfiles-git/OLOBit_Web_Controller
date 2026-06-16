@@ -392,106 +392,107 @@
                                 </div>
 
                                 <div class="form-check form-switch mb-2">
-                                     <input class="form-check-input" type="checkbox" id="hourly_chime">
-                                     <label class="form-check-label" for="hourly_chime">Enable Hourly Chime</label>
-                                 </div>
-                                 <div class="mb-3 ms-4" id="hourly_chime_style_container">
-                                     <label class="form-label small text-muted">Chime Sound Style</label>
-                                     <select class="form-select form-select-sm" id="chime_style">
-                                         <option value="0">Classic Westminster Chime</option>
-                                         <option value="1">Casio Retro Double-Beep</option>
-                                     </select>
-                                 </div>
+                                    <input class="form-check-input" type="checkbox" id="hourly_chime">
+                                    <label class="form-check-label" for="hourly_chime">Enable Hourly Chime</label>
+                                </div>
+                                <div class="mb-3 ms-4" id="hourly_chime_style_container">
+                                    <label class="form-label small text-muted">Chime Sound Style</label>
+                                    <select class="form-select form-select-sm" id="chime_style">
+                                        <option value="0">Classic Westminster Chime</option>
+                                        <option value="1">Casio Retro Double-Beep</option>
+                                    </select>
+                                </div>
 
-                                 <div class="form-check form-switch mb-2">
-                                     <input class="form-check-input" type="checkbox" id="water_reminder" checked>
-                                     <label class="form-check-label" for="water_reminder">Enable Water Reminder</label>
-                                 </div>
-                                 <div class="mb-3 ms-4" id="water_reminder_interval_container">
-                                     <label class="form-label small text-muted">Reminder Interval</label>
-                                     <select class="form-select form-select-sm" id="water_reminder_interval">
-                                         <option value="15">15 Minutes</option>
-                                         <option value="30">30 Minutes</option>
-                                         <option value="45">45 Minutes</option>
-                                         <option value="60" selected>1 Hour</option>
-                                         <option value="90">1.5 Hours</option>
-                                         <option value="120">2 Hours</option>
-                                     </select>
-                                 </div>
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="water_reminder" checked>
+                                    <label class="form-check-label" for="water_reminder">Enable Water Reminder</label>
+                                </div>
+                                <div class="mb-3 ms-4" id="water_reminder_interval_container">
+                                    <label class="form-label small text-muted">Reminder Interval</label>
+                                    <select class="form-select form-select-sm" id="water_reminder_interval">
+                                        <option value="15">15 Minutes</option>
+                                        <option value="30">30 Minutes</option>
+                                        <option value="45">45 Minutes</option>
+                                        <option value="60" selected>1 Hour</option>
+                                        <option value="90">1.5 Hours</option>
+                                        <option value="120">2 Hours</option>
+                                    </select>
+                                </div>
 
-                                 <div class="form-check form-switch mb-2 border-top pt-3">
-                                     <input class="form-check-input" type="checkbox" id="alarm_enabled">
-                                     <label class="form-check-label" for="alarm_enabled">Enable Alarm</label>
-                                 </div>
-                                 <div class="mb-3 ms-4" id="alarm_time_container">
-                                     <label class="form-label small text-muted">Alarm Time</label>
-                                     <input type="time" class="form-control form-control-sm" id="alarm_time" value="07:00">
-                                 </div>
+                                <div class="form-check form-switch mb-2 border-top pt-3">
+                                    <input class="form-check-input" type="checkbox" id="alarm_enabled">
+                                    <label class="form-check-label" for="alarm_enabled">Enable Alarm</label>
+                                </div>
+                                <div class="mb-3 ms-4" id="alarm_time_container">
+                                    <label class="form-label small text-muted">Alarm Time</label>
+                                    <input type="time" class="form-control form-control-sm" id="alarm_time"
+                                        value="07:00">
+                                </div>
 
-                                 <div class="form-check form-switch mb-2 border-top pt-3">
-                                     <input class="form-check-input" type="checkbox" id="dnd_enabled">
-                                     <label class="form-check-label" for="dnd_enabled">Enable Do Not Disturb</label>
-                                 </div>
-                                 <div class="row g-2 mb-3 ms-2" id="dnd_time_container">
-                                     <div class="col">
-                                         <label class="form-label small text-muted">Start Hour</label>
-                                         <select class="form-select form-select-sm" id="dnd_start_hour">
-                                             <option value="0">00:00</option>
-                                             <option value="1">01:00</option>
-                                             <option value="2">02:00</option>
-                                             <option value="3">03:00</option>
-                                             <option value="4">04:00</option>
-                                             <option value="5">05:00</option>
-                                             <option value="6">06:00</option>
-                                             <option value="7">07:00</option>
-                                             <option value="8">08:00</option>
-                                             <option value="9">09:00</option>
-                                             <option value="10">10:00</option>
-                                             <option value="11">11:00</option>
-                                             <option value="12">12:00</option>
-                                             <option value="13">13:00</option>
-                                             <option value="14">14:00</option>
-                                             <option value="15">15:00</option>
-                                             <option value="16">16:00</option>
-                                             <option value="17">17:00</option>
-                                             <option value="18">18:00</option>
-                                             <option value="19">19:00</option>
-                                             <option value="20">20:00</option>
-                                             <option value="21">21:00</option>
-                                             <option value="22" selected>22:00</option>
-                                             <option value="23">23:00</option>
-                                         </select>
-                                     </div>
-                                     <div class="col">
-                                         <label class="form-label small text-muted">End Hour</label>
-                                         <select class="form-select form-select-sm" id="dnd_end_hour">
-                                             <option value="0">00:00</option>
-                                             <option value="1">01:00</option>
-                                             <option value="2">02:00</option>
-                                             <option value="3">03:00</option>
-                                             <option value="4">04:00</option>
-                                             <option value="5">05:00</option>
-                                             <option value="6">06:00</option>
-                                             <option value="7" selected>07:00</option>
-                                             <option value="8">08:00</option>
-                                             <option value="9">09:00</option>
-                                             <option value="10">10:00</option>
-                                             <option value="11">11:00</option>
-                                             <option value="12">12:00</option>
-                                             <option value="13">13:00</option>
-                                             <option value="14">14:00</option>
-                                             <option value="15">15:00</option>
-                                             <option value="16">16:00</option>
-                                             <option value="17">17:00</option>
-                                             <option value="18">18:00</option>
-                                             <option value="19">19:00</option>
-                                             <option value="20">20:00</option>
-                                             <option value="21">21:00</option>
-                                             <option value="22">22:00</option>
-                                             <option value="23">23:00</option>
-                                         </select>
-                                     </div>
-                                 </div>
+                                <div class="form-check form-switch mb-2 border-top pt-3">
+                                    <input class="form-check-input" type="checkbox" id="dnd_enabled">
+                                    <label class="form-check-label" for="dnd_enabled">Enable Do Not Disturb</label>
+                                </div>
+                                <div class="row g-2 mb-3 ms-2" id="dnd_time_container">
+                                    <div class="col">
+                                        <label class="form-label small text-muted">Start Hour</label>
+                                        <select class="form-select form-select-sm" id="dnd_start_hour">
+                                            <option value="0">00:00</option>
+                                            <option value="1">01:00</option>
+                                            <option value="2">02:00</option>
+                                            <option value="3">03:00</option>
+                                            <option value="4">04:00</option>
+                                            <option value="5">05:00</option>
+                                            <option value="6">06:00</option>
+                                            <option value="7">07:00</option>
+                                            <option value="8">08:00</option>
+                                            <option value="9">09:00</option>
+                                            <option value="10">10:00</option>
+                                            <option value="11">11:00</option>
+                                            <option value="12">12:00</option>
+                                            <option value="13">13:00</option>
+                                            <option value="14">14:00</option>
+                                            <option value="15">15:00</option>
+                                            <option value="16">16:00</option>
+                                            <option value="17">17:00</option>
+                                            <option value="18">18:00</option>
+                                            <option value="19">19:00</option>
+                                            <option value="20">20:00</option>
+                                            <option value="21">21:00</option>
+                                            <option value="22" selected>22:00</option>
+                                            <option value="23">23:00</option>
+                                        </select>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label small text-muted">End Hour</label>
+                                        <select class="form-select form-select-sm" id="dnd_end_hour">
+                                            <option value="0">00:00</option>
+                                            <option value="1">01:00</option>
+                                            <option value="2">02:00</option>
+                                            <option value="3">03:00</option>
+                                            <option value="4">04:00</option>
+                                            <option value="5">05:00</option>
+                                            <option value="6">06:00</option>
+                                            <option value="7" selected>07:00</option>
+                                            <option value="8">08:00</option>
+                                            <option value="9">09:00</option>
+                                            <option value="10">10:00</option>
+                                            <option value="11">11:00</option>
+                                            <option value="12">12:00</option>
+                                            <option value="13">13:00</option>
+                                            <option value="14">14:00</option>
+                                            <option value="15">15:00</option>
+                                            <option value="16">16:00</option>
+                                            <option value="17">17:00</option>
+                                            <option value="18">18:00</option>
+                                            <option value="19">19:00</option>
+                                            <option value="20">20:00</option>
+                                            <option value="21">21:00</option>
+                                            <option value="22">22:00</option>
+                                            <option value="23">23:00</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -595,12 +596,12 @@
                         <div class="col-md-8">
                             <div class="glass-card p-4">
                                 <h5 class="text-info mb-4"><i class="fas fa-font me-2"></i>Canvas Text Mode</h5>
-                                
+
                                 <div class="mb-3">
                                     <label class="form-label" for="canvas_text">Custom Text</label>
                                     <input type="text" class="form-control" id="canvas_text" value="Hello!">
                                 </div>
-                                
+
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label" for="canvas_font">Font Family</label>
@@ -623,7 +624,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-4">
                                     <label class="form-label" for="canvas_anim">Animation Style</label>
                                     <select class="form-select" id="canvas_anim">
@@ -634,7 +635,7 @@
                                         <option value="4">Blinking / Flash</option>
                                     </select>
                                 </div>
-                                
+
                                 <div class="d-flex gap-2">
                                     <button id="pushCanvasBtn" class="btn btn-elegant flex-grow-1">
                                         <i class="fas fa-paper-plane me-2"></i>Push to Device
@@ -1183,9 +1184,9 @@
 
         document.getElementById('buzzer_pin').onchange = (e) => sendData('buzzer_pin', e.target.value);
         document.getElementById('touch_pin').onchange = (e) => sendData('touch_pin', e.target.value);
-        
+
         document.getElementById('watch_face').onchange = (e) => sendData('watch_face', e.target.value);
-        
+
         const bootSizeEl = document.getElementById('boot_size');
         const customTitleEl = document.getElementById('custom_title');
         function updateBootTitleMaxLength() {
@@ -1214,20 +1215,16 @@
         document.getElementById('water_reminder').onchange = (e) => sendData('water_reminder', e.target.checked ? '1' : '0');
         document.getElementById('water_reminder_interval').onchange = (e) => sendData('water_reminder_interval', e.target.value);
         document.getElementById('chime_style').onchange = (e) => sendData('chime_style', e.target.value);
-        
+
         document.getElementById('alarm_enabled').onchange = (e) => sendData('alarm_enabled', e.target.checked ? '1' : '0');
         document.getElementById('alarm_time').onchange = (e) => {
-            let parts = e.target.value.split(':');
-            if (parts.length === 2) {
-                sendData('alarm_hour', parseInt(parts[0]).toString());
-                sendData('alarm_minute', parseInt(parts[1]).toString());
-            }
+            sendData('alarm_time', e.target.value);
         };
-        
+
         document.getElementById('dnd_enabled').onchange = (e) => sendData('dnd_enabled', e.target.checked ? '1' : '0');
         document.getElementById('dnd_start_hour').onchange = (e) => sendData('dnd_start_hour', e.target.value);
         document.getElementById('dnd_end_hour').onchange = (e) => sendData('dnd_end_hour', e.target.value);
-        
+
         document.getElementById('pushCanvasBtn').addEventListener('click', async () => {
             const text = document.getElementById('canvas_text').value;
             const anim = document.getElementById('canvas_anim').value;
