@@ -6,8 +6,9 @@
     <title>OLO Bit Web Controller</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/esptool-js@0.4.3/bundle.js"></script>
     
-<style>
+    <style>
         /* --- GREY & ORANGE THEME --- */
         :root {
             --bg-gradient: linear-gradient(135deg, #2d3436 0%, #000000 100%);
@@ -73,10 +74,10 @@
             background-size: cover;
             background-position: center;
             border-radius: 10px;
-            padding: 15px;
+            padding: 10px;
             margin: 5px 0;
             transition: all 0.2s ease;
-            min-height: 110px;
+            min-height: 80px; /* Shorter icons as requested */
             display: flex;
             align-items: flex-end;
             overflow: hidden;
@@ -96,22 +97,20 @@
             border-color: var(--accent);
             box-shadow: 0 0 15px rgba(255, 121, 63, 0.4);
         }
-		.text-info {
-			color: var(--accent) !important;
-		}
-		#loadingOverlay 
-		{
-			display: none;
-			position: fixed;
-			inset: 0;
-			background: rgba(0,0,0,0.7);
-			z-index: 9999;
-			align-items: center;
-			justify-content: center;
-			flex-direction: column;
-		}
-
-
+        .text-info {
+            color: var(--accent) !important;
+        }
+        #loadingOverlay 
+        {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
 
         .log-container { background: var(--terminal-bg); border-radius: 12px; overflow: hidden; border: 1px solid #3d3d3d; }
         .log-content { height: 250px; overflow-y: auto; padding: 15px; color: var(--terminal-text); font-family: monospace; font-size: 0.85rem; }
@@ -129,7 +128,7 @@
     <div class="row w-100 align-items-center">
         <div class="col-md-6 text-center text-md-start">
             <h1 class="display-4 fw-bold mb-4" style="color: var(--accent);">OLO Bit <span style="font-size: 0.5em; opacity: 0.7; color: white;">Web Controller</span></h1>
-            <p class="lead text-secondary mb-4">Manage GIFs, Audio, and Hardware settings directly from your browser via USB.</p>
+            <p class="lead text-secondary mb-4">Manage GIFs, Audio, Time, and Hardware settings directly from your browser via USB.</p>
             
             <div class="glass-card p-5 text-center">
                 <button id="connectBtn" class="btn btn-elegant btn-lg w-100 mb-3">
@@ -164,6 +163,7 @@
             <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-audio"><i class="fas fa-music me-2"></i>Audio</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-chronos"><i class="fas fa-clock me-2"></i>Chronos</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-hardware"><i class="fas fa-cogs me-2"></i>Hardware</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-flasher"><i class="fas fa-bolt me-2"></i>Flasher</button></li>
         </ul>
 
         <div class="row mb-4 justify-content-center">
@@ -175,6 +175,7 @@
 
         <div class="tab-content">
             
+            <!-- GIFs TAB -->
             <div class="tab-pane fade show active" id="tab-gifs">
                 <div class="row">
                     <div class="col-md-4">
@@ -228,21 +229,21 @@
                                     <button class="btn btn-sm btn-outline-light" onclick="toggleAllGifs(false)">Clear</button>
                                 </div>
                             </div>
-                            <div class="row" id="gifGrid">
-                                </div>
+                            <div class="row" id="gifGrid"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- AUDIO TAB -->
             <div class="tab-pane fade" id="tab-audio">
                 <div class="row">
                     <div class="col-12 mb-3">
                          <div class="glass-card p-3">
                             <a href="music.html" class="btn btn-elegant mb-3" target="_blank">
-    <i class="fas fa-music me-2"></i>
-    <span>Composing tools</span>
-</a>
+                                <i class="fas fa-music me-2"></i>
+                                <span>Composing Tools</span>
+                            </a>
                          </div>
                     </div>
                     
@@ -290,33 +291,72 @@
                 </div>
             </div>
 
+            <!-- CHRONOS & PERSONALIZATION TAB -->
             <div class="tab-pane fade" id="tab-chronos">
-                <div class="glass-card p-4 mw-600 mx-auto" style="max-width: 600px;">
-                    <h5 class="text-info mb-4">Time & Connectivity</h5>
-                    
-                    <div class="mb-4">
-                        <label>Notification Duration: <span id="notifDurationValue">5</span>s</label>
-                        <input type="range" class="form-range" id="notifDuration" min="1" max="10" value="5">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="glass-card p-4 h-100">
+                            <h5 class="text-info mb-4"><i class="fas fa-clock me-2"></i>Time & Display</h5>
+                            
+                            <div class="mb-4">
+                                <label>Notification Duration: <span id="notifDurationValue">5</span>s</label>
+                                <input type="range" class="form-range" id="notifDuration" min="1" max="10" value="5">
+                            </div>
+
+                            <div class="mb-4">
+                                <label>Focus Timer Duration: <span id="timer_durationValue">20</span> min</label>
+                                <input type="range" class="form-range" id="timer_duration" min="1" max="60" value="20">
+                            </div>
+
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="is_24h" checked>
+                                <label class="form-check-label" for="is_24h">24-Hour Time Format</label>
+                            </div>
+
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="hourly_chime">
+                                <label class="form-check-label" for="hourly_chime">Enable Hourly Chime</label>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label>Bluetooth Auto-off: <span id="bluetooth_auto_offValue">5</span> min</label>
-                        <input type="range" class="form-range" id="bluetooth_auto_off" min="0" max="30" value="5">
-                        <small class="text-muted d-block">Set to 0 to keep Bluetooth always on.</small>
+                    <div class="col-md-4">
+                        <div class="glass-card p-4 h-100">
+                            <h5 class="text-info mb-4"><i class="fas fa-paint-brush me-2"></i>Personalization</h5>
+                            <div class="mb-3">
+                                <label class="small text-muted">BOOTING TEXT</label>
+                                <input type="text" class="form-control" id="custom_title" maxlength="32" placeholder="e.g., OLO BIT STARTING...">
+                                <small class="text-muted d-block mt-2">Text displayed during device boot animation.</small>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Bluetooth Name</label>
-                        <input type="text" class="form-control" id="bluetoothName" value="OLO Bit">
+                    <div class="col-md-4">
+                        <div class="glass-card p-4 h-100">
+                            <h5 class="text-info mb-4"><i class="fas fa-bluetooth me-2"></i>Bluetooth Settings</h5>
+                            
+                            <div class="mb-4">
+                                <label>Auto-off Delay: <span id="bluetooth_auto_offValue">5</span> min</label>
+                                <input type="range" class="form-range" id="bluetooth_auto_off" min="0" max="30" value="5">
+                                <small class="text-muted d-block">Set to 0 to keep Bluetooth always on.</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Bluetooth Name</label>
+                                <input type="text" class="form-control" id="bluetoothName" value="OLO Bit">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- HARDWARE CONFIG TAB -->
             <div class="tab-pane fade" id="tab-hardware">
                 <div class="row">
+                    <!-- Screen Settings -->
                     <div class="col-md-4">
                         <div class="glass-card p-4 h-100">
-                            <h5 class="text-info mb-3">Screen (I2C)</h5>
+                            <h5 class="text-info mb-3"><i class="fas fa-desktop me-2"></i>Display (I2C)</h5>
                             <div class="mb-2">
                                 <label>Driver</label>
                                 <select class="form-select" id="display_type">
@@ -335,55 +375,98 @@
                             </div>
                         </div>
                     </div>
-					<div class="col-md-4">
-						<div class="glass-card p-4 h-100">
-							<h5 class="text-info mb-3"><i class="fas fa-terminal me-2"></i>Personalization</h5>
-							<div class="mb-3">
-								<label class="small text-muted">BOOTING TEXT</label>
-								<input type="text" class="form-control" id="custom_title" maxlength="32" placeholder="e.g., OLO BIT STARTING...">
-								<small class="text-muted">Shown during device startup.</small>
-							</div>
-						</div>
-					</div>
 
+                    <!-- System Pins -->
                     <div class="col-md-4">
                         <div class="glass-card p-4 h-100">
-                            <h5 class="text-info mb-3">Audio & Touch</h5>
-                            <div class="mb-3">
-                                <label>Type</label>
-                                <select class="form-select" id="use_sound">
-                                    <option value="0">Off</option>
-                                    <option value="1">Buzzer (Passive)</option>
-                                    <option value="2">I2S DAC (Amplifier)</option>
-                                </select>
-                            </div>
-
-                            <div id="grp_buzzer" style="display:none;">
-                                <div class="mb-2"><label>Buzzer Pin</label><input type="number" class="form-control" id="buzzer_pin"></div>
-								<hr class="border-secondary">
-                            <div class="mb-2"><label>Touch Pin</label><input type="number" class="form-control" id="touch_pin"></div>
-                            </div>
-							<div class="form-check form-switch mt-3">
-    <input class="form-check-input" type="checkbox" id="hourly_chime">
-    <label class="form-check-label">Enable Hourly Chime</label>
-</div>
-                            <div id="grp_i2s" style="display:none;">
-                                <div class="mb-2"><label>LRCK Pin</label><input type="number" class="form-control" id="I2S_LRCK_PIN"></div>
-                                <div class="mb-2"><label>BCLK Pin</label><input type="number" class="form-control" id="I2S_BCK_PIN"></div>
-                                <div class="mb-2"><label>DIN Pin</label><input type="number" class="form-control" id="I2S_DATA_PIN"></div>
-                                <div class="mb-2">
-                                    <label>Volume</label>
-                                    <input type="range" class="form-range" id="volume" min="0" max="10" oninput="document.getElementById('volVal').innerText=this.value">
-                                    <div class="text-end small"><span id="volVal">5</span>/10</div>
-                                </div>
-                            </div>
+                            <h5 class="text-info mb-3"><i class="fas fa-microchip me-2"></i>System Pins</h5>
+                            <div class="mb-3"><label>Buzzer Pin (Passive)</label><input type="number" class="form-control" id="buzzer_pin"></div>
+                            <div class="mb-3"><label>Touch Button Pin</label><input type="number" class="form-control" id="touch_pin"></div>
                         </div>
                     </div>
 
+                    <!-- SD Card Configurations -->
+                    <div class="col-md-4">
+                        <div class="glass-card p-4 h-100">
+                            <h5 class="text-info mb-3"><i class="fas fa-database me-2"></i>SD Card (SPI)</h5>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="useSD">
+                                <label class="form-check-label" for="useSD">Enable SD Card</label>
+                            </div>
+                            <div class="mb-2"><label>CS Pin</label><input type="number" class="form-control" id="SD_CS"></div>
+                            <div class="mb-2"><label>SCK Pin</label><input type="number" class="form-control" id="SD_SCK"></div>
+                            <div class="mb-2"><label>MOSI Pin</label><input type="number" class="form-control" id="SD_MOSI"></div>
+                            <div class="mb-2"><label>MISO Pin</label><input type="number" class="form-control" id="SD_MISO"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-        </div> <div class="card mt-4 mb-5 border-0 bg-transparent">
+            <!-- FLASHER TAB -->
+            <div class="tab-pane fade" id="tab-flasher">
+                <div class="glass-card p-4 mw-600 mx-auto" style="max-width: 600px;">
+                    <h5 class="text-info mb-4"><i class="fas fa-bolt me-2"></i>Web Serial Firmware Flasher</h5>
+                    
+                    <p class="text-secondary small">
+                        This tool flashes the firmware directly from the browser to your ESP32-C3 OLO Bit device.
+                        Ensure the <strong>firmware/</strong> directory contains: <code>bootloader.bin</code>, <code>partitions.bin</code>, and <code>firmware.bin</code>.
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white">Files to program:</label>
+                        <ul class="list-group list-group-flush bg-transparent">
+                            <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between align-items-center">
+                                <span>1. Bootloader (<code>bootloader.bin</code>)</span>
+                                <span class="badge bg-secondary">Address: 0x0</span>
+                            </li>
+                            <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between align-items-center">
+                                <span>2. Partition Table (<code>partitions.bin</code>)</span>
+                                <span class="badge bg-secondary">Address: 0x8000</span>
+                            </li>
+                            <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between align-items-center">
+                                <span>3. App Firmware (<code>firmware.bin</code>)</span>
+                                <span class="badge bg-secondary">Address: 0x10000</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-white">Flashing Baud Rate</label>
+                        <select class="form-select" id="flashBaudRate">
+                            <option value="921600" selected>921600 (Recommended)</option>
+                            <option value="460800">460800</option>
+                            <option value="115200">115200</option>
+                        </select>
+                    </div>
+
+                    <button id="startFlashBtn" class="btn btn-elegant btn-lg w-100 mb-4">
+                        <i class="fas fa-circle-notch fa-spin me-2" style="display:none;" id="flashSpinner"></i>
+                        <i class="fas fa-flash me-2" id="flashIcon"></i> Program Firmware
+                    </button>
+
+                    <div id="flashProgressContainer" style="display:none;" class="mb-3">
+                        <label class="small text-muted d-block mb-1">Flashing Progress: <span id="flashProgressText">0%</span></label>
+                        <div class="progress" style="height: 10px; background: rgba(255,255,255,0.1);">
+                            <div id="flashProgressBar" class="progress-bar bg-warning" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="log-container mt-3">
+                        <div class="log-header p-2 bg-dark d-flex justify-content-between align-items-center border-bottom border-secondary">
+                            <span class="text-muted small">Programmer Output Logs</span>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('flashLog').innerHTML=''">Clear Log</button>
+                        </div>
+                        <div class="log-content" style="height: 150px;" id="flashLog">
+                            <div class="log-line text-muted">Awaiting programming start...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> 
+        
+        <!-- SERIAL MONITOR -->
+        <div class="card mt-4 mb-5 border-0 bg-transparent">
             <h5 class="text-light mb-2"><i class="fas fa-terminal me-2"></i>Serial Monitor</h5>
             <div class="log-container">
                 <div class="log-header">
@@ -406,71 +489,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 <script>
     // --- 1. CONFIGURATION DATA ---
-	
-	    /*"cuoi": "Laugh",             // Added: Mapping to Laugh.png
-        "khoc": "Crying",            // Added: Mapping to Crying.png
-        "ngac_nhien": "Yelling",     // Added: Mapping to Yelling.png
-        "ngap": "Sleepy",            // Added: Mapping to Sleepy.png
-        "squint": "Smirk",           // Added: Mapping to Smirk.png*/
-const gifData = {
-        "suzuki": "suzuki",
-        "carlogo": "Carlogo",
-        "angry": "Angry", 
-        "angry2": "Pretentious", 
-        "angry3": "Purple Flame", 
-        "bee": "Bee", 
-        "cry": "Crying Smile", 
-        "cry2": "Crying", 
-
-        "cuoi_khinh_bi": "Awkward Laugh",
-        "chong_mat": "Rotation", 
-        "mac_dinh": "Default", 
-        "demon_slayer": "Nezuko", 
-        "den_giao_thong": "Road Rage",
-        "den_pha": "Headlights", 
-        "devil_eyes": "GTR Rain", 
-        "distracted": "Distracted", 
-        "egg": "Cookie",
-        "gian_du": "Angry", 
-        "hand_some": "Banana", 
-        "happy_2": "Laugh", 
-        "hat_xi": "Sneeze",
-        "hat_xi_2": "Big Sneeze", 
-        "hehe": "Smirk", 
-        "intro": "MML", 
-        "keep_it_up": "Keep it up",
-        "leu_leu": "Raspberry", 
-        "love": "Love", 
-        "love2": "Dumb Love", 
-        "music": "Music",
-        "neon": "Neon", 
-        "noname": "Pinky", 
-        "nheo_mat": "Distracted 2", 
-        "nhin_ben_phai": "Look right", 
-        "nhin_ben_trai": "Look left", 
-        "nhin_xuong": "Look down", 
-        "police": "Police", 
-        "pong": "Pong",
-        "rain": "rain", 
-        "sakura": "Sakura", 
-        "samurai": "Blade", 
-        "scared": "Accel", 
-        "sleepy": "Sleepy",
-        "smile": "Smile", 
-        "speed": "Revs", 
-        "star": "Stars", 
-        "sung_nuoc": "Hadouken Miss",
-        "sung_nuoc_2": "Hadouken Hit", 
-        "turbo": "Turbo", 
-        "thong_long": "Tsurikawa", 
-        "thu_nho": "Breaking",
-        "up_size_down": "Upside down", 
-        "UwU": "UwU", 
-        "wheels": "Equip", 
-        "speed2": "Speed 2",
-        "yelling": "Yelling", 
-        "car": "Car", 
-        "speed3": "Speed 3"
+    const gifData = {
+        "custom1": "Custom 1", "custom2": "Custom 2", "angry": "Tanjiro", "angry2": "Pretentious", "angry3": "Purple Flame",
+        "bee": "Bee", "cry": "Crying Smile", "cry2": "Crying", "awkward_laugh": "Awkward Laugh",
+        "rotation": "Rotation", "default": "Default", "demon_slayer": "Nezuko", "road_rage": "Road Rage",
+        "headlights": "Headlights", "devil_eyes": "GTR Rain", "distracted": "Distracted", "egg": "Cookie",
+        "furious": "Angry", "hand_some": "Banana", "happy_2": "Laugh", "sneeze": "Sneeze",
+        "sneeze2": "Big Sneeze", "hehe": "Smirk", "intro": "MML", "keep_it_up": "Keep it up",
+        "raspberry": "Raspberry", "love": "Love", "love2": "Dumb Love", "music": "Music",
+        "neon": "Neon", "noname": "Pinky", "distracted2": "Distracted 2", "look_right": "Look Right",
+        "look_left": "Look Left", "look_down": "Look Down", "police": "Police", "pong": "Pong",
+        "rain": "Rain", "sakura": "Sakura", "samurai": "Blade", "scared": "Accel", "sleepy": "Sleepy",
+        "smile": "Smile", "speed": "Revs", "star": "Stars", "hadouken_miss": "Hadouken Miss",
+        "hadouken_hit": "Hadouken Hit", "turbo": "Turbo", "tsurikawa": "Tsurikawa", "breaking": "Breaking",
+        "up_size_down": "Upside down", "UwU": "UwU", "wheels": "Equip", "speed2": "Speed 2",
+        "yelling": "Yelling", "car": "Car", "speed3": "Speed 3"
     };
 
     const specialTriggers = [
@@ -539,7 +572,7 @@ const gifData = {
         sendData('gif_selected_bin', bin);
     }
 
-    // --- 4. AUDIO ENGINE (Restored from index.php) ---
+    // --- 4. AUDIO ENGINE ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
     const notesFreq = {
@@ -565,7 +598,7 @@ const gifData = {
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
 
-            oscillator.type = 'square'; // Matches ESP32 tone type
+            oscillator.type = 'square';
             oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
@@ -573,7 +606,7 @@ const gifData = {
             oscillator.start();
             setTimeout(() => {
                 oscillator.stop();
-                setTimeout(resolve, rest); // Wait for rest time
+                setTimeout(resolve, rest);
             }, duration);
         });
     }
@@ -583,7 +616,6 @@ const gifData = {
         const raw = input.trim();
 
         if (!raw.includes(' ')) {
-            // Compact format (e.g., C4100D4100)
             let i = 0;
             while (i < raw.length) {
                 let note = "", duration = "";
@@ -604,7 +636,6 @@ const gifData = {
                 notes.push({ note, duration: parseInt(duration), rest: 0 });
             }
         } else {
-            // Space separated format (Note Duration Rest)
             const rawParts = raw.split(/\s+/);
             let i = 0;
             while (i < rawParts.length) {
@@ -627,7 +658,6 @@ const gifData = {
     }
 
     async function previewSound(textareaId) {
-        // Resume context if suspended (browser policy)
         if (audioCtx.state === 'suspended') {
             await audioCtx.resume();
         }
@@ -640,14 +670,12 @@ const gifData = {
             if (freq) {
                 await playNote(freq, item.duration, item.rest);
             } else {
-                // If note not found, just wait duration
                 await new Promise(res => setTimeout(res, item.duration + item.rest));
             }
         }
     }
 
     // --- 5. SERIAL LOGIC ---
-
     async function connect() {
         if (!navigator.serial) {
             alert("Web Serial not supported. Please use Chrome/Edge.");
@@ -680,7 +708,6 @@ const gifData = {
                 const screen = document.getElementById('controllerScreen');
                 screen.style.display = 'block';
                 screen.scrollIntoView({ behavior: 'smooth' });
-                
             }, 3000);
 
         } catch (e) {
@@ -731,23 +758,14 @@ const gifData = {
             case 'MAC': document.getElementById('macValue').innerText = val; break;
             case 'version': document.getElementById('verValue').innerText = val; break;
             case 'hourly_chime': document.getElementById('hourly_chime').checked = (val === '1'); break;
+            
             // GIF
             case 'gif_speed': setVal('gif_speed', val); setText('gif_speedValue', val); break;
             case 'gif_delay': 
-					const delayMs = parseInt(val);
-					const delaySec = Math.floor(delayMs / 1000);
-					
-					// Update the slider position (0-60)
-					const delayInput = document.getElementById('gif_delay');
-					if (delayInput) {
-						delayInput.value = delaySec;
-					}
-					// Update the text label (e.g., "5")
-					const delayLabel = document.getElementById('gif_delayValue');
-					if (delayLabel) {
-						delayLabel.innerText = delaySec;
-					}
-					break;
+                const sec = Math.floor(parseInt(val)/1000);
+                setVal('gif_delay', sec); 
+                setText('gif_delayValue', sec); 
+                break;
             case 'isInverted': document.getElementById('isInverted').checked = (val === '1' || val === 'true'); break;
             case 'gif_default': setVal('gif_default', val); break;
             case 'gif_intro': setVal('gif_intro', val); break;
@@ -773,32 +791,25 @@ const gifData = {
             case 'notifDuration': setVal('notifDuration', val); setText('notifDurationValue', val); break;
             case 'bluetooth_auto_off': setVal('bluetooth_auto_off', val); setText('bluetooth_auto_offValue', val); break;
             case 'bluetoothName': setVal('bluetoothName', val); break;
+            case 'timer_duration': setVal('timer_duration', val); setText('timer_durationValue', val); break;
+            case 'is_24h': document.getElementById('is_24h').checked = (val === 'true'); break;
 
             // Hardware
             case 'display_type': setVal('display_type', val); break;
             case 'scl_pin': setVal('scl_pin', val); break;
             case 'sda_pin': setVal('sda_pin', val); break;
             case 'is_flip_mode': setVal('is_flip_mode', val); break;
-            case 'use_sound': 
-                setVal('use_sound', val); 
-                toggleAudioSettings(val);
-                break;
             case 'buzzer_pin': setVal('buzzer_pin', val); break;
-            case 'I2S_LRCK_PIN': setVal('I2S_LRCK_PIN', val); break;
-            case 'I2S_BCK_PIN': setVal('I2S_BCK_PIN', val); break;
-            case 'I2S_DATA_PIN': setVal('I2S_DATA_PIN', val); break;
-            case 'volume': setVal('volume', val); setText('volVal', val); break;
-            case 'useSD': setVal('useSD', val === 'true' ? '1' : '0'); break;
+            case 'touch_pin': setVal('touch_pin', val); break;
+            case 'useSD': setVal('useSD', val === 'true' || val === '1'); break;
             case 'SD_SCK': setVal('SD_SCK', val); break;
             case 'SD_MISO': setVal('SD_MISO', val); break;
             case 'SD_MOSI': setVal('SD_MOSI', val); break;
             case 'SD_CS': setVal('SD_CS', val); break;
-            case 'touch_pin': setVal('touch_pin', val); break;
         }
     }
 
     // --- 6. UTILS & SENDING ---
-
     async function sendData(key, value) {
         if(!writer) return;
         
@@ -837,11 +848,6 @@ const gifData = {
         if(el) el.innerText = txt;
     }
 
-    function toggleAudioSettings(val) {
-        document.getElementById('grp_buzzer').style.display = (val === '1') ? 'block' : 'none';
-        document.getElementById('grp_i2s').style.display = (val === '2') ? 'block' : 'none';
-    }
-
     function log(msg, type) {
         const box = document.getElementById('serialLog');
         const line = document.createElement('div');
@@ -867,10 +873,175 @@ const gifData = {
         }
     }
 
-    // --- 7. EVENT LISTENERS ---
+    // --- 7. WEB SERIAL FIRMWARE FLASHER ---
+    let isFlashing = false;
+
+    async function fetchBinary(url) {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to load ${url}: ${response.statusText}`);
+        }
+        const buffer = await response.arrayBuffer();
+        return new Uint8Array(buffer);
+    }
+
+    async function flashFirmware() {
+        if (isFlashing) return;
+
+        const flashLogEl = document.getElementById('flashLog');
+        flashLogEl.innerHTML = "";
+
+        function flashLog(msg) {
+            const line = document.createElement('div');
+            line.className = 'log-line';
+            line.innerText = msg;
+            flashLogEl.appendChild(line);
+            flashLogEl.scrollTop = flashLogEl.scrollHeight;
+        }
+
+        if (!port) {
+            flashLog("No device connected. Prompting port selection...");
+            try {
+                port = await navigator.serial.requestPort();
+            } catch (err) {
+                flashLog("Failed to select port: " + err.message);
+                return;
+            }
+        }
+
+        if (!confirm("This will erase and overwrite the device firmware. Continue?")) {
+            return;
+        }
+
+        isFlashing = true;
+        document.getElementById('startFlashBtn').disabled = true;
+        document.getElementById('flashSpinner').style.display = 'inline-block';
+        document.getElementById('flashIcon').style.display = 'none';
+        document.getElementById('flashProgressContainer').style.display = 'block';
+
+        const progressBar = document.getElementById('flashProgressBar');
+        const progressText = document.getElementById('flashProgressText');
+        progressBar.style.width = "0%";
+        progressText.innerText = "0%";
+
+        let bootloader, partitions, firmware;
+
+        try {
+            flashLog("Fetching bootloader.bin...");
+            bootloader = await fetchBinary('firmware/bootloader.bin');
+            flashLog("Fetching partitions.bin...");
+            partitions = await fetchBinary('firmware/partitions.bin');
+            flashLog("Fetching firmware.bin...");
+            firmware = await fetchBinary('firmware/firmware.bin');
+            flashLog("All firmware binaries successfully loaded into browser!");
+        } catch (e) {
+            flashLog("Error loading binaries: " + e.message);
+            isFlashing = false;
+            document.getElementById('startFlashBtn').disabled = false;
+            document.getElementById('flashSpinner').style.display = 'none';
+            document.getElementById('flashIcon').style.display = 'inline-block';
+            return;
+        }
+
+        // Release the existing port locks if currently open in settings mode
+        try {
+            if (reader || writer) {
+                flashLog("Stopping and releasing settings communication locks...");
+                keepReading = false;
+                if (reader) {
+                    await reader.cancel();
+                    reader.releaseLock();
+                    reader = null;
+                }
+                if (writer) {
+                    writer.releaseLock();
+                    writer = null;
+                }
+                await port.close();
+                flashLog("Settings serial port closed successfully.");
+            }
+        } catch (e) {
+            flashLog("Warning while freeing serial port: " + e.message);
+        }
+
+        try {
+            flashLog("Opening serial transport layer...");
+            const transport = new esptooljs.Transport(port);
+            
+            const terminal = {
+                clean: () => { flashLogEl.innerHTML = ''; },
+                writeLine: (data) => { flashLog(data); },
+                write: (data) => { flashLog(data); }
+            };
+
+            const flashBaudRate = parseInt(document.getElementById('flashBaudRate').value) || 921600;
+
+            const esploader = new esptooljs.ESPLoader({
+                transport: transport,
+                baudrate: flashBaudRate,
+                terminal: terminal
+            });
+
+            flashLog("Entering chip ROM bootloader...");
+            await esploader.main("default_reset");
+            flashLog("Connected! Detected Chip: " + esploader.chipName);
+
+            const fileArray = [
+                { data: bootloader, address: 0x0 },
+                { data: partitions, address: 0x8000 },
+                { data: firmware, address: 0x10000 }
+            ];
+
+            flashLog("Writing firmware binaries to flash...");
+            
+            await esploader.writeFlash({
+                fileArray: fileArray,
+                flashSize: "keep",
+                flashMode: "keep",
+                flashFreq: "keep",
+                eraseAll: false,
+                compress: true,
+                reportProgress: (fileIndex, written, total) => {
+                    const pct = Math.floor((written / total) * 100);
+                    progressBar.style.width = pct + "%";
+                    progressText.innerText = `Writing File ${fileIndex + 1}/3: ${pct}%`;
+                }
+            });
+
+            flashLog("Programming sequence completed successfully!");
+            progressBar.style.width = "100%";
+            progressText.innerText = "100% (Success)";
+
+            flashLog("Rebooting device...");
+            await esploader.after("hard_reset");
+            flashLog("ESP32-C3 device rebooted. Flashing session closed.");
+            alert("Firmware flashed successfully! Please reconnect the device to update settings.");
+
+        } catch (e) {
+            flashLog("ERROR: Flashing failed: " + e.message);
+            console.error(e);
+        } finally {
+            isFlashing = false;
+            document.getElementById('startFlashBtn').disabled = false;
+            document.getElementById('flashSpinner').style.display = 'none';
+            document.getElementById('flashIcon').style.display = 'inline-block';
+            
+            // Cleanup and close connection so settings can be reconnected
+            try {
+                if (port) await port.close();
+            } catch(ex){}
+            port = null;
+            document.getElementById('controllerScreen').style.display = 'none';
+            document.getElementById('connectScreen').style.display = 'flex';
+        }
+    }
+
+    // --- 8. EVENT LISTENERS ---
     document.getElementById('connectBtn').addEventListener('click', connect);
-	document.getElementById('custom_title').onchange = (e) => sendData('custom_title', e.target.value);
+    document.getElementById('custom_title').onchange = (e) => sendData('custom_title', e.target.value);
     document.getElementById('hourly_chime').onchange = (e) => sendData('hourly_chime', e.target.checked ? '1' : '0');
+    document.getElementById('startFlashBtn').addEventListener('click', flashFirmware);
+
     document.getElementById('saveBtn').addEventListener('click', () => {
         sendData('set', 'save');
         alert("Settings Saved!");
@@ -880,7 +1051,14 @@ const gifData = {
         if(confirm("Reboot device?")) sendData('set', 'reset');
     });
 
+    document.getElementById('gif_speed').oninput = (e) => {
+        document.getElementById('gif_speedValue').innerText = e.target.value;
+    };
     document.getElementById('gif_speed').onchange = (e) => sendData('gif_speed', e.target.value);
+
+    document.getElementById('gif_delay').oninput = (e) => {
+        document.getElementById('gif_delayValue').innerText = e.target.value;
+    };
     document.getElementById('gif_delay').onchange = (e) => sendData('gif_delay', e.target.value * 1000);
     document.getElementById('isInverted').onchange = (e) => sendData('isInverted', e.target.checked);
     document.getElementById('gif_default').onchange = (e) => sendData('gif_default', e.target.value);
@@ -897,23 +1075,20 @@ const gifData = {
     document.getElementById('bluetooth_auto_off').onchange = (e) => sendData('bluetooth_auto_off', e.target.value);
     document.getElementById('bluetoothName').onchange = (e) => sendData('bluetoothName', e.target.value);
 
+    document.getElementById('timer_duration').oninput = (e) => {
+        document.getElementById('timer_durationValue').innerText = e.target.value;
+    };
+    document.getElementById('timer_duration').onchange = (e) => sendData('timer_duration', e.target.value);
+    document.getElementById('is_24h').onchange = (e) => sendData('is_24h', e.target.checked);
+
     document.getElementById('display_type').onchange = (e) => sendData('display_type', e.target.value);
     document.getElementById('scl_pin').onchange = (e) => sendData('scl_pin', e.target.value);
     document.getElementById('sda_pin').onchange = (e) => sendData('sda_pin', e.target.value);
     document.getElementById('is_flip_mode').onchange = (e) => sendData('is_flip_mode', e.target.value);
     
-    document.getElementById('use_sound').onchange = (e) => {
-        sendData('use_sound', e.target.value);
-        toggleAudioSettings(e.target.value);
-    };
-    
     document.getElementById('buzzer_pin').onchange = (e) => sendData('buzzer_pin', e.target.value);
-    document.getElementById('I2S_LRCK_PIN').onchange = (e) => sendData('I2S_LRCK_PIN', e.target.value);
-    document.getElementById('I2S_BCK_PIN').onchange = (e) => sendData('I2S_BCK_PIN', e.target.value);
-    document.getElementById('I2S_DATA_PIN').onchange = (e) => sendData('I2S_DATA_PIN', e.target.value);
-    document.getElementById('volume').onchange = (e) => sendData('volume', e.target.value);
 
-    document.getElementById('useSD').onchange = (e) => sendData('useSD', e.target.value);
+    document.getElementById('useSD').onchange = (e) => sendData('useSD', e.target.checked ? '1' : '0');
     document.getElementById('SD_SCK').onchange = (e) => sendData('SD_SCK', e.target.value);
     document.getElementById('SD_MISO').onchange = (e) => sendData('SD_MISO', e.target.value);
     document.getElementById('SD_MOSI').onchange = (e) => sendData('SD_MOSI', e.target.value);
