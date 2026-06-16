@@ -18,10 +18,6 @@ To build your own OLO Bit device using an **ESP32-C3 Super Mini** development bo
 | **Touch Button** | Touch Input | **GPIO 1** (pulls HIGH on touch) |
 | **NeoPixel LED** | RGB DIN (Data) | **GPIO 6** |
 | | VCC / GND | 5V (or 3.3V) / GND |
-| **SD Card (SPI)** | SPI CS (Select) | **GPIO 4** (Optional) |
-| | SPI SCK (Clock) | **GPIO 3** (Optional) |
-| | SPI MOSI (Data In) | **GPIO 2** (Optional) |
-| | SPI MISO (Data Out) | **GPIO 1** (Optional) |
 
 ---
 
