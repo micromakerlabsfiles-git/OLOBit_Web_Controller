@@ -23,10 +23,11 @@ To build your own OLO Bit device using an **ESP32-C3 Super Mini** development bo
 
 ## 2. Web Serial Firmware Flasher
 
-The integrated **Flasher** tab uses `esptool-js` to program firmware directly to the ESP32-C3 via USB. 
+The integrated **Flasher** tab uses the official **ESP Web Tools** framework to download and flash firmware directly to the ESP32-C3 via USB using a `manifest.json` definition file.
 
 ### Prerequisites
-1. Ensure the controller folder contains a subdirectory named `firmware/` containing three files:
+1. Ensure the main controller folder contains the following files in the same directory as `index.html`:
+   - `manifest.json` (Describes flashing offsets and binary paths)
    - `bootloader.bin` (Flashing offset: `0x0`)
    - `partitions.bin` (Flashing offset: `0x8000`)
    - `firmware.bin` (Flashing offset: `0x10000`)
@@ -35,11 +36,17 @@ The integrated **Flasher** tab uses `esptool-js` to program firmware directly to
 
 ### How to Flash
 1. Navigate to the **Flasher** tab.
-2. Select your preferred **Baud Rate** (921600 is recommended for fastest programming).
-3. Click **Program Firmware**.
-4. A browser dialog will appear asking you to select a serial port. Select the port corresponding to your device (usually listed as *USB JTAG/serial debug unit* or *ESP32-C3*) and click **Connect**.
-5. The flasher will put the chip into ROM bootloader mode, fetch the binary files from the server, and write them sequentially.
-6. The loader will automatically perform a hard reset to reboot the chip. Once complete, you will see a success message and your device will run the newly programmed firmware.
+2. Click **Program Firmware**.
+3. A modal popup managed by ESP Web Tools will appear. Follow the prompts by clicking **Connect**.
+4. Select the serial port corresponding to your device (usually listed as *USB JTAG/serial debug unit* or *ESP32-C3*) and click **Connect**.
+5. ESP Web Tools will fetch `manifest.json` and the `.bin` files from the server, put the chip into ROM bootloader mode, flash them sequentially, and automatically perform a reset once finished.
+
+> [!IMPORTANT]
+> Because ESP Web Tools relies on standard `fetch()` calls to load the manifest and binaries, running the HTML page directly using the `file://` protocol will fail due to browser security/CORS restrictions. 
+> To test or run the controller locally:
+> 1. Open a terminal in the `Webcontroller V1` directory.
+> 2. Start a simple local server: `python -m http.server 8000` (or your preferred local dev server).
+> 3. Open your browser and navigate to: `http://localhost:8000`.
 
 ---
 
@@ -56,9 +63,10 @@ Upload all contents of the `Webcontroller V1` directory to the repository:
 - `index.html` (the controller page)
 - `music.html` (the buzzer composer tool)
 - `assets/` (the logo and image assets for the grid)
-- `firmware/` (the folder containing the `.bin` files)
+- `manifest.json` (the flashing manifest)
+- `bootloader.bin`, `partitions.bin`, `firmware.bin` (firmware files)
 
-Ensure the file structure matches exactly, so that `firmware/` is in the same folder as `index.html`.
+Ensure all files are placed directly in the repository root folder.
 
 ### Step 3: Enable GitHub Pages
 1. In your GitHub repository, go to **Settings** > **Pages** (under the Code and automation section).

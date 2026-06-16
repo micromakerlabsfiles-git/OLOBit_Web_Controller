@@ -6,7 +6,7 @@
     <title>OLO Bit Web Controller</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/esptool-js@0.4.3/bundle.js"></script>
+    <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
     
     <style>
         /* --- GREY & ORANGE THEME --- */
@@ -354,7 +354,7 @@
             <div class="tab-pane fade" id="tab-hardware">
                 <div class="row">
                     <!-- Screen Settings -->
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="glass-card p-4 h-100">
                             <h5 class="text-info mb-3"><i class="fas fa-desktop me-2"></i>Display (I2C)</h5>
                             <div class="mb-2">
@@ -377,26 +377,11 @@
                     </div>
 
                     <!-- System Pins -->
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="glass-card p-4 h-100">
                             <h5 class="text-info mb-3"><i class="fas fa-microchip me-2"></i>System Pins</h5>
                             <div class="mb-3"><label>Buzzer Pin (Passive)</label><input type="number" class="form-control" id="buzzer_pin"></div>
                             <div class="mb-3"><label>Touch Button Pin</label><input type="number" class="form-control" id="touch_pin"></div>
-                        </div>
-                    </div>
-
-                    <!-- SD Card Configurations -->
-                    <div class="col-md-4">
-                        <div class="glass-card p-4 h-100">
-                            <h5 class="text-info mb-3"><i class="fas fa-database me-2"></i>SD Card (SPI)</h5>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="useSD">
-                                <label class="form-check-label" for="useSD">Enable SD Card</label>
-                            </div>
-                            <div class="mb-2"><label>CS Pin</label><input type="number" class="form-control" id="SD_CS"></div>
-                            <div class="mb-2"><label>SCK Pin</label><input type="number" class="form-control" id="SD_SCK"></div>
-                            <div class="mb-2"><label>MOSI Pin</label><input type="number" class="form-control" id="SD_MOSI"></div>
-                            <div class="mb-2"><label>MISO Pin</label><input type="number" class="form-control" id="SD_MISO"></div>
                         </div>
                     </div>
                 </div>
@@ -409,10 +394,10 @@
                     
                     <p class="text-secondary small">
                         This tool flashes the firmware directly from the browser to your ESP32-C3 OLO Bit device.
-                        Ensure the <strong>firmware/</strong> directory contains: <code>bootloader.bin</code>, <code>partitions.bin</code>, and <code>firmware.bin</code>.
+                        It uses the official <strong>ESP Web Tools</strong> framework to download and flash the latest firmware.
                     </p>
 
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label class="form-label text-white">Files to program:</label>
                         <ul class="list-group list-group-flush bg-transparent">
                             <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between align-items-center">
@@ -430,35 +415,14 @@
                         </ul>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label text-white">Flashing Baud Rate</label>
-                        <select class="form-select" id="flashBaudRate">
-                            <option value="921600" selected>921600 (Recommended)</option>
-                            <option value="460800">460800</option>
-                            <option value="115200">115200</option>
-                        </select>
-                    </div>
-
-                    <button id="startFlashBtn" class="btn btn-elegant btn-lg w-100 mb-4">
-                        <i class="fas fa-circle-notch fa-spin me-2" style="display:none;" id="flashSpinner"></i>
-                        <i class="fas fa-flash me-2" id="flashIcon"></i> Program Firmware
-                    </button>
-
-                    <div id="flashProgressContainer" style="display:none;" class="mb-3">
-                        <label class="small text-muted d-block mb-1">Flashing Progress: <span id="flashProgressText">0%</span></label>
-                        <div class="progress" style="height: 10px; background: rgba(255,255,255,0.1);">
-                            <div id="flashProgressBar" class="progress-bar bg-warning" role="progressbar" style="width: 0%"></div>
-                        </div>
-                    </div>
-
-                    <div class="log-container mt-3">
-                        <div class="log-header p-2 bg-dark d-flex justify-content-between align-items-center border-bottom border-secondary">
-                            <span class="text-muted small">Programmer Output Logs</span>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('flashLog').innerHTML=''">Clear Log</button>
-                        </div>
-                        <div class="log-content" style="height: 150px;" id="flashLog">
-                            <div class="log-line text-muted">Awaiting programming start...</div>
-                        </div>
+                    <div class="text-center">
+                        <esp-web-install-button manifest="manifest.json">
+                            <button slot="activate" class="btn btn-elegant btn-lg w-100 mb-3" id="flashButtonSlot">
+                                <i class="fas fa-bolt me-2"></i> Program Firmware
+                            </button>
+                            <span slot="unsupported" class="text-danger small d-block mb-3"><i class="fas fa-exclamation-triangle"></i> Browser Web Serial not supported. Please use Chrome, Edge, or Opera.</span>
+                            <span slot="not-allowed" class="text-warning small d-block mb-3"><i class="fas fa-exclamation-triangle"></i> HTTPS connection required for Web Serial.</span>
+                        </esp-web-install-button>
                     </div>
                 </div>
             </div>
@@ -513,7 +477,7 @@
     ];
 
     // --- 2. SERIAL VARIABLES ---
-    let port, writer, reader;
+    let port, reader;
     let keepReading = false;
 
     // --- 3. INIT UI ---
@@ -686,10 +650,6 @@
             port = await navigator.serial.requestPort();
             await port.open({ baudRate: 115200 });
 
-            const textEncoder = new TextEncoderStream();
-            writer = textEncoder.writable.getWriter();
-            textEncoder.readable.pipeTo(port.writable);
-
             document.getElementById('connectScreen').style.display = 'none';
             document.getElementById('loadingOverlay').style.display = 'flex';
             
@@ -718,20 +678,24 @@
     }
 
     async function readLoop() {
-        const textDecoder = new TextDecoderStream();
-        const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
-        reader = textDecoder.readable.getReader();
-
+        reader = port.readable.getReader();
+        const decoder = new TextDecoder();
         try {
             while (keepReading) {
                 const { value, done } = await reader.read();
                 if (done) break;
-                if (value) handleSerialData(value);
+                if (value) {
+                    const text = decoder.decode(value);
+                    handleSerialData(text);
+                }
             }
         } catch (error) {
-            console.error(error);
+            console.error("Read loop error:", error);
         } finally {
-            reader.releaseLock();
+            if (reader) {
+                reader.releaseLock();
+                reader = null;
+            }
         }
     }
 
@@ -801,17 +765,12 @@
             case 'is_flip_mode': setVal('is_flip_mode', val); break;
             case 'buzzer_pin': setVal('buzzer_pin', val); break;
             case 'touch_pin': setVal('touch_pin', val); break;
-            case 'useSD': setVal('useSD', val === 'true' || val === '1'); break;
-            case 'SD_SCK': setVal('SD_SCK', val); break;
-            case 'SD_MISO': setVal('SD_MISO', val); break;
-            case 'SD_MOSI': setVal('SD_MOSI', val); break;
-            case 'SD_CS': setVal('SD_CS', val); break;
         }
     }
 
     // --- 6. UTILS & SENDING ---
     async function sendData(key, value) {
-        if(!writer) return;
+        if(!port) return;
         
         const isSound = ['intro_sound','touch_sound','double_touch_sound','long_touch_sound','notification_sound'].includes(key);
         
@@ -830,8 +789,17 @@
     }
 
     async function writeLine(str) {
-        if(!writer) return;
-        await writer.write(str + "\n");
+        if(!port || !port.writable) return;
+        const encoder = new TextEncoder();
+        const data = encoder.encode(str + "\n");
+        const localWriter = port.writable.getWriter();
+        try {
+            await localWriter.write(data);
+        } catch(e) {
+            console.error("Write line error:", e);
+        } finally {
+            localWriter.releaseLock();
+        }
         log(str, "tx");
     }
 
@@ -873,174 +841,53 @@
         }
     }
 
-    // --- 7. WEB SERIAL FIRMWARE FLASHER ---
-    let isFlashing = false;
-
-    async function fetchBinary(url) {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Failed to load ${url}: ${response.statusText}`);
-        }
-        const buffer = await response.arrayBuffer();
-        return new Uint8Array(buffer);
-    }
-
-    async function flashFirmware() {
-        if (isFlashing) return;
-
-        const flashLogEl = document.getElementById('flashLog');
-        flashLogEl.innerHTML = "";
-
-        function flashLog(msg) {
-            const line = document.createElement('div');
-            line.className = 'log-line';
-            line.innerText = msg;
-            flashLogEl.appendChild(line);
-            flashLogEl.scrollTop = flashLogEl.scrollHeight;
-        }
-
-        if (!port) {
-            flashLog("No device connected. Prompting port selection...");
-            try {
-                port = await navigator.serial.requestPort();
-            } catch (err) {
-                flashLog("Failed to select port: " + err.message);
-                return;
-            }
-        }
-
-        if (!confirm("This will erase and overwrite the device firmware. Continue?")) {
-            return;
-        }
-
-        isFlashing = true;
-        document.getElementById('startFlashBtn').disabled = true;
-        document.getElementById('flashSpinner').style.display = 'inline-block';
-        document.getElementById('flashIcon').style.display = 'none';
-        document.getElementById('flashProgressContainer').style.display = 'block';
-
-        const progressBar = document.getElementById('flashProgressBar');
-        const progressText = document.getElementById('flashProgressText');
-        progressBar.style.width = "0%";
-        progressText.innerText = "0%";
-
-        let bootloader, partitions, firmware;
-
-        try {
-            flashLog("Fetching bootloader.bin...");
-            bootloader = await fetchBinary('firmware/bootloader.bin');
-            flashLog("Fetching partitions.bin...");
-            partitions = await fetchBinary('firmware/partitions.bin');
-            flashLog("Fetching firmware.bin...");
-            firmware = await fetchBinary('firmware/firmware.bin');
-            flashLog("All firmware binaries successfully loaded into browser!");
-        } catch (e) {
-            flashLog("Error loading binaries: " + e.message);
-            isFlashing = false;
-            document.getElementById('startFlashBtn').disabled = false;
-            document.getElementById('flashSpinner').style.display = 'none';
-            document.getElementById('flashIcon').style.display = 'inline-block';
-            return;
-        }
-
-        // Release the existing port locks if currently open in settings mode
-        try {
-            if (reader || writer) {
-                flashLog("Stopping and releasing settings communication locks...");
+    // --- 7. WEB SERIAL FIRMWARE FLASHER (ESP Web Tools integration) ---
+    // Handle closing the settings serial connection before ESP Web Tools attempts to flash
+    const flashButton = document.getElementById('flashButtonSlot');
+    if (flashButton) {
+        flashButton.addEventListener('click', async (e) => {
+            if (port) {
+                // Prevent event from bubbling up to esp-web-install-button immediately
+                e.stopPropagation();
+                e.preventDefault();
+                
+                log("Releasing Web Serial connection before flashing...", "sys");
                 keepReading = false;
                 if (reader) {
-                    await reader.cancel();
-                    reader.releaseLock();
-                    reader = null;
+                    try {
+                        await reader.cancel();
+                    } catch(err) {
+                        console.error("Reader cancel error:", err);
+                    }
+                    await new Promise(r => setTimeout(r, 100)); // wait for readLoop to exit
                 }
-                if (writer) {
-                    writer.releaseLock();
-                    writer = null;
+                try {
+                    await port.close();
+                    log("Settings serial port closed successfully.", "sys");
+                } catch (err) {
+                    console.error("Port close error:", err);
                 }
-                await port.close();
-                flashLog("Settings serial port closed successfully.");
+                port = null;
+                
+                // Update UI state to disconnected
+                document.getElementById('controllerScreen').style.display = 'none';
+                document.getElementById('connectScreen').style.display = 'flex';
+                
+                // Wait a short moment and then trigger the click on the custom element itself
+                const installBtn = document.querySelector('esp-web-install-button');
+                if (installBtn) {
+                    setTimeout(() => {
+                        installBtn.click();
+                    }, 100);
+                }
             }
-        } catch (e) {
-            flashLog("Warning while freeing serial port: " + e.message);
-        }
-
-        try {
-            flashLog("Opening serial transport layer...");
-            const transport = new esptooljs.Transport(port);
-            
-            const terminal = {
-                clean: () => { flashLogEl.innerHTML = ''; },
-                writeLine: (data) => { flashLog(data); },
-                write: (data) => { flashLog(data); }
-            };
-
-            const flashBaudRate = parseInt(document.getElementById('flashBaudRate').value) || 921600;
-
-            const esploader = new esptooljs.ESPLoader({
-                transport: transport,
-                baudrate: flashBaudRate,
-                terminal: terminal
-            });
-
-            flashLog("Entering chip ROM bootloader...");
-            await esploader.main("default_reset");
-            flashLog("Connected! Detected Chip: " + esploader.chipName);
-
-            const fileArray = [
-                { data: bootloader, address: 0x0 },
-                { data: partitions, address: 0x8000 },
-                { data: firmware, address: 0x10000 }
-            ];
-
-            flashLog("Writing firmware binaries to flash...");
-            
-            await esploader.writeFlash({
-                fileArray: fileArray,
-                flashSize: "keep",
-                flashMode: "keep",
-                flashFreq: "keep",
-                eraseAll: false,
-                compress: true,
-                reportProgress: (fileIndex, written, total) => {
-                    const pct = Math.floor((written / total) * 100);
-                    progressBar.style.width = pct + "%";
-                    progressText.innerText = `Writing File ${fileIndex + 1}/3: ${pct}%`;
-                }
-            });
-
-            flashLog("Programming sequence completed successfully!");
-            progressBar.style.width = "100%";
-            progressText.innerText = "100% (Success)";
-
-            flashLog("Rebooting device...");
-            await esploader.after("hard_reset");
-            flashLog("ESP32-C3 device rebooted. Flashing session closed.");
-            alert("Firmware flashed successfully! Please reconnect the device to update settings.");
-
-        } catch (e) {
-            flashLog("ERROR: Flashing failed: " + e.message);
-            console.error(e);
-        } finally {
-            isFlashing = false;
-            document.getElementById('startFlashBtn').disabled = false;
-            document.getElementById('flashSpinner').style.display = 'none';
-            document.getElementById('flashIcon').style.display = 'inline-block';
-            
-            // Cleanup and close connection so settings can be reconnected
-            try {
-                if (port) await port.close();
-            } catch(ex){}
-            port = null;
-            document.getElementById('controllerScreen').style.display = 'none';
-            document.getElementById('connectScreen').style.display = 'flex';
-        }
+        });
     }
 
     // --- 8. EVENT LISTENERS ---
     document.getElementById('connectBtn').addEventListener('click', connect);
     document.getElementById('custom_title').onchange = (e) => sendData('custom_title', e.target.value);
     document.getElementById('hourly_chime').onchange = (e) => sendData('hourly_chime', e.target.checked ? '1' : '0');
-    document.getElementById('startFlashBtn').addEventListener('click', flashFirmware);
 
     document.getElementById('saveBtn').addEventListener('click', () => {
         sendData('set', 'save');
@@ -1087,12 +934,6 @@
     document.getElementById('is_flip_mode').onchange = (e) => sendData('is_flip_mode', e.target.value);
     
     document.getElementById('buzzer_pin').onchange = (e) => sendData('buzzer_pin', e.target.value);
-
-    document.getElementById('useSD').onchange = (e) => sendData('useSD', e.target.checked ? '1' : '0');
-    document.getElementById('SD_SCK').onchange = (e) => sendData('SD_SCK', e.target.value);
-    document.getElementById('SD_MISO').onchange = (e) => sendData('SD_MISO', e.target.value);
-    document.getElementById('SD_MOSI').onchange = (e) => sendData('SD_MOSI', e.target.value);
-    document.getElementById('SD_CS').onchange = (e) => sendData('SD_CS', e.target.value);
     document.getElementById('touch_pin').onchange = (e) => sendData('touch_pin', e.target.value);
 </script>
 </body>
