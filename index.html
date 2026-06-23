@@ -2,1246 +2,1912 @@
 <html lang="en" data-bs-theme="dark">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OLO Bit Web Controller</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+  <meta charset="UTF-8">
+  <title>OLO Glyph Web Control Center</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script type="module" src="https://unpkg.com/esp-web-tools@9.4.2/dist/web/install-button.js?module"></script>
 
-    <style>
-        /* --- GREY & ORANGE THEME --- */
-        :root {
-            --bg-gradient: linear-gradient(135deg, #2d3436 0%, #000000 100%);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --accent: #ff793f;
-            /* Vibrant Orange */
-            --accent-hover: #cd6133;
-            --terminal-bg: #1e272e;
-            --terminal-text: #ff793f;
-        }
+  <style>
+    /* --- PREMIUM GLOW THEME --- */
+    :root {
+      --bg-gradient: radial-gradient(circle at 10% 20%, rgba(20, 20, 30, 1) 0%, rgba(10, 10, 14, 1) 90%);
+      --glass-bg: rgba(22, 22, 33, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --accent: hsl(18, 100%, 62%);
+      --accent-glow: rgba(255, 121, 63, 0.35);
+      --text: #f3f3f5;
+      --text-muted: #9aa0a6;
+      --success: hsl(145, 63%, 49%);
+      --success-glow: rgba(46, 213, 115, 0.3);
+      --danger: hsl(354, 70%, 54%);
+      --sidebar-w: 320px;
+    }
 
-        body {
-            background: var(--bg-gradient);
-            min-height: 100vh;
-            color: #d1d8e0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            padding-bottom: 50px;
-        }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text);
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+    }
 
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            margin-bottom: 20px;
-        }
+    h1, h2, h3, h4, h5, h6, .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+    }
 
-        .btn-elegant {
-            background: linear-gradient(45deg, #ff793f 0%, #ff5252 100%);
-            border: none;
-            border-radius: 12px;
-            padding: 12px 30px;
-            font-weight: 600;
-            color: #fff;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 121, 63, 0.3);
-        }
+    /* --- GLASS LAYOUT PANELS --- */
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      margin-bottom: 24px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-        .btn-elegant:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 121, 63, 0.5);
-            color: #fff;
-        }
+    .glass-panel:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
 
-        .form-control,
-        .form-select {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: white;
-        }
+    /* --- TWO COLUMN DASHBOARD --- */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      gap: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+      transition: all 0.4s ease;
+    }
 
-        .form-control:focus,
-        .form-select:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 0.25rem rgba(255, 121, 63, 0.25);
-        }
+    @media (max-width: 991px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
 
-        .nav-pills .nav-link {
-            color: #d1d8e0;
-            border-radius: 10px;
-            margin: 0 5px;
-        }
+    /* --- SIDEBAR AND BRAND --- */
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-        .nav-pills .nav-link.active {
-            background-color: var(--accent);
-            color: white;
-        }
+    .brand-logo {
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, var(--accent), #ff5252);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 12px var(--accent-glow));
+    }
 
-        .form-check.image-bg {
-            position: relative;
-            background-size: cover;
-            background-position: center;
-            border-radius: 10px;
-            padding: 10px;
-            margin: 5px 0;
-            transition: all 0.2s ease;
-            min-height: 80px;
-            /* Shorter icons as requested */
-            display: flex;
-            align-items: flex-end;
-            overflow: hidden;
-            border: 2px solid transparent;
-            cursor: pointer;
-        }
+    .brand-title {
+      font-size: 1.6rem;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
 
-        .form-check.image-bg::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.2));
-            z-index: 1;
-        }
+    /* --- BUTTONS --- */
+    button, .btn {
+      border-radius: 10px;
+      font-weight: 600;
+      padding: 10px 18px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      border: none;
+      cursor: pointer;
+    }
 
-        .form-check.image-bg:has(input:checked) {
-            border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(255, 121, 63, 0.4);
-        }
+    .btn-primary, button.btn-primary {
+      background: linear-gradient(135deg, #ff793f, #ff5252);
+      color: white;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
 
-        .text-info {
-            color: var(--accent) !important;
-        }
+    .btn-primary:hover, button.btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 121, 63, 0.5);
+      opacity: 0.95;
+    }
 
-        #loadingOverlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
+    .btn-success, button.btn-success {
+      background: linear-gradient(135deg, #2ed573, #26c281);
+      color: white;
+      box-shadow: 0 4px 15px var(--success-glow);
+    }
 
-        .log-container {
-            background: var(--terminal-bg);
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #3d3d3d;
-        }
+    .btn-success:hover, button.btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(46, 213, 115, 0.45);
+    }
 
-        .log-content {
-            height: 250px;
-            overflow-y: auto;
-            padding: 15px;
-            color: var(--terminal-text);
-            font-family: monospace;
-            font-size: 0.85rem;
-        }
-    </style>
+    .btn-secondary, button.btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-secondary:hover, button.btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .btn-danger, button.btn-danger {
+      background: linear-gradient(135deg, #ff4757, #ff6b81);
+      color: white;
+    }
+
+    .btn-danger:hover, button.btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 71, 87, 0.35);
+    }
+
+    /* --- FORMS & INPUTS --- */
+    input, select {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: white;
+      border-radius: 10px;
+      padding: 11px 14px;
+      width: 100%;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-glow);
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .form-range {
+      height: 6px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      accent-color: var(--accent);
+    }
+
+    /* --- TABS SYSTEM --- */
+    .nav-tabs {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 24px;
+      gap: 8px;
+    }
+
+    .nav-tabs .nav-link {
+      color: var(--text-muted);
+      border: none;
+      padding: 12px 18px;
+      border-radius: 10px 10px 0 0;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tabs .nav-link:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .nav-tabs .nav-link.active {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--accent);
+      border-bottom: 2px solid var(--accent);
+      font-weight: 700;
+    }
+
+    /* --- STATE INDICATORS --- */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: rgba(255, 71, 87, 0.12);
+      color: var(--danger);
+      border: 1px solid rgba(255, 71, 87, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .status-badge.connected {
+      background: rgba(46, 213, 115, 0.12);
+      color: var(--success);
+      border: 1px solid rgba(46, 213, 115, 0.25);
+      box-shadow: 0 0 15px rgba(46, 213, 115, 0.15);
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--danger);
+      margin-right: 8px;
+    }
+
+    .status-badge.connected .status-dot {
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    /* --- CONSOLE LOG --- */
+    .console-container {
+      margin-top: 16px;
+    }
+
+    .log-console {
+      height: 160px;
+      background: rgba(10, 10, 15, 0.9);
+      color: #a4b0be;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      padding: 14px;
+      border-radius: 12px;
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      white-space: pre-wrap;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+    }
+
+    /* --- CONTROLLER SECTION & OVERLAY --- */
+    .main-controller-area {
+      position: relative;
+      min-height: 500px;
+    }
+
+    .offline-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(12, 12, 18, 0.82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 16px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    body.is-connected #offline-overlay {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .offline-card {
+      max-width: 480px;
+      padding: 36px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+      transform: translateY(0);
+      transition: transform 0.3s ease;
+    }
+
+    body.is-disconnected .offline-card {
+      transform: translateY(0);
+    }
+
+    /* --- TIGHT SLIDER LABELS --- */
+    .slider-group {
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .slider-val {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    /* Custom card layouts */
+    .config-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .config-card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* --- WEBFLASHER STYLING --- */
+    esp-web-install-button {
+      --esp-tools-button-color: linear-gradient(135deg, #ff793f, #ff5252);
+      --esp-tools-button-border-radius: 10px;
+      --esp-tools-button-font-weight: 600;
+    }
+
+    /* --- FLASHING STATE BLUR --- */
+    body.is-flashing .dashboard-grid {
+      filter: blur(8px);
+      pointer-events: none;
+      opacity: 0.25;
+    }
+
+    body.is-flashing #offline-overlay {
+      display: none !important;
+    }
+
+    /* --- COLOR PICKER CIRCLES --- */
+    .color-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: inline-block;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+    .color-dot:hover {
+      transform: scale(1.15);
+      box-shadow: 0 4px 10px rgba(255, 255, 255, 0.15);
+    }
+    
+    body.is-disconnected .btn-connected-only {
+      display: none !important;
+    }
+    body.is-connected .btn-disconnected-only {
+      display: none !important;
+    }
+  </style>
+
 </head>
 
-<body>
+<body class="is-disconnected">
 
-    <div id="loadingOverlay">
-        <div class="spinner-border text-info" style="width: 3rem; height: 3rem;" role="status"></div>
-        <p class="mt-3 text-white">Connecting to OLO Bit...</p>
-    </div>
+  <!-- Exit flashing overlay button -->
+  <div id="flasher-exit-container" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 1000000;">
+    <button class="btn btn-primary" onclick="exitFlashingMode()"><i class="fas fa-arrow-left me-2"></i> Return to Dashboard</button>
+  </div>
 
-    <div id="connectScreen" class="container d-flex align-items-center justify-content-center"
-        style="min-height: 100vh;">
-        <div class="row w-100 align-items-center">
-            <div class="col-md-6 text-center text-md-start">
-                <h1 class="display-4 fw-bold mb-4" style="color: var(--accent);">OLO Bit <span
-                        style="font-size: 0.5em; opacity: 0.7; color: white;">Web Controller</span></h1>
-                <p class="lead text-secondary mb-4">Manage GIFs, Audio, Time, and Hardware settings directly from your
-                    browser via USB.</p>
+  <!-- Hidden Root Level Web Flasher to avoid CSS Stacking Context clips -->
+  <esp-web-install-button id="hiddenInstallBtn" manifest="manifest.json"
+    style="position: fixed; z-index: 999999; bottom: 0; left: 0;">
+    <button slot="activate" id="hiddenInstallBtnInner" style="display: none;">Install</button>
+  </esp-web-install-button>
 
-                <div class="glass-card p-5 text-center">
-                    <button id="connectBtn" class="btn btn-elegant btn-lg w-100 mb-3">
-                        <i class="fas fa-plug me-2"></i> Control Device
-                    </button>
+  <div class="dashboard-grid">
+    <!-- LEFT COLUMN: CONNECTION & SIDEBAR CONTROLS -->
+    <aside class="d-flex flex-column">
+      <div class="glass-panel h-100 d-flex flex-column">
 
-                    <esp-web-install-button manifest="manifest.json" class="d-block mb-3">
-                        <button slot="activate" class="btn btn-elegant btn-lg w-100">
-                            <i class="fas fa-bolt me-2"></i> Install/Update Firmware
-                        </button>
-                        <span slot="unsupported" class="text-danger small d-block mt-2"><i
-                                class="fas fa-exclamation-triangle"></i> Browser Web Serial not supported. Please use
-                            Chrome, Edge, or Opera.</span>
-                        <span slot="not-allowed" class="text-warning small d-block mt-2"><i
-                                class="fas fa-exclamation-triangle"></i> HTTPS connection required for Web
-                            Serial.</span>
-                    </esp-web-install-button>
-
-                    <small class="text-muted"><i class="fab fa-chrome"></i> Requires Chrome, Edge, or Opera</small>
-                </div>
-            </div>
-            <div class="col-md-6 text-center">
-                <img src="assets/olobitplus.png" alt="OLO Logo" class="img-fluid">
-            </div>
+        <div class="brand-header">
+          <i class="fas fa-layer-group brand-logo"></i>
+          <div class="d-flex flex-column">
+            <span class="brand-title">OLO GLYPH</span>
+            <span class="small text-muted">Web Control Center v1.0</span>
+          </div>
         </div>
-    </div>
 
-    <div id="controllerScreen" style="display: none;" class="fade-in pt-3">
+        <!-- Connection State Indicator -->
+        <div class="mb-4">
+          <label>Hardware Connection State</label>
+          <div id="connection-status" class="status-badge">
+            <span class="status-dot"></span>
+            <span id="status-text">Disconnected</span>
+          </div>
+        </div>
 
-        <nav class="navbar navbar-expand-lg glass-card mx-3 p-3 d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-                <span class="status-dot connected"></span>
-                <span class="fw-bold h5 mb-0">OLO Bit Connected</span>
+        <!-- Action Stack -->
+        <div class="d-flex flex-column gap-2 mb-4">
+          <!-- Disconnected Mode Buttons -->
+          <button id="connectBtn" class="btn btn-primary btn-disconnected-only" onclick="startConnection()">
+            <i class="fas fa-plug me-2"></i> Connect Device
+          </button>
+
+          <!-- Connected Mode Buttons -->
+          <button class="btn btn-secondary btn-connected-only" onclick="sendCmd('GET_SETTINGS')">
+            <i class="fas fa-sync-alt me-2"></i> Sync Settings
+          </button>
+          <button id="saveAllBtn" class="btn btn-success btn-connected-only" onclick="saveAll()">
+            <i class="fas fa-save me-2"></i> Save Settings
+          </button>
+          <button class="btn btn-danger btn-connected-only" onclick="btnReboot()">
+            <i class="fas fa-power-off me-2"></i> Reboot OLO
+          </button>
+          <button class="btn btn-warning btn-connected-only" onclick="btnResetSettings()">
+            <i class="fas fa-trash-can me-2"></i> Reset Settings
+          </button>
+          <button class="btn btn-secondary btn-connected-only" onclick="disconnect()">
+            <i class="fas fa-times me-2"></i> Disconnect
+          </button>
+        </div>
+
+        <!-- Firmware Flash Utility Card -->
+        <div class="config-card mb-4 mt-auto">
+          <span class="config-card-title"><i class="fas fa-bolt text-warning"></i> Firmware Installer</span>
+          <p class="small text-muted mb-3" style="font-size:0.8rem; line-height: 1.4;">Flash the factory binary directly over USB in Chrome/Edge.</p>
+          <div class="d-grid">
+            <button class="btn btn-secondary w-100" onclick="triggerFirmwareFlash()" style="font-size: 0.85rem; padding: 8px 12px;">
+              <i class="fas fa-microchip me-1"></i> Flash Firmware
+            </button>
+          </div>
+        </div>
+
+        <!-- Hardware Pin Layout Card -->
+        <div class="config-card mb-3">
+          <span class="config-card-title"><i class="fas fa-circle-info text-info"></i> Pin Layout</span>
+          <div class="small text-muted" style="font-size:0.75rem; line-height: 1.5;">
+            <div class="d-flex justify-content-between border-bottom border-secondary pb-1 mb-1">
+              <span>SDA Display</span>
+              <span class="text-white font-monospace">GPIO 20 (Default)</span>
             </div>
-            <div class="d-flex gap-3">
-                <span class="badge bg-secondary d-flex align-items-center"><i class="fas fa-microchip me-2"></i> MAC:
-                    <span id="macValue" class="ms-1">--:--:--</span></span>
-                <span class="badge bg-warning text-dark d-flex align-items-center"><i class="fas fa-tag me-2"></i> Ver:
-                    <span id="verValue" class="ms-1">1.0</span></span>
+            <div class="d-flex justify-content-between border-bottom border-secondary pb-1 mb-1">
+              <span>SCL Display</span>
+              <span class="text-white font-monospace">GPIO 21 (Default)</span>
             </div>
-        </nav>
+            <div class="d-flex justify-content-between border-bottom border-secondary pb-1 mb-1">
+              <span>Touch Pin</span>
+              <span class="text-white font-monospace">GPIO 1</span>
+            </div>
+            <div class="d-flex justify-content-between border-bottom border-secondary pb-1 mb-1">
+              <span>Buzzer Pin</span>
+              <span class="text-white font-monospace">GPIO 2</span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span>LED Pin</span>
+              <span class="text-white font-monospace">GPIO 6</span>
+            </div>
+          </div>
+        </div>
 
-        <div class="container-fluid px-4">
+      </div>
+    </aside>
 
-            <ul class="nav nav-pills mb-4 justify-content-center" id="mainTabs" role="tablist">
-                <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-gifs"><i
-                            class="fas fa-images me-2"></i>GIFs</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-audio"><i
-                            class="fas fa-music me-2"></i>Audio</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-chronos"><i
-                            class="fas fa-clock me-2"></i>Chronos</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-canvas"><i
-                            class="fas fa-font me-2"></i>Canvas</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-hardware"><i
-                            class="fas fa-cogs me-2"></i>Hardware</button></li>
-            </ul>
+    <!-- RIGHT COLUMN: MAIN CONTROL & TABS AREA -->
+    <main class="main-controller-area">
 
-            <div class="row mb-4 justify-content-center">
-                <div class="col-auto">
-                    <button id="resetBtn" class="btn btn-danger me-2"><i
-                            class="fas fa-power-off me-2"></i>Reboot</button>
-                    <button id="saveBtn" class="btn btn-elegant"><i class="fas fa-save me-2"></i>Save All
-                        Settings</button>
+      <!-- Offline Blockout Overlay -->
+      <div id="offline-overlay" class="offline-overlay">
+        <div class="offline-card glass-panel text-center">
+          <i class="fas fa-plug-circle-exclamation text-warning mb-4"
+            style="font-size: 3.2rem; filter: drop-shadow(0 0 15px rgba(255,121,63,0.3));"></i>
+          <h4 class="mb-2">OLO Glyph Offline</h4>
+          <p class="text-muted small mb-4" style="line-height:1.5;">Configure parameters and send direct commands to the screen. To activate this dashboard, connect your hardware over serial.</p>
+          <button class="btn btn-primary" onclick="startConnection()"><i class="fas fa-plug me-2"></i> Connect Device</button>
+        </div>
+      </div>
+
+      <!-- Active Controller Dashboard Workspace -->
+      <div class="glass-panel">
+        <!-- Nav Tabs -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#live">🎮 Live Control</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#eyes">👁️ Eye Physics</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#time">⏰ Clock & Alarms</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#Glyph">🎨 Glyph Mode</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#network">🌐 Weather & WiFi</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#hardware">⚙️ Hardware</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#led">💡 LED Lighting</button></li>
+        </ul>
+
+        <!-- Tab Contents -->
+        <div class="tab-content" id="myTabContent">
+
+          <!-- LIVE CONTROL TAB -->
+          <div class="tab-pane fade show active" id="live" role="tabpanel">
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <div class="config-card h-100">
+                  <span class="config-card-title"><i class="fas fa-face-smile text-warning"></i> Quick Mood Control</span>
+                  <label>Current Mood Override</label>
+                  <select id="mood" onchange="send('MOOD', this.value)">
+                    <option value="0">Normal</option>
+                    <option value="1">Happy</option>
+                    <option value="2">Focused</option>
+                    <option value="3">Sleeping</option>
+                    <option value="4">Sad</option>
+                    <option value="5">Angry</option>
+                    <option value="6">In Love</option>
+                    <option value="7">Suspicious</option>
+                  </select>
+                  <button class="btn btn-secondary w-100 mt-2" onclick="sendCmd('BLINK')">
+                    <i class="fas fa-eye me-2"></i> Force Blink Animation
+                  </button>
                 </div>
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <div class="config-card h-100">
+                  <span class="config-card-title"><i class="fas fa-display text-primary"></i> Manual Page Jumps</span>
+                  <label>Jump to Screen Page</label>
+                  <select id="page" onchange="send('PAGE', this.value)">
+                    <option value="0">Live Eyes</option>
+                    <option value="1">Clock (Primary Face)</option>
+                    <option value="2">Local Weather Pane</option>
+                    <option value="3">Secondary World Clock</option>
+                    <option value="4">Three-Day Forecast</option>
+                    <option value="5">Alarm Config View</option>
+                    <option value="8">Countdown Timer</option>
+                    <option value="9">Stopwatch Utility</option>
+                    <option value="10">LED Settings Page</option>
+                    <option value="11">WiFi Settings Page</option>
+                  </select>
+
+                  <label class="mt-3">Display Brightness (Contrast)</label>
+                  <div class="slider-group">
+                    <div class="slider-header">
+                      <label class="small text-muted">Contrast</label>
+                      <span class="slider-val" id="brVal">255</span>
+                    </div>
+                    <input type="range" class="w-100 form-range" id="br" min="1" max="255" value="255" oninput="document.getElementById('brVal').innerText=this.value; send('BR', this.value)">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- EYES SETTINGS TAB -->
+          <div class="tab-pane fade" id="eyes" role="tabpanel">
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <div class="config-card">
+                  <span class="config-card-title"><i class="fas fa-eye text-primary"></i> Eye Physical Dimensions</span>
+                  
+                  <div class="slider-group">
+                    <div class="slider-header">
+                      <label class="small text-white">Width Scale</label>
+                      <span class="slider-val" id="ewVal">36</span>
+                    </div>
+                    <input type="range" class="w-100 form-range" id="ew" min="10" max="60" value="36" oninput="document.getElementById('ewVal').innerText=this.value; updateEyeSize()">
+                  </div>
+
+                  <div class="slider-group">
+                    <div class="slider-header">
+                      <label class="small text-white">Height Scale</label>
+                      <span class="slider-val" id="ehVal">36</span>
+                    </div>
+                    <input type="range" class="w-100 form-range" id="eh" min="10" max="60" value="36" oninput="document.getElementById('ehVal').innerText=this.value; updateEyeSize()">
+                  </div>
+
+                  <div class="slider-group mb-0">
+                    <div class="slider-header">
+                      <label class="small text-white">Corner Corner Radius</label>
+                      <span class="slider-val" id="erVal">8</span>
+                    </div>
+                    <input type="range" class="w-100 form-range" id="er" min="0" max="20" value="8" oninput="document.getElementById('erVal').innerText=this.value; updateEyeRadius()">
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <div class="config-card d-flex flex-column h-100 justify-content-between">
+                  <div>
+                    <span class="config-card-title"><i class="fas fa-arrows-to-dot text-accent"></i> Position Offsets</span>
+                    
+                    <div class="slider-group">
+                      <div class="slider-header">
+                        <label class="small text-white">Horizontal Offset (X)</label>
+                        <span class="slider-val" id="exVal">0</span>
+                      </div>
+                      <input type="range" class="w-100 form-range" id="ex" min="-12" max="12" value="0" oninput="document.getElementById('exVal').innerText=this.value; updateEyePos()">
+                    </div>
+
+                    <div class="slider-group mb-0">
+                      <div class="slider-header">
+                        <label class="small text-white">Vertical Offset (Y)</label>
+                        <span class="slider-val" id="eyVal">0</span>
+                      </div>
+                      <input type="range" class="w-100 form-range" id="ey" min="-8" max="8" value="0" oninput="document.getElementById('eyVal').innerText=this.value; updateEyePos()">
+                    </div>
+                  </div>
+
+                  <div class="d-flex gap-2 mt-4">
+                    <button class="btn btn-success flex-grow-1" onclick="saveEyes()"><i class="fas fa-check me-2"></i> Save Shape</button>
+                    <button class="btn btn-secondary" onclick="resetEyes()"><i class="fas fa-rotate-left me-2"></i> Reset</button>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div class="tab-content">
+            <!-- MANUAL EYE Gaze OVERRIDE -->
+            <div class="config-card">
+              <span class="config-card-title"><i class="fas fa-arrows-up-down-left-right text-success"></i> Gaze Direction Override</span>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <div class="slider-group mb-0">
+                    <div class="slider-header">
+                      <label class="small text-white">Pupil Horizontal Offset (X)</label>
+                      <span class="slider-val" id="pxVal">0</span>
+                    </div>
+                    <input type="range" class="w-100 form-range" id="px" min="-8" max="8" value="0" oninput="document.getElementById('pxVal').innerText=this.value; updateEye()">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="slider-group mb-0">
+                    <div class="slider-header">
+                      <label class="small text-white">Pupil Vertical Offset (Y)</label>
+                      <span class="slider-val" id="pyVal">0</span>
+                    </div>
+                    <input type="range" class="w-100 form-range" id="py" min="-6" max="6" value="0" oninput="document.getElementById('pyVal').innerText=this.value; updateEye()">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-                <!-- GIFs TAB -->
-                <div class="tab-pane fade show active" id="tab-gifs">
+          <!-- TIME SETTINGS TAB -->
+          <div class="tab-pane fade" id="time" role="tabpanel">
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <div class="config-card h-100">
+                  <span class="config-card-title"><i class="fas fa-clock text-primary"></i> Alarm Configurations</span>
+                  <div class="row">
+                    <div class="col-6 mb-3">
+                      <label>Hour (0-23)</label>
+                      <input type="number" id="aH" min="0" max="23" value="7">
+                    </div>
+                    <div class="col-6 mb-3">
+                      <label>Minute (0-59)</label>
+                      <input type="number" id="aM" min="0" max="59" value="0">
+                    </div>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="aOn">
+                    <label class="form-check-label text-white" for="aOn">Enable Daily Alarm Ring</label>
+                  </div>
+
+                  <hr class="border-secondary my-3">
+
+                  <span class="config-card-title"><i class="fas fa-hourglass-half text-accent"></i> Timer Duration</span>
+                  <label>Countdown Period (Minutes)</label>
+                  <input type="number" id="tmr" min="1" max="120" value="10">
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <div class="config-card h-100">
+                  <span class="config-card-title"><i class="fas fa-hourglass-start text-warning"></i> Screen Layout Styles</span>
+                  <label>Clock Face Layout</label>
+                  <select id="clkFace">
+                    <option value="0">Classic Simple Digital</option>
+                    <option value="1">Modern Centered Bold</option>
+                    <option value="2">Minimalist Two-Lines Layout</option>
+                  </select>
+
+                  <div class="form-check form-switch mb-4">
+                    <input class="form-check-input" type="checkbox" id="time24">
+                    <label class="form-check-label text-white" for="time24">24-Hour Time Format</label>
+                  </div>
+
+                  <label>Timezone Offset</label>
+                  <select id="tz_off" onchange="send('SET_TZ', this.value)">
+                    <option value="-43200">UTC-12:00 (Kwajalein)</option>
+                    <option value="-39600">UTC-11:00 (Samoa)</option>
+                    <option value="-36000">UTC-10:00 (Hawaii)</option>
+                    <option value="-32400">UTC-09:00 (Alaska)</option>
+                    <option value="-28800">UTC-08:00 (Pacific Time)</option>
+                    <option value="-25200">UTC-07:00 (Mountain Time)</option>
+                    <option value="-21600">UTC-06:00 (Central Time)</option>
+                    <option value="-18000">UTC-05:00 (Eastern Time)</option>
+                    <option value="-14400">UTC-04:00 (Atlantic Time)</option>
+                    <option value="-12600">UTC-03:30 (Newfoundland)</option>
+                    <option value="-10800">UTC-03:00 (Buenos Aires)</option>
+                    <option value="-7200">UTC-02:00 (Mid-Atlantic)</option>
+                    <option value="-3600">UTC-01:00 (Azores)</option>
+                    <option value="0">UTC+00:00 (London/GMT)</option>
+                    <option value="3600">UTC+01:00 (Paris/CET)</option>
+                    <option value="7200">UTC+02:00 (Athens/EET)</option>
+                    <option value="10800">UTC+03:00 (Moscow/MSK)</option>
+                    <option value="12600">UTC+03:30 (Tehran)</option>
+                    <option value="14400">UTC+04:00 (Dubai)</option>
+                    <option value="16200">UTC+04:30 (Kabul)</option>
+                    <option value="18000">UTC+05:00 (Karachi)</option>
+                    <option value="19800" selected>UTC+05:30 (New Delhi/IST)</option>
+                    <option value="20700">UTC+05:45 (Kathmandu)</option>
+                    <option value="21600">UTC+06:00 (Dhaka)</option>
+                    <option value="23400">UTC+06:30 (Yangon)</option>
+                    <option value="25200">UTC+07:00 (Bangkok)</option>
+                    <option value="28800">UTC+08:00 (Beijing/SST)</option>
+                    <option value="31500">UTC+08:45 (Eucla)</option>
+                    <option value="32400">UTC+09:00 (Tokyo/KST)</option>
+                    <option value="34200">UTC+09:30 (Adelaide)</option>
+                    <option value="36000">UTC+10:00 (Sydney/AEST)</option>
+                    <option value="37800">UTC+10:30 (Lord Howe)</option>
+                    <option value="39600">UTC+11:00 (Solomon Islands)</option>
+                    <option value="43200">UTC+12:00 (Auckland)</option>
+                    <option value="46800">UTC+13:00 (Tonga)</option>
+                    <option value="50400">UTC+14:00 (Kiritimati)</option>
+                  </select>
+
+                  <label class="mt-3">Screensaver Timeout (Seconds)</label>
+                  <div class="slider-group">
+                    <div class="slider-header">
+                      <label class="small text-muted">Timeout (Seconds)</label>
+                      <span class="slider-val" id="ssVal">10</span>
+                    </div>
+                    <input type="range" class="w-100 form-range" id="ss_timeout" min="5" max="300" value="10" oninput="document.getElementById('ssVal').innerText=this.value">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- WORLD CLOCK SUB-PANEL -->
+            <div class="config-card">
+              <span class="config-card-title"><i class="fas fa-earth-americas text-success"></i> Dual World Clock Selection</span>
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label>Zone 1 (Left Display Pane)</label>
+                  <select id="tz1"></select>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label>Zone 2 (Right Display Pane)</label>
+                  <select id="tz2"></select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- GLYPH MODE TAB -->
+          <div class="tab-pane fade" id="Glyph" role="tabpanel">
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <div class="config-card h-100">
+                  <span class="config-card-title"><i class="fas fa-quote-left text-accent"></i> Glyph Text Content</span>
+                  <label>Custom Text String</label>
+                  <input id="cTxt" value="Hello!">
+
+                  <label>Predefined Office Statuses</label>
+                  <select id="predefText" onchange="selectPredefinedText(this.value)">
+                    <option value="" disabled selected>-- Select Work Status --</option>
+                    <option value="In a Meeting">In a Meeting</option>
+                    <option value="Do Not Disturb">Do Not Disturb</option>
+                    <option value="Focused Coding">Focused Coding</option>
+                    <option value="Lunch Break">Lunch Break</option>
+                    <option value="Out of Office">Out of Office</option>
+                    <option value="Back in 10 Mins">Back in 10 Mins</option>
+                    <option value="On a Call">On a Call</option>
+                    <option value="Deep Work">Deep Work</option>
+                    <option value="In a Sync">In a Sync</option>
+                    <option value="Reviewing PRs">Reviewing PRs</option>
+                    <option value="Standup Mode">Standup Mode</option>
+                    <option value="Coffee Break">Coffee Break</option>
+                    <option value="Away from Desk">Away from Desk</option>
+                  </select>
+                  <small class="text-muted" style="font-size:0.75rem; line-height:1.4;">Text automatically downscales its font to fit screen parameters when sent.</small>
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <div class="config-card h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <span class="config-card-title"><i class="fas fa-font text-info"></i> Render Settings</span>
+
+                    <label>Font Family & Baseline Size</label>
+                    <select id="cFnt">
+                      <option value="0">Helv Bold 8</option>
+                      <option value="1">Helv Bold 10</option>
+                      <option value="2">Helv Bold 14</option>
+                      <option value="3">Helv Bold 18</option>
+                      <option value="4">Logisoso 24</option>
+                      <option value="5">New Century 8</option>
+                      <option value="6">New Century 14</option>
+                      <option value="7">Times Bold 10</option>
+                      <option value="8">Times Bold 18</option>
+                      <option value="9">Retro Pixel 8</option>
+                    </select>
+
+                    <label>Animation Transition Style</label>
+                    <select id="cAnm">
+                      <option value="0">Static</option>
+                      <option value="1">Scroll Left</option>
+                      <option value="2">Scroll Right</option>
+                      <option value="3">Blink</option>
+                      <option value="4">Bounce Scroll</option>
+                      <option value="5">Typing Effect</option>
+                    </select>
+                  </div>
+
+                  <button id="pushGlyphBtn" class="btn btn-primary w-100 mt-4" onclick="pushGlyph()">
+                    <i class="fas fa-desktop me-2"></i> Push & View Glyph on Device
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NETWORK & WEATHER TAB -->
+          <div class="tab-pane fade" id="network" role="tabpanel">
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <div class="config-card h-100">
+                  <span class="config-card-title"><i class="fas fa-cloud-sun text-accent"></i> Local Weather Integration</span>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label>Target City</label>
+                      <input id="city" placeholder="e.g. London">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label>OpenWeather API Key</label>
+                      <input id="apikey" type="password" placeholder="Insert OpenWeather Token">
+                    </div>
+                  </div>
+                  <p class="small text-muted mb-0" style="line-height:1.5;"><i class="fas fa-circle-exclamation me-1"></i> Weather data is pulled via the host browser and pushed periodically to the device cache every 4 hours while USB connection is active.</p>
+                </div>
+              </div>
+
+              <!-- WIFI SETUP CARD -->
+              <div class="col-md-6 mb-4">
+                <div class="config-card h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <span class="config-card-title"><i class="fas fa-wifi text-primary"></i> WiFi Network Credentials</span>
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="glass-card p-4">
-                                <h5 class="mb-3 text-info"><i class="fas fa-sliders-h me-2"></i>Playback Settings</h5>
-
-                                <label>Speed: <span id="gif_speedValue" class="text-accent">0</span></label>
-                                <input type="range" class="form-range" id="gif_speed" min="50" max="200" value="100">
-
-                                <label class="mt-3">Delay (Seconds): <span id="gif_delayValue"
-                                        class="text-accent">10</span></label>
-                                <input type="range" class="form-range" id="gif_delay" min="0" max="60" value="10">
-
-                                <div class="form-check form-switch mt-3">
-                                    <input class="form-check-input" type="checkbox" id="isInverted">
-                                    <label class="form-check-label">Negative Colors (Inverted)</label>
-                                </div>
-
-                                <hr class="border-secondary">
-
-                                <h5 class="mb-3 text-info"><i class="fas fa-hand-pointer me-2"></i>Triggers</h5>
-
-                                <div class="mb-2">
-                                    <label class="small text-muted">DEFAULT GIF</label>
-                                    <select class="form-select" id="gif_default"></select>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="small text-muted">STARTUP GIF</label>
-                                    <select class="form-select" id="gif_intro"></select>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="small text-muted">SINGLE TAP</label>
-                                    <select class="form-select trigger-select" id="gif_touch"></select>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="small text-muted">DOUBLE TAP</label>
-                                    <select class="form-select trigger-select" id="gif_double_touch"></select>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="small text-muted">LONG PRESS</label>
-                                    <select class="form-select trigger-select" id="gif_long_touch"></select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-8">
-                            <div class="glass-card p-4">
-                                <div class="d-flex justify-content-between mb-3">
-                                    <h5 class="text-info"><i class="fas fa-th me-2"></i>Gif Selector</h5>
-                                    <div>
-                                        <button class="btn btn-sm btn-outline-light me-1"
-                                            onclick="toggleAllGifs(true)">Select All</button>
-                                        <button class="btn btn-sm btn-outline-light"
-                                            onclick="toggleAllGifs(false)">Clear</button>
-                                    </div>
-                                </div>
-                                <div class="row" id="gifGrid"></div>
-                            </div>
-                        </div>
+                      <div class="col-md-6 mb-3">
+                        <label>SSID / Network Name</label>
+                        <input id="wf_ssid" placeholder="Enter WiFi SSID">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label>Password</label>
+                        <input id="wf_pass" type="password" placeholder="Enter WiFi Password">
+                      </div>
                     </div>
+                  </div>
+                  <button class="btn btn-primary w-100 mt-3" onclick="saveWiFiSettings()">
+                    <i class="fas fa-save me-2"></i> Save Credentials & Reboot
+                  </button>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <!-- AUDIO TAB -->
-                <div class="tab-pane fade" id="tab-audio">
-                    <div class="row">
-                        <div class="col-12 mb-3">
-                            <div class="glass-card p-3">
-                                <a href="music.html" class="btn btn-elegant mb-3" target="_blank">
-                                    <i class="fas fa-music me-2"></i>
-                                    <span>Composing Tools</span>
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="glass-card p-4">
-                                <h5 class="text-info mb-3">System Sounds</h5>
-
-                                <label class="small text-muted">STARTUP MELODY</label>
-                                <div class="input-group mb-3">
-                                    <textarea class="form-control font-monospace" id="intro_sound" rows="2"></textarea>
-                                    <button class="btn btn-secondary" onclick="previewSound('intro_sound')"><i
-                                            class="fas fa-play"></i></button>
-                                </div>
-
-                                <label class="small text-muted">NOTIFICATION</label>
-                                <div class="input-group mb-3">
-                                    <textarea class="form-control font-monospace" id="notification_sound"
-                                        rows="2"></textarea>
-                                    <button class="btn btn-secondary" onclick="previewSound('notification_sound')"><i
-                                            class="fas fa-play"></i></button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="glass-card p-4">
-                                <h5 class="text-info mb-3">Interaction Sounds</h5>
-
-                                <label class="small text-muted">SINGLE TAP</label>
-                                <div class="input-group mb-3">
-                                    <textarea class="form-control font-monospace" id="touch_sound" rows="2"></textarea>
-                                    <button class="btn btn-secondary" onclick="previewSound('touch_sound')"><i
-                                            class="fas fa-play"></i></button>
-                                </div>
-
-                                <label class="small text-muted">DOUBLE TAP</label>
-                                <div class="input-group mb-3">
-                                    <textarea class="form-control font-monospace" id="double_touch_sound"
-                                        rows="2"></textarea>
-                                    <button class="btn btn-secondary" onclick="previewSound('double_touch_sound')"><i
-                                            class="fas fa-play"></i></button>
-                                </div>
-
-                                <label class="small text-muted">LONG PRESS</label>
-                                <div class="input-group mb-3">
-                                    <textarea class="form-control font-monospace" id="long_touch_sound"
-                                        rows="2"></textarea>
-                                    <button class="btn btn-secondary" onclick="previewSound('long_touch_sound')"><i
-                                            class="fas fa-play"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+          <!-- HARDWARE SETTINGS TAB -->
+          <div class="tab-pane fade" id="hardware" role="tabpanel">
+            <div class="config-card">
+              <span class="config-card-title"><i class="fas fa-microchip text-primary"></i> Hardware Driver Options</span>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label>OLED Driver Chipset</label>
+                  <select id="display_type">
+                    <option value="ssd1306">SSD1306 (Standard 0.96")</option>
+                    <option value="sh1106">SH1106 (Alternative 1.3")</option>
+                  </select>
                 </div>
-
-                <!-- CHRONOS & PERSONALIZATION TAB -->
-                <div class="tab-pane fade" id="tab-chronos">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="glass-card p-4 h-100">
-                                <h5 class="text-info mb-4"><i class="fas fa-clock me-2"></i>Time & Display</h5>
-
-                                <div class="mb-4">
-                                    <label>Notification Duration: <span id="notifDurationValue">5</span>s</label>
-                                    <input type="range" class="form-range" id="notifDuration" min="1" max="10"
-                                        value="5">
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="form-label" for="watch_face">Watch Face Style</label>
-                                    <select class="form-select" id="watch_face">
-                                        <option value="0">Classic Style</option>
-                                        <option value="1">Casio Retro Style</option>
-                                        <option value="2">Analog Style</option>
-                                        <option value="3">7-Segment Style</option>
-                                    </select>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label>Focus Timer Duration: <span id="timer_durationValue">20</span> min</label>
-                                    <input type="range" class="form-range" id="timer_duration" min="1" max="60"
-                                        value="20">
-                                </div>
-
-                                <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" id="is_24h" checked>
-                                    <label class="form-check-label" for="is_24h">24-Hour Time Format</label>
-                                </div>
-
-                                <div class="form-check form-switch mb-2">
-                                    <input class="form-check-input" type="checkbox" id="hourly_chime">
-                                    <label class="form-check-label" for="hourly_chime">Enable Hourly Chime</label>
-                                </div>
-                                <div class="mb-3 ms-4" id="hourly_chime_style_container">
-                                    <label class="form-label small text-muted">Chime Sound Style</label>
-                                    <select class="form-select form-select-sm" id="chime_style">
-                                        <option value="0">Classic Westminster Chime</option>
-                                        <option value="1">Casio Retro Double-Beep</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-check form-switch mb-2">
-                                    <input class="form-check-input" type="checkbox" id="water_reminder" checked>
-                                    <label class="form-check-label" for="water_reminder">Enable Water Reminder</label>
-                                </div>
-                                <div class="mb-3 ms-4" id="water_reminder_interval_container">
-                                    <label class="form-label small text-muted">Reminder Interval</label>
-                                    <select class="form-select form-select-sm" id="water_reminder_interval">
-                                        <option value="15">15 Minutes</option>
-                                        <option value="30">30 Minutes</option>
-                                        <option value="45">45 Minutes</option>
-                                        <option value="60" selected>1 Hour</option>
-                                        <option value="90">1.5 Hours</option>
-                                        <option value="120">2 Hours</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-check form-switch mb-2 border-top pt-3">
-                                    <input class="form-check-input" type="checkbox" id="alarm_enabled">
-                                    <label class="form-check-label" for="alarm_enabled">Enable Alarm</label>
-                                </div>
-                                <div class="mb-3 ms-4" id="alarm_time_container">
-                                    <label class="form-label small text-muted">Alarm Time</label>
-                                    <input type="time" class="form-control form-control-sm" id="alarm_time"
-                                        value="07:00">
-                                </div>
-
-                                <div class="form-check form-switch mb-2 border-top pt-3">
-                                    <input class="form-check-input" type="checkbox" id="dnd_enabled">
-                                    <label class="form-check-label" for="dnd_enabled">Enable Do Not Disturb</label>
-                                </div>
-                                <div class="row g-2 mb-3 ms-2" id="dnd_time_container">
-                                    <div class="col">
-                                        <label class="form-label small text-muted">Start Hour</label>
-                                        <select class="form-select form-select-sm" id="dnd_start_hour">
-                                            <option value="0">00:00</option>
-                                            <option value="1">01:00</option>
-                                            <option value="2">02:00</option>
-                                            <option value="3">03:00</option>
-                                            <option value="4">04:00</option>
-                                            <option value="5">05:00</option>
-                                            <option value="6">06:00</option>
-                                            <option value="7">07:00</option>
-                                            <option value="8">08:00</option>
-                                            <option value="9">09:00</option>
-                                            <option value="10">10:00</option>
-                                            <option value="11">11:00</option>
-                                            <option value="12">12:00</option>
-                                            <option value="13">13:00</option>
-                                            <option value="14">14:00</option>
-                                            <option value="15">15:00</option>
-                                            <option value="16">16:00</option>
-                                            <option value="17">17:00</option>
-                                            <option value="18">18:00</option>
-                                            <option value="19">19:00</option>
-                                            <option value="20">20:00</option>
-                                            <option value="21">21:00</option>
-                                            <option value="22" selected>22:00</option>
-                                            <option value="23">23:00</option>
-                                        </select>
-                                    </div>
-                                    <div class="col">
-                                        <label class="form-label small text-muted">End Hour</label>
-                                        <select class="form-select form-select-sm" id="dnd_end_hour">
-                                            <option value="0">00:00</option>
-                                            <option value="1">01:00</option>
-                                            <option value="2">02:00</option>
-                                            <option value="3">03:00</option>
-                                            <option value="4">04:00</option>
-                                            <option value="5">05:00</option>
-                                            <option value="6">06:00</option>
-                                            <option value="7" selected>07:00</option>
-                                            <option value="8">08:00</option>
-                                            <option value="9">09:00</option>
-                                            <option value="10">10:00</option>
-                                            <option value="11">11:00</option>
-                                            <option value="12">12:00</option>
-                                            <option value="13">13:00</option>
-                                            <option value="14">14:00</option>
-                                            <option value="15">15:00</option>
-                                            <option value="16">16:00</option>
-                                            <option value="17">17:00</option>
-                                            <option value="18">18:00</option>
-                                            <option value="19">19:00</option>
-                                            <option value="20">20:00</option>
-                                            <option value="21">21:00</option>
-                                            <option value="22">22:00</option>
-                                            <option value="23">23:00</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="glass-card p-4 h-100">
-                                <h5 class="text-info mb-4"><i class="fas fa-paint-brush me-2"></i>Personalization</h5>
-                                <div class="mb-3">
-                                    <label class="small text-muted">BOOTING TEXT</label>
-                                    <input type="text" class="form-control" id="custom_title" maxlength="32"
-                                        placeholder="e.g., OLO BIT STARTING...">
-                                    <small class="text-muted d-block mt-2">Text displayed during device boot
-                                        animation.</small>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="small text-muted" for="boot_font">BOOT TEXT FONT</label>
-                                    <select class="form-select form-select-sm" id="boot_font">
-                                        <option value="0">Helvetica Bold</option>
-                                        <option value="1">Times Bold</option>
-                                        <option value="2">Courier Bold</option>
-                                        <option value="3">New Century Bold</option>
-                                        <option value="4">Lucida Regular</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="small text-muted" for="boot_size">BOOT TEXT SIZE</label>
-                                    <select class="form-select form-select-sm" id="boot_size">
-                                        <option value="0">8px</option>
-                                        <option value="1">12px</option>
-                                        <option value="2">14px</option>
-                                        <option value="3">18px</option>
-                                        <option value="4">24px</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="glass-card p-4 h-100">
-                                <h5 class="text-info mb-4"><i class="fas fa-bluetooth me-2"></i>Bluetooth Settings</h5>
-
-                                <div class="mb-4">
-                                    <label>Auto-off Delay: <span id="bluetooth_auto_offValue">5</span> min</label>
-                                    <input type="range" class="form-range" id="bluetooth_auto_off" min="0" max="30"
-                                        value="5">
-                                    <small class="text-muted d-block">Set to 0 to keep Bluetooth always on.</small>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">Bluetooth Name</label>
-                                    <input type="text" class="form-control" id="bluetoothName" value="OLO Bit">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-md-6 mb-3">
+                  <label>Orientation Settings</label>
+                  <select id="is_flip_mode">
+                    <option value="0">Normal Orientation</option>
+                    <option value="1">Rotate 180° (Flipped)</option>
+                  </select>
                 </div>
-
-                <!-- HARDWARE CONFIG TAB -->
-                <div class="tab-pane fade" id="tab-hardware">
-                    <div class="row">
-                        <!-- Screen Settings -->
-                        <div class="col-md-6">
-                            <div class="glass-card p-4 h-100">
-                                <h5 class="text-info mb-3"><i class="fas fa-desktop me-2"></i>Display (I2C)</h5>
-                                <div class="mb-2">
-                                    <label>Driver</label>
-                                    <select class="form-select" id="display_type">
-                                        <option value="ssd1306">SSD1306</option>
-                                        <option value="sh1106">SH1106</option>
-                                    </select>
-                                </div>
-                                <div class="mb-2"><label>SCL Pin</label><input type="number" class="form-control"
-                                        id="scl_pin"></div>
-                                <div class="mb-2"><label>SDA Pin</label><input type="number" class="form-control"
-                                        id="sda_pin"></div>
-                                <div class="mb-2">
-                                    <label>Orientation</label>
-                                    <select class="form-select" id="is_flip_mode">
-                                        <option value="0">Normal</option>
-                                        <option value="1">Flipped 180°</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- System Pins -->
-                        <div class="col-md-6">
-                            <div class="glass-card p-4 h-100">
-                                <h5 class="text-info mb-3"><i class="fas fa-microchip me-2"></i>System Pins</h5>
-                                <div class="mb-3"><label>Buzzer Pin (Passive)</label><input type="number"
-                                        class="form-control" id="buzzer_pin"></div>
-                                <div class="mb-3"><label>Touch Button Pin</label><input type="number"
-                                        class="form-control" id="touch_pin"></div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-md-6 mb-3">
+                  <label>I2C Data Pin (SDA)</label>
+                  <input type="number" id="sda_pin" placeholder="21">
                 </div>
-
-                <!-- CANVAS TAB -->
-                <div class="tab-pane fade" id="tab-canvas">
-                    <div class="row justify-content-center">
-                        <div class="col-md-8">
-                            <div class="glass-card p-4">
-                                <h5 class="text-info mb-4"><i class="fas fa-font me-2"></i>Canvas Text Mode</h5>
-
-                                <div class="mb-3">
-                                    <label class="form-label" for="canvas_text">Custom Text</label>
-                                    <input type="text" class="form-control" id="canvas_text" value="Hello!">
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="canvas_font">Font Family</label>
-                                        <select class="form-select" id="canvas_font">
-                                            <option value="0">Helvetica Bold</option>
-                                            <option value="1">Times Bold</option>
-                                            <option value="2">Courier Bold</option>
-                                            <option value="3">New Century Bold</option>
-                                            <option value="4">Lucida Regular</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="canvas_size">Font Size</label>
-                                        <select class="form-select" id="canvas_size">
-                                            <option value="0">8px</option>
-                                            <option value="1">12px</option>
-                                            <option value="2" selected>14px</option>
-                                            <option value="3">18px</option>
-                                            <option value="4">24px</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="form-label" for="canvas_anim">Animation Style</label>
-                                    <select class="form-select" id="canvas_anim">
-                                        <option value="0">Scroll Left</option>
-                                        <option value="1">Scroll Right</option>
-                                        <option value="2">Bounce Scroll</option>
-                                        <option value="3">Typewriter Effect</option>
-                                        <option value="4">Blinking / Flash</option>
-                                    </select>
-                                </div>
-
-                                <div class="d-flex gap-2">
-                                    <button id="pushCanvasBtn" class="btn btn-elegant flex-grow-1">
-                                        <i class="fas fa-paper-plane me-2"></i>Push to Device
-                                    </button>
-                                    <button id="stopCanvasBtn" class="btn btn-danger">
-                                        <i class="fas fa-stop me-2"></i>Stop
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-md-6 mb-3">
+                  <label>I2C Clock Pin (SCL)</label>
+                  <input type="number" id="scl_pin" placeholder="20">
                 </div>
+              </div>
 
+              <hr class="border-secondary my-4">
 
-
+              <span class="config-card-title"><i class="fas fa-volume-up text-accent"></i> Beeper & Reminders</span>
+              <div class="row mt-2">
+                <div class="col-md-4 mb-3">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="snd" checked>
+                    <label class="form-check-label text-white" for="snd">Touch Feedback beep</label>
+                  </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="chm" checked>
+                    <label class="form-check-label text-white" for="chm">Hourly Chime beep</label>
+                  </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="wtr">
+                    <label class="form-check-label text-white" for="wtr">Hourly Hydration Alert</label>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- SERIAL MONITOR -->
-            <div class="card mt-4 mb-5 border-0 bg-transparent">
-                <h5 class="text-light mb-2"><i class="fas fa-terminal me-2"></i>Serial Monitor</h5>
-                <div class="log-container">
-                    <div class="log-header">
-                        <span class="text-muted small">BAUD: 115200</span>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="clearLog()">Clear Log</button>
-                    </div>
-                    <div class="log-content" id="serialLog">
-                        <div class="log-line log-sys">Ready to connect...</div>
-                    </div>
+            <!-- SECURITY CARD -->
+            <div class="config-card mt-3">
+              <span class="config-card-title"><i class="fas fa-shield-halved text-warning"></i> Dashboard Security</span>
+              <div class="row">
+                <div class="col-md-8 mb-3">
+                  <label>Admin Password</label>
+                  <input type="password" id="admin_pwd" placeholder="Set Dashboard Password (leave blank to disable)">
                 </div>
-                <div class="mt-2 d-flex">
-                    <input type="text" id="manualCmd" class="form-control me-2" placeholder="Send manual command..."
-                        onkeypress="if(event.key==='Enter') sendManual()">
-                    <button class="btn btn-secondary" onclick="sendManual()">Send</button>
+                <div class="col-md-4 mb-3 d-flex align-items-end">
+                  <button class="btn btn-warning w-100" onclick="saveAdminPwd()">Set Password</button>
                 </div>
+              </div>
             </div>
+
+            <!-- NVS MEMORY MANAGEMENT CARD -->
+            <div class="config-card mt-3">
+              <span class="config-card-title"><i class="fas fa-trash-can text-danger"></i> NVS Memory Management</span>
+              <p class="small text-muted mb-3" style="line-height:1.5;">Resetting the NVS memory clears all stored configurations (WiFi, weather settings, timezone, calibrations, and logs). This is recommended if you experience flash defragmentation issues.</p>
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <button class="btn btn-danger w-100" onclick="btnResetSettings()">
+                    <i class="fas fa-trash-can me-2"></i> Reset NVS Memory
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LED LIGHTING TAB -->
+          <div class="tab-pane fade" id="led" role="tabpanel">
+            <div class="row">
+
+              <!-- LEFT CARD: GENERAL & GAMUT -->
+              <div class="col-md-6 mb-4">
+                <div class="config-card h-100">
+                  <span class="config-card-title"><i class="fas fa-lightbulb text-warning"></i> LED Power & Gamut</span>
+
+                  <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary">
+                    <div>
+                      <label class="h6 mb-0 d-block">Main LED Switch</label>
+                      <span class="small text-muted">Toggle the 1-pixel WS2812B NeoPixel state</span>
+                    </div>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input" type="checkbox" id="ledO" checked onchange="toggleLedPower(this.checked)">
+                    </div>
+                  </div>
+
+                  <div class="slider-group">
+                    <div class="slider-header">
+                      <label class="small text-white">Brightness</label>
+                      <span class="slider-val" id="ledBVal">128</span>
+                    </div>
+                    <input type="range" class="w-100 form-range" id="ledB" min="0" max="255" value="128" oninput="changeLedBrightness(this.value)">
+                  </div>
+
+                  <label class="small text-white d-block mb-2">Color Gamut Settings</label>
+                  <div class="slider-group mb-2">
+                    <div class="slider-header">
+                      <label class="xsmall text-muted">Hue</label>
+                      <span class="slider-val" id="hueVal">30</span>
+                    </div>
+                    <input type="range" class="w-100 form-range" id="hue" min="0" max="359" value="30" oninput="updateHslColor()">
+                  </div>
+                  <div class="slider-group mb-2">
+                    <div class="slider-header">
+                      <label class="xsmall text-muted">Saturation</label>
+                      <span class="slider-val" id="satVal">100%</span>
+                    </div>
+                    <input type="range" class="w-100 form-range" id="sat" min="0" max="100" value="100" oninput="updateHslColor()">
+                  </div>
+                  <div class="slider-group mb-3">
+                    <div class="slider-header">
+                      <label class="xsmall text-muted">Lightness</label>
+                      <span class="slider-val" id="lightVal">50%</span>
+                    </div>
+                    <input type="range" class="w-100 form-range" id="light" min="0" max="100" value="50" oninput="updateHslColor()">
+                  </div>
+
+                  <div class="d-flex align-items-center gap-3">
+                    <div id="color-preview" style="width:40px; height:40px; border-radius:8px; border:1px solid var(--glass-border); box-shadow:0 0 10px rgba(0,0,0,0.5); background-color: rgb(255, 127, 0);"></div>
+                    <div class="small text-muted font-monospace" id="rgb-string">rgb(255, 127, 0)</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- RIGHT CARD: EFFECTS & ALERTS & MELODIES -->
+              <div class="col-md-6 mb-4">
+                <div class="config-card h-100 d-flex flex-column">
+                  <span class="config-card-title"><i class="fas fa-wand-magic-sparkles text-accent"></i> Visual Effects & Melodies</span>
+
+                  <div class="mb-4">
+                    <label class="small text-white">Active Light Effect</label>
+                    <select id="ledE" onchange="send('LED_EFFECT', this.value)">
+                      <option value="0">Static Color</option>
+                      <option value="1">Breathe Pulse</option>
+                      <option value="2">Rainbow Cycle</option>
+                      <option value="3">Fast Blink</option>
+                      <option value="4">Heartbeat Pulse</option>
+                      <option value="5">Fade In Ramp</option>
+                      <option value="6">Glow Flicker</option>
+                      <option value="7">Sparkle Strobe</option>
+                      <option value="8">Color Breathe</option>
+                      <option value="9">Alternating Complement</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-4">
+                    <label class="small text-white">Clubbed Melodies (Buzzer + LED)</label>
+                    <div class="d-flex flex-wrap gap-2 mt-1">
+                      <button class="btn btn-secondary btn-sm" onclick="send('LED_SONG', 0)"><i class="fas fa-play me-1"></i> Star Wars</button>
+                      <button class="btn btn-secondary btn-sm" onclick="send('LED_SONG', 1)"><i class="fas fa-play me-1"></i> Mario</button>
+                      <button class="btn btn-secondary btn-sm" onclick="send('LED_SONG', 2)"><i class="fas fa-play me-1"></i> Rickroll</button>
+                      <button class="btn btn-danger btn-sm" onclick="send('LED_SONG', -1)"><i class="fas fa-stop me-1"></i> Stop</button>
+                    </div>
+                  </div>
+
+                  <div class="border-top border-secondary pt-3 mt-auto">
+                    <span class="config-card-title text-info mb-3 d-block"><i class="fas fa-bell"></i> Notification Special States</span>
+
+                    <div class="row g-2 mb-2">
+                      <div class="col-6">
+                        <label class="xsmall text-white">Hourly Chime Visual</label>
+                        <select id="chime_effect" class="form-select form-select-sm" onchange="pushNotifConfig('chime')">
+                          <option value="0">Static Color</option>
+                          <option value="1">Breathe Pulse</option>
+                          <option value="2">Rainbow Cycle</option>
+                          <option value="3">Fast Blink</option>
+                        </select>
+                      </div>
+                      <div class="col-6">
+                        <label class="xsmall text-white">Chime Color</label>
+                        <input type="color" id="chime_color" class="form-control form-control-color w-100 p-1" style="height:38px;" value="#00ff00" onchange="pushNotifConfig('chime')">
+                      </div>
+                    </div>
+
+                    <div class="row g-2 mb-2">
+                      <div class="col-6">
+                        <label class="xsmall text-white">Water Alert Visual</label>
+                        <select id="water_effect" class="form-select form-select-sm" onchange="pushNotifConfig('water')">
+                          <option value="0">Static Color</option>
+                          <option value="1">Breathe Pulse</option>
+                          <option value="2">Rainbow Cycle</option>
+                          <option value="3">Fast Blink</option>
+                        </select>
+                      </div>
+                      <div class="col-6">
+                        <label class="xsmall text-white">Water Color</label>
+                        <input type="color" id="water_color" class="form-control form-control-color w-100 p-1" style="height:38px;" value="#0000ff" onchange="pushNotifConfig('water')">
+                      </div>
+                    </div>
+
+                    <div class="row g-2 mb-2">
+                      <div class="col-6">
+                        <label class="xsmall text-white">Alarm Alert Visual</label>
+                        <select id="alarm_effect" class="form-select form-select-sm" onchange="pushNotifConfig('alarm')">
+                          <option value="0">Static Color</option>
+                          <option value="1">Breathe Pulse</option>
+                          <option value="2">Rainbow Cycle</option>
+                          <option value="3">Fast Blink</option>
+                        </select>
+                      </div>
+                      <div class="col-6">
+                        <label class="xsmall text-white">Alarm Color</label>
+                        <input type="color" id="alarm_color" class="form-control form-control-color w-100 p-1" style="height:38px;" value="#ff0000" onchange="pushNotifConfig('alarm')">
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
 
         </div>
+      </div>
+
+      <!-- SYSTEM CONSOLE -->
+      <div class="console-container">
+        <label class="small text-white mb-2">Web Serial Output Log</label>
+        <div id="log" class="log-console">Awaiting connection to OLO Glyph...</div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Unsaved Changes Modal -->
+  <div class="modal fade" id="unsavedChangesModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="unsavedModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark border-secondary text-white" style="border-radius: 12px;">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title" id="unsavedModalLabel"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Unsaved Changes</h5>
+        </div>
+        <div class="modal-body">
+          You have modified configuration parameters. Save modifications to internal device memory before navigating away, or discard?
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-secondary" id="modalCancelBtn">Cancel</button>
+          <button type="button" class="btn btn-danger" id="modalDiscardBtn">Discard</button>
+          <button type="button" class="btn btn-success" id="modalSaveBtn">Save Changes</button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // --- 1. CONFIGURATION DATA ---
-        const gifData = {
-            "custom1": "Custom 1", "custom2": "Custom 2", "angry": "Tanjiro", "angry2": "Pretentious", "angry3": "Purple Flame",
-            "bee": "Bee", "cry": "Crying Smile", "cry2": "Crying", "awkward_laugh": "Awkward Laugh",
-            "rotation": "Rotation", "default": "Default", "demon_slayer": "Nezuko", "road_rage": "Road Rage",
-            "headlights": "Headlights", "devil_eyes": "GTR Rain", "distracted": "Distracted", "egg": "Cookie",
-            "furious": "Angry", "hand_some": "Banana", "happy_2": "Laugh", "sneeze": "Sneeze",
-            "sneeze2": "Big Sneeze", "hehe": "Smirk", "intro": "MML", "keep_it_up": "Keep it up",
-            "raspberry": "Raspberry", "love": "Love", "love2": "Dumb Love", "music": "Music",
-            "neon": "Neon", "noname": "Pinky", "distracted2": "Distracted 2", "look_right": "Look Right",
-            "look_left": "Look Left", "look_down": "Look Down", "police": "Police", "pong": "Pong",
-            "rain": "Rain", "sakura": "Sakura", "samurai": "Blade", "scared": "Accel", "sleepy": "Sleepy",
-            "smile": "Smile", "speed": "Revs", "star": "Stars", "hadouken_miss": "Hadouken Miss",
-            "hadouken_hit": "Hadouken Hit", "turbo": "Turbo", "tsurikawa": "Tsurikawa", "breaking": "Breaking",
-            "up_size_down": "Upside down", "UwU": "UwU", "wheels": "Equip", "speed2": "Speed 2",
-            "yelling": "Yelling", "car": "Car", "speed3": "Speed 3"
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const timezones = [
+      { name: "Los Angeles", off: -28800 }, { name: "Denver", off: -25200 }, { name: "Chicago", off: -21600 },
+      { name: "New York", off: -18000 }, { name: "Sao Paulo", off: -10800 }, { name: "London", off: 0 },
+      { name: "Paris", off: 3600 }, { name: "Cairo", off: 7200 }, { name: "Moscow", off: 10800 },
+      { name: "Dubai", off: 14400 }, { name: "Karachi", off: 18000 }, { name: "Mumbai", off: 19800 },
+      { name: "Dhaka", off: 21600 }, { name: "Bangkok", off: 25200 }, { name: "Singapore", off: 28800 },
+      { name: "Tokyo", off: 32400 }, { name: "Sydney", off: 39600 }
+    ];
+
+    function initTimezones() {
+      const sel1 = document.getElementById('tz1');
+      const sel2 = document.getElementById('tz2');
+      timezones.forEach(tz => {
+        let opt1 = document.createElement('option'); opt1.value = tz.name + "," + tz.off; opt1.text = tz.name; sel1.appendChild(opt1);
+        let opt2 = document.createElement('option'); opt2.value = tz.name + "," + tz.off; opt2.text = tz.name; sel2.appendChild(opt2);
+      });
+    }
+
+    function setZone(num) { send('Z' + num + '_SET', document.getElementById('tz' + num).value); }
+
+    function log(t) {
+      const l = document.getElementById('log');
+      l.textContent += `>> ${t}\n`;
+      l.scrollTop = l.scrollHeight;
+    }
+
+    function updateConnectionState(isConnected) {
+      const badge = document.getElementById('connection-status');
+      const text = document.getElementById('status-text');
+      if (isConnected) {
+        badge.className = "status-badge connected";
+        text.innerText = "Connected";
+        document.body.classList.remove('is-disconnected');
+        document.body.classList.add('is-connected');
+      } else {
+        badge.className = "status-badge";
+        text.innerText = "Disconnected";
+        document.body.classList.remove('is-connected');
+        document.body.classList.add('is-disconnected');
+      }
+    }
+
+    let port, writer, reader;
+    let timeSyncInterval, weatherSyncInterval;
+    let writeQueue = [];
+    let isWriting = false;
+
+    async function startConnection() {
+      try {
+        log("Requesting Web Serial port access...");
+        await connect();
+      } catch (e) {
+        log("Connection Failed: " + e.message);
+      }
+    }
+
+    async function connect(selectedPort) {
+      try {
+        if (!port) port = selectedPort || await navigator.serial.requestPort();
+        await port.open({ baudRate: 115200 });
+        writer = port.writable.getWriter();
+        reader = port.readable.getReader();
+        updateConnectionState(true);
+        setTimeout(() => sendCmd('GET_SETTINGS'), 1500);
+
+        // Sync local PC time immediately and every 1 hour
+        setTimeout(() => {
+          if (writer) {
+            const epoch = Math.floor(Date.now() / 1000);
+            const offset = -new Date().getTimezoneOffset() * 60;
+            send('TIME_SET', `${epoch},${offset}`);
+          }
+        }, 2000);
+        timeSyncInterval = setInterval(() => {
+          if (writer) {
+            const epoch = Math.floor(Date.now() / 1000);
+            const offset = -new Date().getTimezoneOffset() * 60;
+            send('TIME_SET', `${epoch},${offset}`);
+          }
+        }, 3600000);
+
+        // Refresh weather
+        setTimeout(updateWeatherFromPC, 3000);
+        weatherSyncInterval = setInterval(updateWeatherFromPC, 1800000);
+        readLoop();
+      } catch (e) {
+        log("Connect Error: " + e.message);
+        updateConnectionState(false);
+      }
+    }
+
+    async function disconnect() {
+      try {
+        if (timeSyncInterval) { clearInterval(timeSyncInterval); timeSyncInterval = null; }
+        if (weatherSyncInterval) { clearInterval(weatherSyncInterval); weatherSyncInterval = null; }
+        
+        writeQueue = [];
+        isWriting = false;
+
+        if (reader) {
+          try {
+            await reader.cancel();
+          } catch (e) {}
+          try {
+            reader.releaseLock();
+          } catch (e) {}
+          reader = null;
+        }
+        if (writer) {
+          try {
+            writer.releaseLock();
+          } catch (e) {}
+          writer = null;
+        }
+        if (port) {
+          try {
+            await port.close();
+          } catch (e) {}
+          port = null;
+        }
+      } catch (e) { log("Disconnect Error: " + e.message); }
+      updateConnectionState(false);
+    }
+
+    async function btnReboot() {
+      await sendCmd('REBOOT');
+      log("Reboot command sent. Closing connection...");
+      setTimeout(disconnect, 500);
+    }
+
+    async function btnResetSettings() {
+      if (confirm("Are you sure you want to reset all settings and clear NVS memory? This will reboot the device.")) {
+        await sendCmd('RESET_SETTINGS');
+        log("Reset settings command sent. Closing connection...");
+        setTimeout(disconnect, 500);
+      }
+    }
+
+    let serialReadLineBuffer = "";
+
+    async function updateWeatherFromPC(force = false) {
+      const cityVal = document.getElementById('city').value.trim();
+      const apiKeyVal = document.getElementById('apikey').value.trim();
+      if (!writer) return;
+      if (!cityVal || !apiKeyVal) {
+        log("Weather Sync Skipped: Enter City and API Key in the 'Weather Setup' tab.");
+        return;
+      }
+
+      if (!force) {
+        const lastFetch = localStorage.getItem('lastWeatherFetchTime');
+        const now = Date.now();
+        if (lastFetch && (now - parseInt(lastFetch) < 4 * 60 * 60 * 1000)) {
+          log("Weather fetch skipped: 4-hour window has not elapsed.");
+          return;
+        }
+      }
+
+      log(`PC fetching weather for ${cityVal}...`);
+      try {
+        const resWeather = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(cityVal)}&appid=${apiKeyVal}&units=metric`);
+        if (!resWeather.ok) throw new Error(`Weather API returned status ${resWeather.status}`);
+        const dataWeather = await resWeather.json();
+
+        const temp = Math.round(dataWeather.main.temp);
+        const humidity = dataWeather.main.humidity;
+        const wMain = dataWeather.weather[0].main;
+        const wDesc = dataWeather.weather[0].description;
+
+        send('TEMP_SET', temp);
+        send('HUM_SET', humidity);
+        send('WMAIN_SET', wMain);
+        send('WDESC_SET', wDesc);
+        log(`Sent weather: ${wMain}, ${temp}°C`);
+
+        const resForecast = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(cityVal)}&appid=${apiKeyVal}&units=metric&cnt=25`);
+        if (resForecast.ok) {
+          const dataForecast = await resForecast.json();
+          const indices = [7, 15, 23];
+          const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          for (let i = 0; i < 3; i++) {
+            const idx = indices[i];
+            if (dataForecast.list && dataForecast.list.length > idx) {
+              const item = dataForecast.list[idx];
+              const fTemp = Math.round(item.main.temp);
+              const fIcon = item.weather[0].main;
+              const dt = new Date(item.dt * 1000);
+              const dayName = days[dt.getDay()];
+              send('FCAST', `${i},${dayName},${fTemp},${fIcon}`);
+            }
+          }
+          log("Sent 3-day forecast to device.");
+        }
+        localStorage.setItem('lastWeatherFetchTime', now);
+      } catch (e) {
+        log("Weather Fetch Error: " + e.message);
+      }
+    }
+
+    function processIncomingLine(line) {
+      if (line === "SET:DONE") {
+        log("Settings fully synced.");
+        updateWeatherFromPC();
+        takeSnapshot();
+        return;
+      }
+      if (line.startsWith("SET:")) {
+        parseSettings(line);
+      }
+    }
+
+    async function readLoop() {
+      const decoder = new TextDecoder();
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          const text = decoder.decode(value);
+          serialReadLineBuffer += text;
+
+          let lineEndIndex;
+          while ((lineEndIndex = serialReadLineBuffer.indexOf('\n')) >= 0) {
+            const line = serialReadLineBuffer.substring(0, lineEndIndex).trim();
+            serialReadLineBuffer = serialReadLineBuffer.substring(lineEndIndex + 1);
+            if (line) {
+              log(line);
+              processIncomingLine(line);
+            }
+          }
+        }
+      } catch (e) {
+        log("Read Loop Stopped: " + e.message);
+      }
+    }
+
+    function parseSettings(data) {
+      if (!data.startsWith("SET:")) return;
+      const sepIdx = data.indexOf('=');
+      if (sepIdx < 0) return;
+      const key = data.substring(4, sepIdx);
+      const val = data.substring(sepIdx + 1);
+
+      if (key == "APIKEY") document.getElementById('apikey').value = val;
+      if (key == "CITY") document.getElementById('city').value = val;
+      if (key == "TIMER") document.getElementById('tmr').value = val;
+      if (key == "TZ_OFF") document.getElementById('tz_off').value = val;
+      if (key == "SS_TIMEOUT") {
+        document.getElementById('ss_timeout').value = val;
+        document.getElementById('ssVal').innerText = val;
+      }
+      if (key == "ALARM") {
+        const a = val.split(',');
+        if (a.length >= 3) {
+          document.getElementById('aH').value = a[0];
+          document.getElementById('aM').value = a[1];
+          document.getElementById('aOn').checked = (a[2] == "1");
+        }
+      }
+      if (key == "SND") document.getElementById('snd').checked = (val == "1");
+      if (key == "CHM") document.getElementById('chm').checked = (val == "1");
+      if (key == "WTR") document.getElementById('wtr').checked = (val == "1");
+      if (key == "EYE") {
+        const e = val.split(',');
+        if (e.length >= 5) {
+          document.getElementById('ex').value = e[0];
+          document.getElementById('ey').value = e[1];
+          document.getElementById('ew').value = e[2];
+          document.getElementById('eh').value = e[3];
+          document.getElementById('er').value = e[4];
+
+          document.getElementById('exVal').innerText = e[0];
+          document.getElementById('eyVal').innerText = e[1];
+          document.getElementById('ewVal').innerText = e[2];
+          document.getElementById('ehVal').innerText = e[3];
+          document.getElementById('erVal').innerText = e[4];
+        }
+      }
+      if (key == "Z1") document.getElementById('tz1').value = val;
+      if (key == "Z2") document.getElementById('tz2').value = val;
+      if (key == "DISP") document.getElementById('display_type').value = val;
+      if (key == "SDA") document.getElementById('sda_pin').value = val;
+      if (key == "SCL") document.getElementById('scl_pin').value = val;
+      if (key == "FLIP") document.getElementById('is_flip_mode').value = val;
+      if (key == "Glyph_TEXT") document.getElementById('cTxt').value = val;
+      if (key == "CLOCK_FACE") document.getElementById('clkFace').value = val;
+      if (key == "TIME_24H") document.getElementById('time24').checked = (val == "1");
+      if (key == "Glyph_FONT") document.getElementById('cFnt').value = val;
+      if (key == "Glyph_ANIM") document.getElementById('cAnm').value = val;
+      if (key == "WIFI_SSID") document.getElementById('wf_ssid').value = val;
+      if (key == "WIFI_PASS") document.getElementById('wf_pass').value = val;
+      if (key == "ADMIN_PWD") document.getElementById('admin_pwd').value = val;
+
+      if (key.startsWith("BT")) {
+        const el = document.getElementById(key.toLowerCase());
+        if (el) el.value = val;
+      }
+
+      // LED controls sync
+      if (key == "LED_ON") {
+        document.getElementById('ledO').checked = (val == "1");
+      }
+      if (key == "LED_BRIGHT") {
+        document.getElementById('ledB').value = val;
+        document.getElementById('ledBVal').innerText = val;
+      }
+      if (key == "LED_COLOR") {
+        const c = val.split(',');
+        if (c.length >= 3) {
+          const r = parseInt(c[0]), g = parseInt(c[1]), b = parseInt(c[2]);
+          setHslInputsFromRgb(r, g, b);
+        }
+      }
+      if (key == "LED_EFFECT") {
+        document.getElementById('ledE').value = val;
+      }
+      if (key == "LED_CHIME") {
+        const c = val.split(',');
+        if (c.length >= 4) {
+          document.getElementById('chime_effect').value = c[0];
+          document.getElementById('chime_color').value = rgbToHex(parseInt(c[1]), parseInt(c[2]), parseInt(c[3]));
+        }
+      }
+      if (key == "LED_WATER") {
+        const c = val.split(',');
+        if (c.length >= 4) {
+          document.getElementById('water_effect').value = c[0];
+          document.getElementById('water_color').value = rgbToHex(parseInt(c[1]), parseInt(c[2]), parseInt(c[3]));
+        }
+      }
+      if (key == "LED_ALARM") {
+        const c = val.split(',');
+        if (c.length >= 4) {
+          document.getElementById('alarm_effect').value = c[0];
+          document.getElementById('alarm_color').value = rgbToHex(parseInt(c[1]), parseInt(c[2]), parseInt(c[3]));
+        }
+      }
+    }
+
+    async function processWriteQueue() {
+      if (isWriting || writeQueue.length === 0) return;
+      isWriting = true;
+      const { cmd, resolve, reject } = writeQueue.shift();
+      try {
+        if (writer) {
+          const encoder = new TextEncoder();
+          await writer.write(encoder.encode(cmd + "\n"));
+        }
+        resolve();
+      } catch (e) {
+        log("Write Error: " + e.message);
+        reject(e);
+      } finally {
+        isWriting = false;
+        setTimeout(processWriteQueue, 10);
+      }
+    }
+
+    function sendRaw(cmd) {
+      return new Promise((resolve, reject) => {
+        writeQueue.push({ cmd, resolve, reject });
+        processWriteQueue();
+      });
+    }
+    function send(k, v) { sendRaw(`${k}:${v}`); }
+    function sendCmd(cmd) { sendRaw(cmd); }
+
+    function setAlarm() {
+      const h = document.getElementById('aH').value;
+      const m = document.getElementById('aM').value;
+      const on = document.getElementById('aOn').checked ? 1 : 0;
+      send('ALARM_SET', `${h},${m},${on}`);
+    }
+
+    function saveAdminPwd() {
+      const pwd = document.getElementById('admin_pwd').value.trim();
+      send('ADMIN_PWD', pwd);
+      log("Admin password update request sent to device.");
+    }
+
+    function saveWiFiSettings() {
+      const ssid = document.getElementById('wf_ssid').value.trim();
+      const pass = document.getElementById('wf_pass').value.trim();
+      if (!ssid) {
+        alert("Please enter WiFi SSID.");
+        return;
+      }
+      send('WIFI_SSID', ssid);
+      setTimeout(() => send('WIFI_PASS', pass), 200);
+      setTimeout(() => sendCmd('WIFI_SAVE'), 400);
+      log("Saving WiFi credentials and rebooting device...");
+    }
+
+    async function saveAll() {
+      // Fetch and send weather updates first
+      await updateWeatherFromPC(true);
+
+      setTimeout(() => setAlarm(), 500);
+      setTimeout(() => send('TIMER_SET', document.getElementById('tmr').value), 600);
+      setTimeout(() => send('CLOCK_FACE', document.getElementById('clkFace').value), 650);
+      setTimeout(() => send('TIME_24H', document.getElementById('time24').checked ? 1 : 0), 680);
+      setTimeout(() => send('SS_TIMEOUT', document.getElementById('ss_timeout').value), 690);
+      setTimeout(() => send('SET_TZ', document.getElementById('tz_off').value), 710);
+      setTimeout(() => send('CITY', document.getElementById('city').value), 720);
+      setTimeout(() => send('APIKEY', document.getElementById('apikey').value), 730);
+
+      setTimeout(() => send('DISP', document.getElementById('display_type').value), 900);
+      setTimeout(() => send('SDA', document.getElementById('sda_pin').value), 1000);
+      setTimeout(() => send('SCL', document.getElementById('scl_pin').value), 1100);
+      setTimeout(() => send('FLIP', document.getElementById('is_flip_mode').value), 1200);
+
+      // Audio options
+      setTimeout(() => send('SOUND', document.getElementById('snd').checked ? 1 : 0), 1300);
+      setTimeout(() => send('CHIME', document.getElementById('chm').checked ? 1 : 0), 1350);
+      setTimeout(() => send('WATER', document.getElementById('wtr').checked ? 1 : 0), 1400);
+
+      // LED configurations
+      setTimeout(() => send('LED_ON', document.getElementById('ledO').checked ? 1 : 0), 1450);
+      setTimeout(() => send('LED_BRIGHT', document.getElementById('ledB').value), 1480);
+      setTimeout(() => pushNotifConfig('chime'), 1510);
+      setTimeout(() => pushNotifConfig('water'), 1540);
+      setTimeout(() => pushNotifConfig('alarm'), 1570);
+
+      setTimeout(() => sendRaw('SAVE'), 1720);
+
+      setTimeout(() => {
+        takeSnapshot();
+        const btn = document.getElementById('saveAllBtn');
+        if (btn) {
+          const originalHTML = btn.innerHTML;
+          btn.innerHTML = "<i class='fas fa-check me-1'></i> Saved!";
+          setTimeout(() => btn.innerHTML = originalHTML, 3000);
+        }
+      }, 1950);
+    }
+
+    function saveEyes() {
+      sendCmd('EYE_SAVE');
+      setTimeout(() => {
+        takeSnapshot();
+        const btn = event.target || document.querySelector('#eyes button.btn-success');
+        if (btn) {
+          const o = btn.innerHTML;
+          btn.innerHTML = "<i class='fas fa-check me-2'></i> Saved!";
+          setTimeout(() => btn.innerHTML = o, 2000);
+        }
+      }, 200);
+    }
+
+    function resetEyes() {
+      document.getElementById('ex').value = 0;
+      document.getElementById('ey').value = 0;
+      document.getElementById('ew').value = 36;
+      document.getElementById('eh').value = 36;
+      document.getElementById('er').value = 8;
+      document.getElementById('px').value = 0;
+      document.getElementById('py').value = 0;
+
+      document.getElementById('exVal').innerText = 0;
+      document.getElementById('eyVal').innerText = 0;
+      document.getElementById('ewVal').innerText = 36;
+      document.getElementById('ehVal').innerText = 36;
+      document.getElementById('erVal').innerText = 8;
+      document.getElementById('pxVal').innerText = 0;
+      document.getElementById('pyVal').innerText = 0;
+
+      send('EYE_POS', '0,0');
+      send('EYE_SIZE', '36,36');
+      send('EYE_RADIUS', '8');
+      send('EYE', '0,0');
+      setTimeout(() => sendCmd('EYE_SAVE'), 200);
+      setTimeout(() => takeSnapshot(), 400);
+    }
+
+    let timeout;
+    function debounce(func, delay) { return function (...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); }; }
+    const updateEye = debounce(() => { send('EYE', document.getElementById('px').value + ',' + document.getElementById('py').value); }, 50);
+    const updateEyePos = debounce(() => { send('EYE_POS', document.getElementById('ex').value + ',' + document.getElementById('ey').value); }, 100);
+    const updateEyeSize = debounce(() => { send('EYE_SIZE', document.getElementById('ew').value + ',' + document.getElementById('eh').value); }, 100);
+    const updateEyeRadius = debounce(() => { send('EYE_RADIUS', document.getElementById('er').value); }, 100);
+
+    // RGB to HSL helper
+    function rgbToHsl(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+      if (max === min) {
+        h = s = 0; // achromatic
+      } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+      return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+    }
+
+    // HSL to RGB helper
+    function hslToRgb(h, s, l) {
+      h /= 360; s /= 100; l /= 100;
+      let r, g, b;
+      if (s === 0) {
+        r = g = b = l; // achromatic
+      } else {
+        const hue2rgb = (p, q, t) => {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1 / 6) return p + (q - p) * 6 * t;
+          if (t < 1 / 2) return q;
+          if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+          return p;
         };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1 / 3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1 / 3);
+      }
+      return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+    }
 
-        const specialTriggers = [
-            { val: "show_clock", txt: "Show/Hide Clock" },
-            { val: "bluetooth", txt: "Toggle Bluetooth" },
-            { val: "next_gif", txt: "Next GIF" },
-        ];
+    function rgbToHex(r, g, b) {
+      return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
 
-        // --- 2. SERIAL VARIABLES ---
-        let port, reader;
-        let keepReading = false;
+    function hexToRgb(hex) {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16)
+      ] : [0, 0, 0];
+    }
 
-        // --- 3. INIT UI ---
-        window.onload = function () {
-            initGifUI();
+    function setHslInputsFromRgb(r, g, b) {
+      const [h, s, l] = rgbToHsl(r, g, b);
+      document.getElementById('hue').value = h;
+      document.getElementById('sat').value = s;
+      document.getElementById('light').value = l;
 
-            // Listeners for ranges
-            document.querySelectorAll('input[type=range]').forEach(input => {
-                input.addEventListener('input', (e) => {
-                    const span = document.getElementById(e.target.id + 'Value');
-                    if (span) span.textContent = e.target.value;
-                });
-            });
-        };
+      document.getElementById('hueVal').innerText = h;
+      document.getElementById('satVal').innerText = s + "%";
+      document.getElementById('lightVal').innerText = l + "%";
 
-        function initGifUI() {
-            const grid = document.getElementById('gifGrid');
-            const defaultSel = document.getElementById('gif_default');
-            const introSel = document.getElementById('gif_intro');
-            const triggerSels = document.querySelectorAll('.trigger-select');
+      const rgbString = `rgb(${r}, ${g}, ${b})`;
+      document.getElementById('rgb-string').innerText = rgbString;
+      document.getElementById('color-preview').style.backgroundColor = rgbString;
+    }
 
-            triggerSels.forEach(sel => {
-                specialTriggers.forEach(t => sel.add(new Option(t.txt, t.val)));
-            });
+    function toggleLedPower(checked) {
+      send('LED_ON', checked ? 1 : 0);
+    }
 
-            let index = 0;
-            for (const [key, label] of Object.entries(gifData)) {
-                const col = document.createElement('div');
-                col.className = 'col-6 col-md-4 col-lg-3 p-1';
-                const bgUrl = `assets/${label.replace(/\s+/g, ' ')}.png`;
-                col.innerHTML = `
-                <div class="form-check image-bg" style="background-image: url('${bgUrl}');" onclick="document.getElementById('chk_${key}').click()">
-                    <input class="form-check-input gif-checkbox" type="checkbox" id="chk_${key}" value="${index}" onchange="updateGifBinary()">
-                    <label class="form-check-label text-white">${label}</label>
-                </div>
-            `;
-                grid.appendChild(col);
+    const changeLedBrightness = debounce((val) => {
+      document.getElementById('ledBVal').innerText = val;
+      send('LED_BRIGHT', val);
+    }, 50);
 
-                let opt = new Option(label, key);
-                defaultSel.add(opt.cloneNode(true));
-                introSel.add(opt.cloneNode(true));
-                triggerSels.forEach(sel => sel.add(opt.cloneNode(true)));
-                index++;
-            }
+    function pickQuickColor(r, g, b) {
+      setHslInputsFromRgb(r, g, b);
+      send('LED_COLOR', `${r},${g},${b}`);
+    }
+
+    const updateHslColor = debounce(() => {
+      const h = document.getElementById('hue').value;
+      const s = document.getElementById('sat').value;
+      const l = document.getElementById('light').value;
+
+      document.getElementById('hueVal').innerText = h;
+      document.getElementById('satVal').innerText = s + "%";
+      document.getElementById('lightVal').innerText = l + "%";
+
+      const [r, g, b] = hslToRgb(h, s, l);
+      const rgbString = `rgb(${r}, ${g}, ${b})`;
+      document.getElementById('rgb-string').innerText = rgbString;
+      document.getElementById('color-preview').style.backgroundColor = rgbString;
+
+      send('LED_COLOR', `${r},${g},${b}`);
+    }, 50);
+
+    function pushNotifConfig(type) {
+      const effect = document.getElementById(type + '_effect').value;
+      const hexColor = document.getElementById(type + '_color').value;
+      const [r, g, b] = hexToRgb(hexColor);
+      send('LED_NOTIF_' + type.toUpperCase(), `${effect},${r},${g},${b}`);
+    }
+
+    function selectPredefinedText(val) {
+      document.getElementById('cTxt').value = val;
+    }
+
+    let flasherPollInterval = null;
+    let flasherDialogWasOpened = false;
+
+    function triggerFirmwareFlash() {
+      log("Flash Firmware clicked. Automatically closing active connection...");
+      disconnect();
+
+      document.body.classList.add('is-flashing');
+      startFlasherPolling();
+
+      // Give time for UI and connection release, then trigger root flasher web component
+      setTimeout(() => {
+        const hiddenBtn = document.getElementById('hiddenInstallBtnInner');
+        if (hiddenBtn) {
+          hiddenBtn.click();
+        }
+      }, 150);
+    }
+
+    function startFlasherPolling() {
+      flasherDialogWasOpened = false;
+      if (flasherPollInterval) clearInterval(flasherPollInterval);
+
+      flasherPollInterval = setInterval(() => {
+        if (!document.body.classList.contains('is-flashing')) {
+          clearInterval(flasherPollInterval);
+          flasherPollInterval = null;
+          return;
         }
 
-        function toggleAllGifs(state) {
-            document.querySelectorAll('.gif-checkbox').forEach(cb => cb.checked = state);
-            updateGifBinary();
+        const flasherEl = document.getElementById('hiddenInstallBtn');
+        if (flasherEl && flasherEl.shadowRoot) {
+          const hasDialog = flasherEl.shadowRoot.querySelector('ewt-dialog') !== null;
+
+          if (hasDialog) {
+            flasherDialogWasOpened = true;
+          } else if (flasherDialogWasOpened && !hasDialog) {
+            // The dialogue was opened and has now been closed/finished. Auto-exit flashing blur state
+            clearInterval(flasherPollInterval);
+            flasherPollInterval = null;
+            exitFlashingMode();
+          }
         }
+      }, 300);
+    }
 
-        function updateGifBinary() {
-            const cbs = document.querySelectorAll('.gif-checkbox');
-            let bin = '';
-            cbs.forEach(cb => bin += cb.checked ? '1' : '0');
-            sendData('gif_selected_bin', bin);
+    function exitFlashingMode() {
+      if (flasherPollInterval) {
+        clearInterval(flasherPollInterval);
+        flasherPollInterval = null;
+      }
+      document.body.classList.remove('is-flashing');
+      log("Exit flashing session. Interface restored to connection screen.");
+    }
+
+    // Unsaved Changes Dirty Check logic
+    let originalValues = {};
+    let targetTab = null;
+    let unsavedModal = null;
+
+    function takeSnapshot() {
+      const inputs = document.querySelectorAll('input, select');
+      inputs.forEach(el => {
+        if (el.id) {
+          originalValues[el.id] = el.type === 'checkbox' ? el.checked : el.value;
         }
+      });
+    }
 
-        // --- 4. AUDIO ENGINE ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        const notesFreq = {
-            "B0": 31, "C1": 33, "CS1": 35, "D1": 37, "DS1": 39, "E1": 41,
-            "F1": 44, "FS1": 46, "G1": 49, "GS1": 52, "A1": 55, "AS1": 58, "B1": 62,
-            "C2": 65, "CS2": 69, "D2": 73, "DS2": 78, "E2": 82, "F2": 87, "FS2": 93,
-            "G2": 98, "GS2": 104, "A2": 110, "AS2": 117, "B2": 123,
-            "C3": 131, "CS3": 139, "D3": 147, "DS3": 156, "E3": 165, "F3": 175, "FS3": 185,
-            "G3": 196, "GS3": 208, "A3": 220, "AS3": 233, "B3": 247,
-            "C4": 262, "CS4": 277, "D4": 294, "DS4": 311, "E4": 330, "F4": 349, "FS4": 370,
-            "G4": 392, "GS4": 415, "A4": 440, "AS4": 466, "B4": 494,
-            "C5": 523, "CS5": 554, "D5": 587, "DS5": 622, "E5": 659, "F5": 698, "FS5": 740,
-            "G5": 784, "GS5": 831, "A5": 880, "AS5": 932, "B5": 988,
-            "C6": 1047, "CS6": 1109, "D6": 1175, "DS6": 1245, "E6": 1319, "F6": 1397, "FS6": 1480,
-            "G6": 1568, "GS6": 1661, "A6": 1760, "AS6": 1865, "B6": 1976,
-            "C7": 2093, "CS7": 2217, "D7": 2349, "DS7": 2489, "E7": 2637, "F7": 2794, "FS7": 2960,
-            "G7": 3136, "GS7": 3322, "A7": 3520, "AS7": 3729, "B7": 3951,
-            "C8": 4186, "CS8": 4435, "D8": 4699, "DS8": 4978
-        };
-
-        function playNote(freq, duration, rest) {
-            return new Promise(resolve => {
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-
-                oscillator.type = 'square';
-                oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-
-                oscillator.start();
-                setTimeout(() => {
-                    oscillator.stop();
-                    setTimeout(resolve, rest);
-                }, duration);
-            });
+    function checkIfDirty() {
+      const inputs = document.querySelectorAll('input, select');
+      for (let el of inputs) {
+        if (el.id && originalValues[el.id] !== undefined) {
+          const currentVal = el.type === 'checkbox' ? el.checked : el.value;
+          if (originalValues[el.id] !== currentVal) {
+            if (['px', 'py', 'mood', 'page', 'br', 'cTxt', 'cFnt', 'cAnm', 'predefText', 'ledO', 'ledB', 'hue', 'sat', 'light', 'ledE', 'chime_effect', 'chime_color', 'water_effect', 'water_color', 'alarm_effect', 'alarm_color', 'clkFace', 'time24'].includes(el.id)) continue;
+            return true;
+          }
         }
+      }
+      return false;
+    }
 
-        function parseNoteInput(input) {
-            const notes = [];
-            const raw = input.trim();
-
-            if (!raw.includes(' ')) {
-                let i = 0;
-                while (i < raw.length) {
-                    let note = "", duration = "";
-                    let tryNote = raw.substr(i, 3);
-                    if (notesFreq[tryNote]) {
-                        note = tryNote; i += 3;
-                    } else {
-                        tryNote = raw.substr(i, 2);
-                        if (notesFreq[tryNote]) {
-                            note = tryNote; i += 2;
-                        } else {
-                            break;
-                        }
-                    }
-                    while (i < raw.length && /\d/.test(raw[i])) {
-                        duration += raw[i]; i++;
-                    }
-                    notes.push({ note, duration: parseInt(duration), rest: 0 });
-                }
-            } else {
-                const rawParts = raw.split(/\s+/);
-                let i = 0;
-                while (i < rawParts.length) {
-                    const note = rawParts[i];
-                    const duration = parseInt(rawParts[i + 1]);
-                    let rest = 0;
-                    if (!isNaN(duration)) {
-                        const restCandidate = rawParts[i + 2];
-                        if (restCandidate && /^\d+$/.test(restCandidate)) {
-                            rest = parseInt(restCandidate);
-                        }
-                        notes.push({ note, duration, rest });
-                        i += /^\d+$/.test(restCandidate) ? 3 : 2;
-                    } else {
-                        i++;
-                    }
-                }
-            }
-            return notes;
+    function resetInputsToSnapshot() {
+      const inputs = document.querySelectorAll('input, select');
+      inputs.forEach(el => {
+        if (el.id && originalValues[el.id] !== undefined) {
+          if (['px', 'py', 'mood', 'page', 'br', 'cTxt', 'cFnt', 'cAnm', 'predefText', 'ledO', 'ledB', 'hue', 'sat', 'light', 'ledE', 'chime_effect', 'chime_color', 'water_effect', 'water_color', 'alarm_effect', 'alarm_color', 'clkFace', 'time24'].includes(el.id)) return;
+          if (el.type === 'checkbox') {
+            el.checked = originalValues[el.id];
+          } else {
+            el.value = originalValues[el.id];
+          }
         }
+      });
+    }
 
-        async function previewSound(textareaId) {
-            if (audioCtx.state === 'suspended') {
-                await audioCtx.resume();
-            }
+    function initUnsavedChangesHandler() {
+      unsavedModal = new bootstrap.Modal(document.getElementById('unsavedChangesModal'));
 
-            const content = document.getElementById(textareaId).value.trim();
-            const notes = parseNoteInput(content);
+      const tabButtons = document.querySelectorAll('.nav-tabs .nav-link');
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', function (e) {
+          if (btn.classList.contains('active')) return;
 
-            for (const item of notes) {
-                const freq = notesFreq[item.note];
-                if (freq) {
-                    await playNote(freq, item.duration, item.rest);
-                } else {
-                    await new Promise(res => setTimeout(res, item.duration + item.rest));
-                }
-            }
-        }
-
-        // --- 5. SERIAL LOGIC ---
-        async function connect() {
-            if (!navigator.serial) {
-                alert("Web Serial not supported. Please use Chrome/Edge.");
-                return;
-            }
-
-            try {
-                port = await navigator.serial.requestPort();
-                await port.open({ baudRate: 115200 });
-
-                document.getElementById('connectScreen').style.display = 'none';
-                document.getElementById('loadingOverlay').style.display = 'flex';
-
-                keepReading = true;
-                readLoop();
-
-                log("Connected! Fetching settings...", "sys");
-                setTimeout(() => sendData('set', 'get'), 1500);
-
-                setTimeout(() => {
-                    const now = Math.floor(Date.now() / 1000);
-                    const tzOffset = new Date().getTimezoneOffset() * 60;
-                    sendData('time', now - tzOffset);
-
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    const screen = document.getElementById('controllerScreen');
-                    screen.style.display = 'block';
-                    screen.scrollIntoView({ behavior: 'smooth' });
-                }, 3000);
-
-            } catch (e) {
-                console.error(e);
-                alert("Connection Failed: " + e);
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
-        }
-
-        async function readLoop() {
-            reader = port.readable.getReader();
-            const decoder = new TextDecoder();
-            try {
-                while (keepReading) {
-                    const { value, done } = await reader.read();
-                    if (done) break;
-                    if (value) {
-                        const text = decoder.decode(value);
-                        handleSerialData(text);
-                    }
-                }
-            } catch (error) {
-                console.error("Read loop error:", error);
-            } finally {
-                if (reader) {
-                    reader.releaseLock();
-                    reader = null;
-                }
-            }
-        }
-
-        let serialBuffer = "";
-        function handleSerialData(text) {
-            log(text, "rx");
-            serialBuffer += text;
-            const lines = serialBuffer.split('\n');
-            serialBuffer = lines.pop();
-
-            for (const line of lines) {
-                if (line.trim()) parseCommand(line.trim());
-            }
-        }
-
-        function parseCommand(line) {
-            const parts = line.split(':');
-            if (parts.length < 2) return;
-
-            const key = parts[0].trim();
-            const val = parts.slice(1).join(':').trim();
-
-            switch (key) {
-                case 'MAC': document.getElementById('macValue').innerText = val; break;
-                case 'version': document.getElementById('verValue').innerText = val; break;
-                case 'hourly_chime': document.getElementById('hourly_chime').checked = (val === '1'); break;
-
-                // GIF
-                case 'gif_speed': setVal('gif_speed', val); setText('gif_speedValue', val); break;
-                case 'gif_delay':
-                    const sec = Math.floor(parseInt(val) / 1000);
-                    setVal('gif_delay', sec);
-                    setText('gif_delayValue', sec);
-                    break;
-                case 'isInverted': document.getElementById('isInverted').checked = (val === '1' || val === 'true'); break;
-                case 'gif_default': setVal('gif_default', val); break;
-                case 'gif_intro': setVal('gif_intro', val); break;
-                case 'gif_touch': setVal('gif_touch', val); break;
-                case 'gif_double_touch': setVal('gif_double_touch', val); break;
-                case 'gif_long_touch': setVal('gif_long_touch', val); break;
-                case 'custom_title': setVal('custom_title', val); break;
-                case 'gif_selected':
-                    const cbs = document.querySelectorAll('.gif-checkbox');
-                    for (let i = 0; i < cbs.length; i++) {
-                        if (val[i]) cbs[i].checked = (val[i] === '1');
-                    }
-                    break;
-
-                // Audio
-                case 'intro_sound': setVal('intro_sound', val); break;
-                case 'notification_sound': setVal('notification_sound', val); break;
-                case 'touch_sound': setVal('touch_sound', val); break;
-                case 'double_touch_sound': setVal('double_touch_sound', val); break;
-                case 'long_touch_sound': setVal('long_touch_sound', val); break;
-
-                // Chronos
-                case 'notifDuration': setVal('notifDuration', val); setText('notifDurationValue', val); break;
-                case 'bluetooth_auto_off': setVal('bluetooth_auto_off', val); setText('bluetooth_auto_offValue', val); break;
-                case 'bluetoothName': setVal('bluetoothName', val); break;
-                case 'timer_duration': setVal('timer_duration', val); setText('timer_durationValue', val); break;
-                case 'is_24h': document.getElementById('is_24h').checked = (val === 'true'); break;
-                case 'watch_face': setVal('watch_face', val); break;
-                case 'boot_font': setVal('boot_font', val); updateBootTitleMaxLength(); break;
-                case 'boot_size': setVal('boot_size', val); updateBootTitleMaxLength(); break;
-                case 'water_reminder': document.getElementById('water_reminder').checked = (val === '1' || val === 'true'); break;
-                case 'alarm_enabled': document.getElementById('alarm_enabled').checked = (val === '1' || val === 'true'); break;
-                case 'alarm_hour': {
-                    let alarmTimeInput = document.getElementById('alarm_time');
-                    let parts = alarmTimeInput.value.split(':');
-                    let mm = parts[1] || '00';
-                    alarmTimeInput.value = `${val.padStart(2, '0')}:${mm}`;
-                    break;
-                }
-                case 'alarm_minute': {
-                    let alarmTimeInput = document.getElementById('alarm_time');
-                    let parts = alarmTimeInput.value.split(':');
-                    let hh = parts[0] || '07';
-                    alarmTimeInput.value = `${hh}:${val.padStart(2, '0')}`;
-                    break;
-                }
-                case 'water_reminder_interval': document.getElementById('water_reminder_interval').value = val; break;
-                case 'chime_style': document.getElementById('chime_style').value = val; break;
-                case 'dnd_enabled': document.getElementById('dnd_enabled').checked = (val === '1' || val === 'true'); break;
-                case 'dnd_start_hour': document.getElementById('dnd_start_hour').value = val; break;
-                case 'dnd_end_hour': document.getElementById('dnd_end_hour').value = val; break;
-
-                // Hardware
-                case 'display_type': setVal('display_type', val); break;
-                case 'scl_pin': setVal('scl_pin', val); break;
-                case 'sda_pin': setVal('sda_pin', val); break;
-                case 'is_flip_mode': setVal('is_flip_mode', val); break;
-                case 'buzzer_pin': setVal('buzzer_pin', val); break;
-                case 'touch_pin': setVal('touch_pin', val); break;
-            }
-        }
-
-        // --- 6. UTILS & SENDING ---
-        async function sendData(key, value) {
-            if (!port) return;
-
-            const isSound = ['intro_sound', 'touch_sound', 'double_touch_sound', 'long_touch_sound', 'notification_sound'].includes(key);
-
-            if (isSound && value.length > 200) {
-                const chunkSz = 200;
-                for (let i = 0; i < value.length; i += chunkSz) {
-                    const chunk = value.substring(i, i + chunkSz);
-                    const cmdKey = (i === 0) ? key : `${key}_cont`;
-                    await writeLine(`${cmdKey}:${chunk}`);
-                    await new Promise(r => setTimeout(r, 100));
-                }
-                await writeLine(`${key}_end:`);
-            } else {
-                await writeLine(`${key}:${value}`);
-            }
-        }
-
-        async function writeLine(str) {
-            if (!port || !port.writable) return;
-            const encoder = new TextEncoder();
-            const data = encoder.encode(str + "\n");
-            const localWriter = port.writable.getWriter();
-            try {
-                await localWriter.write(data);
-            } catch (e) {
-                console.error("Write line error:", e);
-            } finally {
-                localWriter.releaseLock();
-            }
-            log(str, "tx");
-        }
-
-        function setVal(id, val) {
-            const el = document.getElementById(id);
-            if (el) {
-                if (el.type === 'checkbox') el.checked = (val == 1 || val == 'true');
-                else el.value = val;
-            }
-        }
-
-        function setText(id, txt) {
-            const el = document.getElementById(id);
-            if (el) el.innerText = txt;
-        }
-
-        function log(msg, type) {
-            const box = document.getElementById('serialLog');
-            const line = document.createElement('div');
-            line.className = `log-line log-${type}`;
-
-            const time = new Date().toLocaleTimeString().split(' ')[0];
-            const prefix = type === 'tx' ? '>> ' : (type === 'rx' ? '<< ' : '[SYS] ');
-
-            line.innerText = `[${time}] ${prefix}${msg}`;
-            box.appendChild(line);
-            box.scrollTop = box.scrollHeight;
-        }
-
-        function clearLog() {
-            document.getElementById('serialLog').innerHTML = '';
-        }
-
-        function sendManual() {
-            const cmd = document.getElementById('manualCmd').value;
-            if (cmd) {
-                writeLine(cmd);
-                document.getElementById('manualCmd').value = '';
-            }
-        }
-
-        // --- 7. WEB SERIAL FIRMWARE FLASHER (ESP Web Tools integration) ---
-        // Handle closing the settings serial connection before ESP Web Tools attempts to flash
-        const flashButton = document.getElementById('flashButtonSlot');
-        if (flashButton) {
-            flashButton.addEventListener('click', async (e) => {
-                if (port) {
-                    // Prevent event from bubbling up to esp-web-install-button immediately
-                    e.stopPropagation();
-                    e.preventDefault();
-
-                    log("Releasing Web Serial connection before flashing...", "sys");
-                    keepReading = false;
-                    if (reader) {
-                        try {
-                            await reader.cancel();
-                        } catch (err) {
-                            console.error("Reader cancel error:", err);
-                        }
-                        await new Promise(r => setTimeout(r, 100)); // wait for readLoop to exit
-                    }
-                    try {
-                        await port.close();
-                        log("Settings serial port closed successfully.", "sys");
-                    } catch (err) {
-                        console.error("Port close error:", err);
-                    }
-                    port = null;
-
-                    // Update UI state to disconnected
-                    document.getElementById('controllerScreen').style.display = 'none';
-                    document.getElementById('connectScreen').style.display = 'flex';
-
-                    // Wait a short moment and then trigger the click on the custom element itself
-                    const installBtn = document.querySelector('esp-web-install-button');
-                    if (installBtn) {
-                        setTimeout(() => {
-                            installBtn.click();
-                        }, 100);
-                    }
-                }
-            });
-        }
-
-        // --- 8. EVENT LISTENERS ---
-        document.getElementById('connectBtn').addEventListener('click', connect);
-        document.getElementById('custom_title').onchange = (e) => sendData('custom_title', e.target.value);
-        document.getElementById('hourly_chime').onchange = (e) => sendData('hourly_chime', e.target.checked ? '1' : '0');
-
-        document.getElementById('saveBtn').addEventListener('click', () => {
-            sendData('set', 'save');
-            alert("Settings Saved!");
+          if (checkIfDirty()) {
+            e.preventDefault();
+            e.stopPropagation();
+            targetTab = btn;
+            unsavedModal.show();
+          } else {
+            const tab = new bootstrap.Tab(btn);
+            tab.show();
+          }
         });
+      });
 
-        document.getElementById('resetBtn').addEventListener('click', () => {
-            if (confirm("Reboot device?")) sendData('set', 'reset');
-        });
+      document.getElementById('modalCancelBtn').addEventListener('click', () => {
+        unsavedModal.hide();
+      });
 
-        document.getElementById('gif_speed').oninput = (e) => {
-            document.getElementById('gif_speedValue').innerText = e.target.value;
-        };
-        document.getElementById('gif_speed').onchange = (e) => sendData('gif_speed', e.target.value);
-
-        document.getElementById('gif_delay').oninput = (e) => {
-            document.getElementById('gif_delayValue').innerText = e.target.value;
-        };
-        document.getElementById('gif_delay').onchange = (e) => sendData('gif_delay', e.target.value * 1000);
-        document.getElementById('isInverted').onchange = (e) => sendData('isInverted', e.target.checked);
-        document.getElementById('gif_default').onchange = (e) => sendData('gif_default', e.target.value);
-        document.getElementById('gif_intro').onchange = (e) => sendData('gif_intro', e.target.value);
-        document.getElementById('gif_touch').onchange = (e) => sendData('gif_touch', e.target.value);
-        document.getElementById('gif_double_touch').onchange = (e) => sendData('gif_double_touch', e.target.value);
-        document.getElementById('gif_long_touch').onchange = (e) => sendData('gif_long_touch', e.target.value);
-
-        ['intro_sound', 'notification_sound', 'touch_sound', 'double_touch_sound', 'long_touch_sound'].forEach(id => {
-            document.getElementById(id).addEventListener('blur', (e) => sendData(id, e.target.value));
-        });
-
-        document.getElementById('notifDuration').onchange = (e) => sendData('notifDuration', e.target.value);
-        document.getElementById('bluetooth_auto_off').onchange = (e) => sendData('bluetooth_auto_off', e.target.value);
-        document.getElementById('bluetoothName').onchange = (e) => sendData('bluetoothName', e.target.value);
-
-        document.getElementById('timer_duration').oninput = (e) => {
-            document.getElementById('timer_durationValue').innerText = e.target.value;
-        };
-        document.getElementById('timer_duration').onchange = (e) => sendData('timer_duration', e.target.value);
-        document.getElementById('is_24h').onchange = (e) => sendData('is_24h', e.target.checked);
-
-        document.getElementById('display_type').onchange = (e) => sendData('display_type', e.target.value);
-        document.getElementById('scl_pin').onchange = (e) => sendData('scl_pin', e.target.value);
-        document.getElementById('sda_pin').onchange = (e) => sendData('sda_pin', e.target.value);
-        document.getElementById('is_flip_mode').onchange = (e) => sendData('is_flip_mode', e.target.value);
-
-        document.getElementById('buzzer_pin').onchange = (e) => sendData('buzzer_pin', e.target.value);
-        document.getElementById('touch_pin').onchange = (e) => sendData('touch_pin', e.target.value);
-
-        document.getElementById('watch_face').onchange = (e) => sendData('watch_face', e.target.value);
-
-        const bootSizeEl = document.getElementById('boot_size');
-        const customTitleEl = document.getElementById('custom_title');
-        function updateBootTitleMaxLength() {
-            const size = parseInt(bootSizeEl.value);
-            if (size === 4) { // 24px
-                customTitleEl.maxLength = 8;
-            } else if (size === 3) { // 18px
-                customTitleEl.maxLength = 12;
-            } else if (size === 2) { // 14px
-                customTitleEl.maxLength = 16;
-            } else {
-                customTitleEl.maxLength = 32;
-            }
-            if (customTitleEl.value.length > customTitleEl.maxLength) {
-                customTitleEl.value = customTitleEl.value.substring(0, customTitleEl.maxLength);
-                sendData('custom_title', customTitleEl.value);
-            }
+      document.getElementById('modalDiscardBtn').addEventListener('click', () => {
+        resetInputsToSnapshot();
+        unsavedModal.hide();
+        if (targetTab) {
+          const tab = new bootstrap.Tab(targetTab);
+          tab.show();
         }
-        bootSizeEl.addEventListener('change', updateBootTitleMaxLength);
+      });
 
-        document.getElementById('boot_font').onchange = (e) => sendData('boot_font', e.target.value);
-        document.getElementById('boot_size').onchange = (e) => {
-            sendData('boot_size', e.target.value);
-            updateBootTitleMaxLength();
-        };
-        document.getElementById('water_reminder').onchange = (e) => sendData('water_reminder', e.target.checked ? '1' : '0');
-        document.getElementById('water_reminder_interval').onchange = (e) => sendData('water_reminder_interval', e.target.value);
-        document.getElementById('chime_style').onchange = (e) => sendData('chime_style', e.target.value);
+      document.getElementById('modalSaveBtn').addEventListener('click', () => {
+        saveAll();
+        unsavedModal.hide();
+        if (targetTab) {
+          const tab = new bootstrap.Tab(targetTab);
+          tab.show();
+        }
+      });
+    }
 
-        document.getElementById('alarm_enabled').onchange = (e) => sendData('alarm_enabled', e.target.checked ? '1' : '0');
-        document.getElementById('alarm_time').onchange = (e) => {
-            sendData('alarm_time', e.target.value);
-        };
-
-        document.getElementById('dnd_enabled').onchange = (e) => sendData('dnd_enabled', e.target.checked ? '1' : '0');
-        document.getElementById('dnd_start_hour').onchange = (e) => sendData('dnd_start_hour', e.target.value);
-        document.getElementById('dnd_end_hour').onchange = (e) => sendData('dnd_end_hour', e.target.value);
-
-        document.getElementById('pushCanvasBtn').addEventListener('click', async () => {
-            const text = document.getElementById('canvas_text').value;
-            const anim = document.getElementById('canvas_anim').value;
-            const font = document.getElementById('canvas_font').value;
-            const size = document.getElementById('canvas_size').value;
-
-            await sendData('canvas_text', text);
-            await sendData('canvas_anim', anim);
-            await sendData('canvas_font', font);
-            await sendData('canvas_size', size);
-            await sendData('canvas_trigger', '1');
-        });
-
-        document.getElementById('stopCanvasBtn').addEventListener('click', async () => {
-            await sendData('canvas_trigger', '0');
-        });
-    </script>
+    initTimezones();
+    takeSnapshot();
+    initUnsavedChangesHandler();
+  </script>
 </body>
 
 </html>
