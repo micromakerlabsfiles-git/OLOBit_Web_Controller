@@ -86,11 +86,10 @@
             background-size: cover;
             background-position: center;
             border-radius: 10px;
-            padding: 10px;
+            padding: 6px;
             margin: 5px 0;
             transition: all 0.2s ease;
-            min-height: 80px;
-            /* Shorter icons as requested */
+            aspect-ratio: 3 / 2;
             display: flex;
             align-items: flex-end;
             overflow: hidden;
@@ -105,13 +104,27 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.2));
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.15));
             z-index: 1;
         }
 
         .form-check.image-bg:has(input:checked) {
             border-color: var(--accent);
             box-shadow: 0 0 15px rgba(255, 121, 63, 0.4);
+        }
+
+        .form-check.image-bg label {
+            font-size: 0.75rem;
+            z-index: 2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .form-check.image-bg input {
+            z-index: 2;
         }
 
         .text-info {
@@ -163,7 +176,7 @@
                 <p class="lead text-secondary mb-4">Manage GIFs, Audio, Time, and Hardware settings directly from your
                     browser via USB.</p>
 
-                <div class="glass-card p-5 text-center">
+                <div class="glass-card p-5 text-center mb-3">
                     <button id="connectBtn" class="btn btn-elegant btn-lg w-100 mb-3">
                         <i class="fas fa-plug me-2"></i> Control Device
                     </button>
@@ -181,6 +194,18 @@
                     </esp-web-install-button>
 
                     <small class="text-muted"><i class="fab fa-chrome"></i> Requires Chrome, Edge, or Opera</small>
+                </div>
+
+                <div class="glass-card p-3 d-flex justify-content-around align-items-center gap-2">
+                    <a href="https://olobit.in" target="_blank" class="btn btn-outline-light btn-sm flex-grow-1 py-2">
+                        <i class="fas fa-globe me-2"></i>Product Page
+                    </a>
+                    <a href="https://www.olobit.in/manual" target="_blank" class="btn btn-outline-light btn-sm flex-grow-1 py-2">
+                        <i class="fas fa-book me-2"></i>Manual
+                    </a>
+                    <a href="https://www.olobit.in/warranty" target="_blank" class="btn btn-outline-light btn-sm flex-grow-1 py-2">
+                        <i class="fas fa-shield-alt me-2"></i>Warranty
+                    </a>
                 </div>
             </div>
             <div class="col-md-6 text-center">
@@ -221,8 +246,12 @@
 
             <div class="row mb-4 justify-content-center">
                 <div class="col-auto">
+                    <button id="disconnectBtn" class="btn btn-secondary me-2"><i
+                            class="fas fa-unlink me-2"></i>Disconnect</button>
                     <button id="resetBtn" class="btn btn-danger me-2"><i
                             class="fas fa-power-off me-2"></i>Reboot</button>
+                    <button id="clearNvsBtn" class="btn btn-warning me-2 text-dark"><i
+                            class="fas fa-trash-alt me-2"></i>Clear NVS</button>
                     <button id="saveBtn" class="btn btn-elegant"><i class="fas fa-save me-2"></i>Save All
                         Settings</button>
                 </div>
@@ -360,15 +389,10 @@
                 <!-- CHRONOS & PERSONALIZATION TAB -->
                 <div class="tab-pane fade" id="tab-chronos">
                     <div class="row">
-                        <div class="col-md-4">
+                        <!-- Column 1: Time & Bluetooth -->
+                        <div class="col-md-4 mb-4">
                             <div class="glass-card p-4 h-100">
-                                <h5 class="text-info mb-4"><i class="fas fa-clock me-2"></i>Time & Display</h5>
-
-                                <div class="mb-4">
-                                    <label>Notification Duration: <span id="notifDurationValue">5</span>s</label>
-                                    <input type="range" class="form-range" id="notifDuration" min="1" max="10"
-                                        value="5">
-                                </div>
+                                <h5 class="text-info mb-4"><i class="fas fa-clock me-2"></i>Time & Bluetooth</h5>
 
                                 <div class="mb-4">
                                     <label class="form-label" for="watch_face">Watch Face Style</label>
@@ -380,22 +404,49 @@
                                     </select>
                                 </div>
 
-                                <div class="mb-4">
-                                    <label>Focus Timer Duration: <span id="timer_durationValue">20</span> min</label>
-                                    <input type="range" class="form-range" id="timer_duration" min="1" max="60"
-                                        value="20">
-                                </div>
-
-                                <div class="form-check form-switch mb-3">
+                                <div class="form-check form-switch mb-4">
                                     <input class="form-check-input" type="checkbox" id="is_24h" checked>
                                     <label class="form-check-label" for="is_24h">24-Hour Time Format</label>
                                 </div>
 
+                                <hr class="border-secondary my-4">
+
+                                <h5 class="text-info mb-3"><i class="fas fa-bluetooth me-2"></i>Bluetooth Settings</h5>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Bluetooth Name</label>
+                                    <input type="text" class="form-control" id="bluetoothName" value="OLO Bit">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label>Auto-off Delay: <span id="bluetooth_auto_offValue">5</span> min</label>
+                                    <input type="range" class="form-range" id="bluetooth_auto_off" min="0" max="30"
+                                        value="5">
+                                    <small class="text-muted d-block">Set to 0 to keep Bluetooth always on.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Column 2: Alarms & Alerts -->
+                        <div class="col-md-4 mb-4">
+                            <div class="glass-card p-4 h-100">
+                                <h5 class="text-info mb-4"><i class="fas fa-bell me-2"></i>Alarms & Alerts</h5>
+
                                 <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="alarm_enabled">
+                                    <label class="form-check-label" for="alarm_enabled">Enable Alarm</label>
+                                </div>
+                                <div class="mb-4 ms-4" id="alarm_time_container">
+                                    <label class="form-label small text-muted">Alarm Time</label>
+                                    <input type="time" class="form-control form-control-sm" id="alarm_time"
+                                        value="07:00">
+                                </div>
+
+                                <div class="form-check form-switch mb-2 border-top pt-3">
                                     <input class="form-check-input" type="checkbox" id="hourly_chime">
                                     <label class="form-check-label" for="hourly_chime">Enable Hourly Chime</label>
                                 </div>
-                                <div class="mb-3 ms-4" id="hourly_chime_style_container">
+                                <div class="mb-4 ms-4" id="hourly_chime_style_container">
                                     <label class="form-label small text-muted">Chime Sound Style</label>
                                     <select class="form-select form-select-sm" id="chime_style">
                                         <option value="0">Classic Westminster Chime</option>
@@ -403,11 +454,11 @@
                                     </select>
                                 </div>
 
-                                <div class="form-check form-switch mb-2">
+                                <div class="form-check form-switch mb-2 border-top pt-3">
                                     <input class="form-check-input" type="checkbox" id="water_reminder" checked>
                                     <label class="form-check-label" for="water_reminder">Enable Water Reminder</label>
                                 </div>
-                                <div class="mb-3 ms-4" id="water_reminder_interval_container">
+                                <div class="mb-4 ms-4" id="water_reminder_interval_container">
                                     <label class="form-label small text-muted">Reminder Interval</label>
                                     <select class="form-select form-select-sm" id="water_reminder_interval">
                                         <option value="15">15 Minutes</option>
@@ -417,16 +468,6 @@
                                         <option value="90">1.5 Hours</option>
                                         <option value="120">2 Hours</option>
                                     </select>
-                                </div>
-
-                                <div class="form-check form-switch mb-2 border-top pt-3">
-                                    <input class="form-check-input" type="checkbox" id="alarm_enabled">
-                                    <label class="form-check-label" for="alarm_enabled">Enable Alarm</label>
-                                </div>
-                                <div class="mb-3 ms-4" id="alarm_time_container">
-                                    <label class="form-label small text-muted">Alarm Time</label>
-                                    <input type="time" class="form-control form-control-sm" id="alarm_time"
-                                        value="07:00">
                                 </div>
 
                                 <div class="form-check form-switch mb-2 border-top pt-3">
@@ -496,7 +537,8 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <!-- Column 3: Personalization & System -->
+                        <div class="col-md-4 mb-4">
                             <div class="glass-card p-4 h-100">
                                 <h5 class="text-info mb-4"><i class="fas fa-paint-brush me-2"></i>Personalization</h5>
                                 <div class="mb-3">
@@ -516,7 +558,7 @@
                                         <option value="4">Lucida Regular</option>
                                     </select>
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-4">
                                     <label class="small text-muted" for="boot_size">BOOT TEXT SIZE</label>
                                     <select class="form-select form-select-sm" id="boot_size">
                                         <option value="0">8px</option>
@@ -526,23 +568,20 @@
                                         <option value="4">24px</option>
                                     </select>
                                 </div>
-                            </div>
-                        </div>
 
-                        <div class="col-md-4">
-                            <div class="glass-card p-4 h-100">
-                                <h5 class="text-info mb-4"><i class="fas fa-bluetooth me-2"></i>Bluetooth Settings</h5>
+                                <hr class="border-secondary my-4">
 
+                                <h5 class="text-info mb-4"><i class="fas fa-sliders-h me-2"></i>System Settings</h5>
                                 <div class="mb-4">
-                                    <label>Auto-off Delay: <span id="bluetooth_auto_offValue">5</span> min</label>
-                                    <input type="range" class="form-range" id="bluetooth_auto_off" min="0" max="30"
+                                    <label>Notification Duration: <span id="notifDurationValue">5</span>s</label>
+                                    <input type="range" class="form-range" id="notifDuration" min="1" max="10"
                                         value="5">
-                                    <small class="text-muted d-block">Set to 0 to keep Bluetooth always on.</small>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label">Bluetooth Name</label>
-                                    <input type="text" class="form-control" id="bluetoothName" value="OLO Bit">
+                                    <label>Focus Timer Duration: <span id="timer_durationValue">20</span> min</label>
+                                    <input type="range" class="form-range" id="timer_duration" min="1" max="60"
+                                        value="20">
                                 </div>
                             </div>
                         </div>
@@ -633,6 +672,7 @@
                                         <option value="2">Bounce Scroll</option>
                                         <option value="3">Typewriter Effect</option>
                                         <option value="4">Blinking / Flash</option>
+                                        <option value="5">Fixed (No Animation)</option>
                                     </select>
                                 </div>
 
@@ -731,7 +771,7 @@
             let index = 0;
             for (const [key, label] of Object.entries(gifData)) {
                 const col = document.createElement('div');
-                col.className = 'col-6 col-md-4 col-lg-3 p-1';
+                col.className = 'col-4 col-sm-3 col-md-2 p-1';
                 const bgUrl = `assets/${label.replace(/\s+/g, ' ')}.png`;
                 col.innerHTML = `
                 <div class="form-check image-bg" style="background-image: url('${bgUrl}');" onclick="document.getElementById('chk_${key}').click()">
@@ -875,8 +915,8 @@
                 port = await navigator.serial.requestPort();
                 await port.open({ baudRate: 115200 });
 
-                document.getElementById('connectScreen').style.display = 'none';
                 document.getElementById('loadingOverlay').style.display = 'flex';
+                window.scrollTo({ top: 0, behavior: 'instant' });
 
                 keepReading = true;
                 readLoop();
@@ -892,14 +932,61 @@
                     document.getElementById('loadingOverlay').style.display = 'none';
                     const screen = document.getElementById('controllerScreen');
                     screen.style.display = 'block';
+                    
+                    // Smooth scroll down to controller screen
                     screen.scrollIntoView({ behavior: 'smooth' });
+
+                    // After transition finishes, hide connect screen to lock it there
+                    setTimeout(() => {
+                        document.getElementById('connectScreen').style.display = 'none';
+                    }, 1000);
                 }, 3000);
 
             } catch (e) {
                 console.error(e);
                 alert("Connection Failed: " + e);
                 document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('connectScreen').style.display = 'flex';
+                window.scrollTo({ top: 0, behavior: 'instant' });
             }
+        }
+
+        async function disconnect() {
+            log("Disconnecting device...", "sys");
+            keepReading = false;
+            if (reader) {
+                try {
+                    await reader.cancel();
+                } catch (err) {
+                    console.error("Reader cancel error:", err);
+                }
+                reader = null;
+            }
+            if (port) {
+                try {
+                    await port.close();
+                } catch (err) {
+                    console.error("Port close error:", err);
+                }
+                port = null;
+            }
+
+            // Reset UI states with scroll up transition
+            const connectScreen = document.getElementById('connectScreen');
+            const controllerScreen = document.getElementById('controllerScreen');
+            
+            document.getElementById('loadingOverlay').style.display = 'none';
+            connectScreen.style.display = 'flex';
+            
+            // Scroll back up to connect screen
+            connectScreen.scrollIntoView({ behavior: 'smooth' });
+            
+            // After transition finishes, hide controller screen
+            setTimeout(() => {
+                controllerScreen.style.display = 'none';
+            }, 1000);
+            
+            log("Disconnected. Connect option is available.", "sys");
         }
 
         async function readLoop() {
@@ -908,7 +995,10 @@
             try {
                 while (keepReading) {
                     const { value, done } = await reader.read();
-                    if (done) break;
+                    if (done) {
+                        log("Connection finished by remote device.", "sys");
+                        break;
+                    }
                     if (value) {
                         const text = decoder.decode(value);
                         handleSerialData(text);
@@ -916,12 +1006,27 @@
                 }
             } catch (error) {
                 console.error("Read loop error:", error);
+                log("Read loop error: " + error.message, "sys");
             } finally {
                 if (reader) {
-                    reader.releaseLock();
+                    try {
+                        reader.releaseLock();
+                    } catch (e) {}
                     reader = null;
                 }
+                if (keepReading) {
+                    disconnect();
+                }
             }
+        }
+
+        if (navigator.serial) {
+            navigator.serial.addEventListener('disconnect', (event) => {
+                if (event.target === port) {
+                    log("Device unplugged.", "sys");
+                    disconnect();
+                }
+            });
         }
 
         let serialBuffer = "";
@@ -1101,26 +1206,7 @@
                     e.preventDefault();
 
                     log("Releasing Web Serial connection before flashing...", "sys");
-                    keepReading = false;
-                    if (reader) {
-                        try {
-                            await reader.cancel();
-                        } catch (err) {
-                            console.error("Reader cancel error:", err);
-                        }
-                        await new Promise(r => setTimeout(r, 100)); // wait for readLoop to exit
-                    }
-                    try {
-                        await port.close();
-                        log("Settings serial port closed successfully.", "sys");
-                    } catch (err) {
-                        console.error("Port close error:", err);
-                    }
-                    port = null;
-
-                    // Update UI state to disconnected
-                    document.getElementById('controllerScreen').style.display = 'none';
-                    document.getElementById('connectScreen').style.display = 'flex';
+                    await disconnect();
 
                     // Wait a short moment and then trigger the click on the custom element itself
                     const installBtn = document.querySelector('esp-web-install-button');
@@ -1135,6 +1221,7 @@
 
         // --- 8. EVENT LISTENERS ---
         document.getElementById('connectBtn').addEventListener('click', connect);
+        document.getElementById('disconnectBtn').addEventListener('click', disconnect);
         document.getElementById('custom_title').onchange = (e) => sendData('custom_title', e.target.value);
         document.getElementById('hourly_chime').onchange = (e) => sendData('hourly_chime', e.target.checked ? '1' : '0');
 
@@ -1145,6 +1232,12 @@
 
         document.getElementById('resetBtn').addEventListener('click', () => {
             if (confirm("Reboot device?")) sendData('set', 'reset');
+        });
+
+        document.getElementById('clearNvsBtn').addEventListener('click', () => {
+            if (confirm("Are you sure you want to clear NVS memory? This will reset all settings to defaults and reboot the device.")) {
+                sendData('set', 'clear_nvs');
+            }
         });
 
         document.getElementById('gif_speed').oninput = (e) => {
