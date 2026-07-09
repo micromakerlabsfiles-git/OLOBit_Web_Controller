@@ -8,7 +8,7 @@ Welcome to the **OLO Bit Web Controller & Flasher Hub**! This guide contains qui
 
 ### Quick Launch
 1. Connect the OLO Bit hardware to your computer using a **USB-C Data Cable**.
-2. Open the `index.html` page in **Google Chrome**, **Microsoft Edge**, or **Opera** (these browsers support the Web Serial API).
+2. Open the [`OLO Bit Web Controller`](https://micromakerlabsfiles-git.github.io/OLOBit_Web_Controller/) page in **Google Chrome**, **Microsoft Edge**, or **Opera** (these browsers support the Web Serial API).
 3. Connect and manage settings directly from the dashboard!
 
 ---
