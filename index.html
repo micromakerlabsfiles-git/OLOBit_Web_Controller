@@ -70,6 +70,24 @@
             box-shadow: 0 0 0 0.25rem rgba(255, 121, 63, 0.25);
         }
 
+        .ecosystem-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .ecosystem-list::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        .ecosystem-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 121, 63, 0.4);
+            border-radius: 4px;
+        }
+
+        .ecosystem-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 121, 63, 0.7);
+        }
+
         .nav-pills .nav-link {
             color: #d1d8e0;
             border-radius: 10px;
@@ -89,7 +107,7 @@
             padding: 6px;
             margin: 5px 0;
             transition: all 0.2s ease;
-            aspect-ratio: 3 / 2;
+            aspect-ratio: 2 / 1;
             display: flex;
             align-items: flex-end;
             overflow: hidden;
@@ -114,7 +132,7 @@
         }
 
         .form-check.image-bg label {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             z-index: 2;
             white-space: nowrap;
             overflow: hidden;
@@ -170,6 +188,7 @@
     <div id="connectScreen" class="container d-flex align-items-center justify-content-center"
         style="min-height: 100vh;">
         <div class="row w-100 align-items-center">
+            <!-- LEFT COLUMN: CONTROLLER & CONNECTION -->
             <div class="col-md-6 text-center text-md-start">
                 <h1 class="display-4 fw-bold mb-4" style="color: var(--accent);">OLO Bit <span
                         style="font-size: 0.5em; opacity: 0.7; color: white;">Web Controller</span></h1>
@@ -181,8 +200,18 @@
                         <i class="fas fa-plug me-2"></i> Control Device
                     </button>
 
-                    <esp-web-install-button manifest="manifest.json" class="d-block mb-3">
-                        <button slot="activate" class="btn btn-elegant btn-lg w-100">
+                    <div class="mb-3 text-start">
+                        <label class="form-label small text-muted fw-bold" for="firmware_display_select">SELECT DISPLAY
+                            TYPE FOR FIRMWARE</label>
+                        <select class="form-select form-select-sm" id="firmware_display_select">
+                            <option value="sh1106">SH1106 OLED (128x64) - Default</option>
+                            <option value="ssd1306">SSD1306 OLED (128x64)</option>
+                        </select>
+                    </div>
+
+                    <esp-web-install-button id="firmwareFlashingButton" manifest="manifest_sh1106.json"
+                        class="d-block mb-3">
+                        <button id="flashButtonSlot" slot="activate" class="btn btn-elegant btn-lg w-100">
                             <i class="fas fa-bolt me-2"></i> Install/Update Firmware
                         </button>
                         <span slot="unsupported" class="text-danger small d-block mt-2"><i
@@ -196,20 +225,147 @@
                     <small class="text-muted"><i class="fab fa-chrome"></i> Requires Chrome, Edge, or Opera</small>
                 </div>
 
-                <div class="glass-card p-3 d-flex justify-content-around align-items-center gap-2">
+                <!-- OLOVERSE ECOSYSTEM TRIGGER BUTTON -->
+                <button onclick="openOloverseModal()" class="btn btn-elegant btn-sm w-100 mb-3 py-2"
+                    style="background: linear-gradient(45deg, #0fbcf9 0%, #3498db 100%); box-shadow: 0 4px 15px rgba(15, 188, 249, 0.3);">
+                    <i class="fas fa-cubes me-2"></i> Explore OLOVerse Ecosystem
+                </button>
+
+                <div class="glass-card p-3 d-flex justify-content-around align-items-center gap-2 mb-3">
                     <a href="https://olobit.in" target="_blank" class="btn btn-outline-light btn-sm flex-grow-1 py-2">
                         <i class="fas fa-globe me-2"></i>Product Page
                     </a>
-                    <a href="https://www.olobit.in/manual" target="_blank" class="btn btn-outline-light btn-sm flex-grow-1 py-2">
+                    <a href="https://www.olobit.in/manual" target="_blank"
+                        class="btn btn-outline-light btn-sm flex-grow-1 py-2">
                         <i class="fas fa-book me-2"></i>Manual
                     </a>
-                    <a href="https://www.olobit.in/warranty" target="_blank" class="btn btn-outline-light btn-sm flex-grow-1 py-2">
+                    <a href="https://www.olobit.in/warranty" target="_blank"
+                        class="btn btn-outline-light btn-sm flex-grow-1 py-2">
                         <i class="fas fa-shield-alt me-2"></i>Warranty
                     </a>
                 </div>
+
+                <div class="glass-card p-3 text-start">
+                    <p class="small text-white mb-1"><strong class="text-muted small fw-bold">Author</strong> <br>
+                        <a href="https://www.micromakerlabs.com" target="_blank"
+                            class="text-info text-decoration-none fw-bold" style="font-size: 0.9rem;">
+                            <i class="fas fa-flask me-1"></i>Micromaker Labs
+                        </a>
+                    </p>
+                    <p class="text-muted mb-0" style="font-size: 0.75rem; line-height: 1.3;">We build Interactive desk
+                        pets, smart gadgets, and workspace lighting solutions designed to help you enjoy technology with
+                        DIY.</p>
+                </div>
             </div>
+
+            <!-- RIGHT COLUMN: IMAGE -->
             <div class="col-md-6 text-center">
                 <img src="assets/olobitplus.png" alt="OLO Logo" class="img-fluid">
+            </div>
+        </div>
+    </div>
+
+    <!-- OLOVERSE MODAL POPUP -->
+    <div id="oloverseModal"
+        style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 9999; display: none; align-items: center; justify-content: center;">
+        <div class="glass-card p-4 position-relative"
+            style="max-width: 950px; width: 95%; border: 1px solid rgba(255, 121, 63, 0.2);">
+            <!-- Close Button -->
+            <button onclick="closeOloverseModal()" class="btn btn-sm btn-outline-secondary position-absolute"
+                style="top: 15px; right: 15px; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
+                <h4 class="mb-0 text-white fw-bold"><i class="fas fa-cubes me-2"
+                        style="color: var(--accent);"></i>OLOVerse Ecosystem</h4>
+                <span class="badge bg-secondary text-white">Modular OS Platform</span>
+            </div>
+
+            <p class="small text-secondary mb-3" style="line-height: 1.4;">OLOVerse positions OLO Bit as a dynamic
+                hardware platform that evolves. You can easily transform the device into different productivity, IoT,
+                and security tools by flashing different operating systems over USB.</p>
+
+            <div class="row g-2 mb-4">
+                <!-- OS 1 -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-info text-dark mb-1">OLO Bit OS</span>
+                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">The flagship
+                            default operating system featuring 50+ animated OLO faces, BLE map navigation, custom canvas
+                            text, phone alerts, alarms, weather updates & retro games.</p>
+                    </div>
+                </div>
+                <!-- OS 2 -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-warning text-dark mb-1">OLO Dash</span>
+                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">Daily finance
+                            dashboard gadget in OLOVerse ecosystem with 15 animated emotion faces (similar to Dasai
+                            Mochi).</p>
+                    </div>
+                </div>
+                <!-- OS 3 -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-success text-dark mb-1">OLO-Show</span>
+                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">A complete
+                            end-to-end toolchain for loading custom 1-bit animations onto a microcontroller-driven OLED
+                            display without OLO faces.</p>
+                    </div>
+                </div>
+                <!-- OS 4 -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-primary text-white mb-1">OLO-Aero</span>
+                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">Track
+                            commercial flights in real-time using Opensky APIs on cool custom OLO faces.</p>
+                    </div>
+                </div>
+                <!-- OS 5 -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-danger text-white mb-1">OLO-Jiggler</span>
+                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">BLE mouse
+                            jiggler workstation companion built on the ESP32-C3 Super Mini to keep your screen active.
+                        </p>
+                    </div>
+                </div>
+                <!-- OS 6 -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-light text-dark mb-1">OLO-Glyph</span>
+                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">An offline
+                            desk companion designed for text glyphy activities on your desk.</p>
+                    </div>
+                </div>
+                <!-- OS 7 -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-secondary text-white mb-1">OLO-keystrokes</span>
+                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">Keystroke
+                            injector framework for security/educational use featuring 5 built-in OLO faces.</p>
+                    </div>
+                </div>
+                <!-- OS 8 -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-info text-dark mb-1">BOBO_OS</span>
+                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">By PRTECH.
+                            Includes a configurable eye pet with daily technical controls and Web Serial support.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <a href="https://www.olobit.in/product-page/olo-bit-plus" target="_blank"
+                    class="btn btn-elegant btn-sm flex-grow-1 py-2">
+                    <i class="fas fa-shopping-cart me-1"></i> Buy OLO Bit Plus
+                </a>
+                <a href="https://olobit.in/oloverse" target="_blank"
+                    class="btn btn-outline-light btn-sm flex-grow-1 py-2">
+                    <i class="fas fa-rocket me-1"></i> Explore OLOVerse Hub
+                </a>
             </div>
         </div>
     </div>
@@ -325,61 +481,152 @@
                 <!-- AUDIO TAB -->
                 <div class="tab-pane fade" id="tab-audio">
                     <div class="row">
-                        <div class="col-12 mb-3">
-                            <div class="glass-card p-3">
-                                <a href="music.html" class="btn btn-elegant mb-3" target="_blank">
-                                    <i class="fas fa-music me-2"></i>
-                                    <span>Composing Tools</span>
-                                </a>
+                        <!-- Left Column: Sound Packs & Themes -->
+                        <div class="col-md-5 mb-4">
+                            <div class="glass-card p-4 h-100">
+                                <h5 class="text-info mb-4"><i class="fas fa-compact-disc me-2"></i>OLO Music Packs &
+                                    Themes</h5>
+
+                                <!-- OLO Music Pack Vol. 1 -->
+                                <div class="mb-4 pb-3 border-bottom border-secondary">
+                                    <label class="small text-muted fw-bold mb-2">OLO MUSIC PACK VOL. 1 (BOOT
+                                        CHIMES)</label>
+                                    <div class="d-flex gap-2">
+                                        <select class="form-select form-select-sm" id="boot_pack_select">
+                                            <option value="modern_startup">Modern Startup Chime</option>
+                                            <option value="scifi_boot">Sci-Fi AI Boot</option>
+                                            <option value="retro_computer">Retro Computer Boot</option>
+                                            <option value="cyberpunk_login">Cyberpunk Login</option>
+                                            <option value="soft_desktop">Soft Desktop Startup</option>
+                                        </select>
+                                        <button class="btn btn-sm btn-outline-warning"
+                                            onclick="previewPackSound('boot')"><i class="fas fa-play"></i></button>
+                                        <button class="btn btn-sm btn-elegant py-1 px-3"
+                                            onclick="applyPackSound('boot')">Apply</button>
+                                    </div>
+                                </div>
+
+                                <!-- OLO Music Pack Vol. 2 -->
+                                <div class="mb-4 pb-3 border-bottom border-secondary">
+                                    <label class="small text-muted fw-bold mb-2">OLO MUSIC PACK VOL. 2 (ALERTS &
+                                        GESTURES)</label>
+                                    <select class="form-select form-select-sm mb-2" id="alert_pack_select">
+                                        <option value="retro_platformer">Retro 8-bit Platformer</option>
+                                        <option value="rpg_village">Pixel RPG Village</option>
+                                        <option value="adventure_begins">Adventure Begins</option>
+                                        <option value="forest_journey">Forest Journey</option>
+                                        <option value="castle_exploration">Castle Exploration</option>
+                                        <option value="boss_battle">Boss Battle</option>
+                                        <option value="space_shooter">Space Shooter</option>
+                                        <option value="space_exploration">Space Exploration</option>
+                                        <option value="victory_fanfare">Victory Fanfare</option>
+                                        <option value="high_score">High Score</option>
+                                        <option value="game_over">Game Over</option>
+                                    </select>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <span class="small text-muted text-nowrap">Apply to:</span>
+                                        <select class="form-select form-select-sm" id="alert_target_select">
+                                            <option value="notification_sound">Notification</option>
+                                            <option value="touch_sound">Single Tap</option>
+                                            <option value="double_touch_sound">Double Tap</option>
+                                            <option value="long_touch_sound">Long Press</option>
+                                        </select>
+                                        <button class="btn btn-sm btn-outline-warning"
+                                            onclick="previewPackSound('alert')"><i class="fas fa-play"></i></button>
+                                        <button class="btn btn-sm btn-elegant py-1 px-3"
+                                            onclick="applyPackSound('alert')">Apply</button>
+                                    </div>
+                                </div>
+
+                                <!-- Emotion Style Theme -->
+                                <div class="mb-3">
+                                    <label class="small text-muted fw-bold mb-2">EMOTION STYLE SOUND PACKS</label>
+                                    <p class="small text-muted mb-2">Fills all sound slots with matching emotional
+                                        melodies.</p>
+                                    <div class="d-flex gap-2">
+                                        <select class="form-select form-select-sm" id="emotion_pack_select">
+                                            <option value="happy">▼ Happy</option>
+                                            <option value="calm">▼ Calm</option>
+                                            <option value="epic">▼ Epic</option>
+                                            <option value="mysterious">▼ Mysterious</option>
+                                            <option value="emotional">▼ Emotional</option>
+                                            <option value="futuristic">▼ Futuristic</option>
+                                            <option value="relaxing">▼ Relaxing</option>
+                                            <option value="cute">▼ Cute</option>
+                                            <option value="heroic">▼ Heroic</option>
+                                            <option value="retro">▼ Retro</option>
+                                            <option value="cyberpunk">▼ Cyberpunk</option>
+                                            <option value="fantasy">▼ Fantasy</option>
+                                        </select>
+                                        <button class="btn btn-sm btn-outline-warning" onclick="previewEmotionPack()"><i
+                                                class="fas fa-play-circle me-1"></i>Demo</button>
+                                        <button class="btn btn-sm btn-elegant py-1 px-3" onclick="applyEmotionPack()"><i
+                                                class="fas fa-wand-magic-sparkles me-1"></i>Apply</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="glass-card p-4">
-                                <h5 class="text-info mb-3">System Sounds</h5>
-
-                                <label class="small text-muted">STARTUP MELODY</label>
-                                <div class="input-group mb-3">
-                                    <textarea class="form-control font-monospace" id="intro_sound" rows="2"></textarea>
-                                    <button class="btn btn-secondary" onclick="previewSound('intro_sound')"><i
-                                            class="fas fa-play"></i></button>
+                        <!-- Right Column: Sound Customization -->
+                        <div class="col-md-7 mb-4">
+                            <div class="glass-card p-4 h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="text-info mb-0"><i class="fas fa-sliders-h me-2"></i>Sound Editor</h5>
+                                    <a href="music.html" class="btn btn-sm btn-outline-light" target="_blank">
+                                        <i class="fas fa-music me-1"></i>Composing Tools
+                                    </a>
                                 </div>
 
-                                <label class="small text-muted">NOTIFICATION</label>
-                                <div class="input-group mb-3">
-                                    <textarea class="form-control font-monospace" id="notification_sound"
-                                        rows="2"></textarea>
-                                    <button class="btn btn-secondary" onclick="previewSound('notification_sound')"><i
-                                            class="fas fa-play"></i></button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="glass-card p-4">
-                                <h5 class="text-info mb-3">Interaction Sounds</h5>
-
-                                <label class="small text-muted">SINGLE TAP</label>
-                                <div class="input-group mb-3">
-                                    <textarea class="form-control font-monospace" id="touch_sound" rows="2"></textarea>
-                                    <button class="btn btn-secondary" onclick="previewSound('touch_sound')"><i
-                                            class="fas fa-play"></i></button>
+                                <div class="mb-3">
+                                    <label class="small text-muted fw-bold">STARTUP MELODY</label>
+                                    <div class="input-group">
+                                        <textarea class="form-control font-monospace py-2" id="intro_sound" rows="2"
+                                            placeholder="e.g. C5 100 20 E5 100 20"></textarea>
+                                        <button class="btn btn-secondary" onclick="previewSound('intro_sound')"><i
+                                                class="fas fa-play"></i></button>
+                                    </div>
                                 </div>
 
-                                <label class="small text-muted">DOUBLE TAP</label>
-                                <div class="input-group mb-3">
-                                    <textarea class="form-control font-monospace" id="double_touch_sound"
-                                        rows="2"></textarea>
-                                    <button class="btn btn-secondary" onclick="previewSound('double_touch_sound')"><i
-                                            class="fas fa-play"></i></button>
+                                <div class="mb-3">
+                                    <label class="small text-muted fw-bold">NOTIFICATION</label>
+                                    <div class="input-group">
+                                        <textarea class="form-control font-monospace py-2" id="notification_sound"
+                                            rows="2" placeholder="e.g. C5 100 20"></textarea>
+                                        <button class="btn btn-secondary"
+                                            onclick="previewSound('notification_sound')"><i
+                                                class="fas fa-play"></i></button>
+                                    </div>
                                 </div>
 
-                                <label class="small text-muted">LONG PRESS</label>
-                                <div class="input-group mb-3">
-                                    <textarea class="form-control font-monospace" id="long_touch_sound"
-                                        rows="2"></textarea>
-                                    <button class="btn btn-secondary" onclick="previewSound('long_touch_sound')"><i
-                                            class="fas fa-play"></i></button>
+                                <div class="mb-3">
+                                    <label class="small text-muted fw-bold">SINGLE TAP</label>
+                                    <div class="input-group">
+                                        <textarea class="form-control font-monospace py-2" id="touch_sound" rows="2"
+                                            placeholder="e.g. E5 50 10"></textarea>
+                                        <button class="btn btn-secondary" onclick="previewSound('touch_sound')"><i
+                                                class="fas fa-play"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="small text-muted fw-bold">DOUBLE TAP</label>
+                                    <div class="input-group">
+                                        <textarea class="form-control font-monospace py-2" id="double_touch_sound"
+                                            rows="2" placeholder="e.g. G5 50 10"></textarea>
+                                        <button class="btn btn-secondary"
+                                            onclick="previewSound('double_touch_sound')"><i
+                                                class="fas fa-play"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="small text-muted fw-bold">LONG PRESS</label>
+                                    <div class="input-group">
+                                        <textarea class="form-control font-monospace py-2" id="long_touch_sound"
+                                            rows="2" placeholder="e.g. C6 150 0"></textarea>
+                                        <button class="btn btn-secondary" onclick="previewSound('long_touch_sound')"><i
+                                                class="fas fa-play"></i></button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -758,6 +1005,22 @@
             });
         };
 
+        function openOloverseModal() {
+            document.getElementById('oloverseModal').style.setProperty('display', 'flex', 'important');
+        }
+
+        function closeOloverseModal() {
+            document.getElementById('oloverseModal').style.setProperty('display', 'none', 'important');
+        }
+
+        // Close modal when clicking outside content area
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('oloverseModal');
+            if (modal && event.target === modal) {
+                closeOloverseModal();
+            }
+        });
+
         function initGifUI() {
             const grid = document.getElementById('gifGrid');
             const defaultSel = document.getElementById('gif_default');
@@ -772,6 +1035,9 @@
             for (const [key, label] of Object.entries(gifData)) {
                 const col = document.createElement('div');
                 col.className = 'col-4 col-sm-3 col-md-2 p-1';
+                if (key === 'custom1' || key === 'custom2') {
+                    col.style.order = '999';
+                }
                 const bgUrl = `assets/${label.replace(/\s+/g, ' ')}.png`;
                 col.innerHTML = `
                 <div class="form-check image-bg" style="background-image: url('${bgUrl}');" onclick="document.getElementById('chk_${key}').click()">
@@ -931,14 +1197,21 @@
 
                     document.getElementById('loadingOverlay').style.display = 'none';
                     const screen = document.getElementById('controllerScreen');
+                    const connectScreen = document.getElementById('connectScreen');
+
+                    // Show controllerScreen below connectScreen
                     screen.style.display = 'block';
-                    
-                    // Smooth scroll down to controller screen
+
+                    // Smooth scroll down to detailed settings area
                     screen.scrollIntoView({ behavior: 'smooth' });
 
-                    // After transition finishes, hide connect screen to lock it there
+                    // Once smooth scroll finishes, hide connectScreen and lock scroll inside controllerScreen
                     setTimeout(() => {
-                        document.getElementById('connectScreen').style.display = 'none';
+                        connectScreen.style.setProperty('display', 'none', 'important');
+                        screen.style.height = '100vh';
+                        screen.style.overflowY = 'auto';
+                        document.body.style.overflow = 'hidden';
+                        window.scrollTo(0, 0);
                     }, 1000);
                 }, 3000);
 
@@ -946,7 +1219,8 @@
                 console.error(e);
                 alert("Connection Failed: " + e);
                 document.getElementById('loadingOverlay').style.display = 'none';
-                document.getElementById('connectScreen').style.display = 'flex';
+                document.getElementById('connectScreen').style.setProperty('display', 'flex', 'important');
+                document.body.style.overflow = 'auto';
                 window.scrollTo({ top: 0, behavior: 'instant' });
             }
         }
@@ -971,21 +1245,32 @@
                 port = null;
             }
 
-            // Reset UI states with scroll up transition
             const connectScreen = document.getElementById('connectScreen');
             const controllerScreen = document.getElementById('controllerScreen');
-            
+
             document.getElementById('loadingOverlay').style.display = 'none';
-            connectScreen.style.display = 'flex';
-            
-            // Scroll back up to connect screen
-            connectScreen.scrollIntoView({ behavior: 'smooth' });
-            
+
+            // Restore default scrollable behavior for body
+            document.body.style.overflow = 'auto';
+            controllerScreen.style.height = '';
+            controllerScreen.style.overflowY = '';
+
+            // Show connectScreen
+            connectScreen.style.setProperty('display', 'flex', 'important');
+
+            // Set scroll position to match the height of connectScreen so it doesn't jump
+            const connectHeight = connectScreen.offsetHeight || window.innerHeight;
+            window.scrollTo(0, connectHeight);
+
+            // Smoothly scroll back up to connect screen
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
             // After transition finishes, hide controller screen
             setTimeout(() => {
                 controllerScreen.style.display = 'none';
+                window.scrollTo(0, 0);
             }, 1000);
-            
+
             log("Disconnected. Connect option is available.", "sys");
         }
 
@@ -1011,7 +1296,7 @@
                 if (reader) {
                     try {
                         reader.releaseLock();
-                    } catch (e) {}
+                    } catch (e) { }
                     reader = null;
                 }
                 if (keepReading) {
@@ -1221,6 +1506,14 @@
 
         // --- 8. EVENT LISTENERS ---
         document.getElementById('connectBtn').addEventListener('click', connect);
+        document.getElementById('firmware_display_select').addEventListener('change', (e) => {
+            const val = e.target.value;
+            const btn = document.getElementById('firmwareFlashingButton');
+            if (btn) {
+                btn.setAttribute('manifest', `manifest_${val}.json`);
+                log(`Flashing manifest switched to: manifest_${val}.json`, 'sys');
+            }
+        });
         document.getElementById('disconnectBtn').addEventListener('click', disconnect);
         document.getElementById('custom_title').onchange = (e) => sendData('custom_title', e.target.value);
         document.getElementById('hourly_chime').onchange = (e) => sendData('hourly_chime', e.target.checked ? '1' : '0');
@@ -1330,6 +1623,193 @@
             await sendData('canvas_size', size);
             await sendData('canvas_trigger', '1');
         });
+
+        // --- 9. OLO MUSIC PACKS & EMOTION THEMES ---
+        const musicPacks = {
+            boot: {
+                modern_startup: "C5 100 20 E5 100 20 G5 100 20 C6 300 0",
+                scifi_boot: "E5 50 10 G5 50 10 B5 50 10 D6 50 10 F#6 150 0",
+                retro_computer: "C4 200 100 G4 200 100 C5 400 0",
+                cyberpunk_login: "D4 80 20 D4 80 20 D5 160 40 A4 120 0",
+                soft_desktop: "F4 150 50 A4 150 50 C5 150 50 E5 300 0"
+            },
+            alert: {
+                retro_platformer: "C5 50 10 E5 50 10 G5 50 10 C6 100 0",
+                rpg_village: "A4 120 30 C5 120 30 E5 120 30 D5 240 0",
+                adventure_begins: "G4 80 20 C5 80 20 D5 80 20 E5 160 0",
+                forest_journey: "E4 100 30 G4 100 30 A4 100 30 B4 200 0",
+                castle_exploration: "A3 150 40 C4 150 40 E4 150 40 D#4 300 0",
+                boss_battle: "C4 60 10 C#4 60 10 D4 60 10 D#4 120 0",
+                space_shooter: "C6 40 10 G5 40 10 C5 40 0",
+                space_exploration: "E5 200 40 B5 200 40 D6 300 0",
+                victory_fanfare: "C5 80 10 C5 80 10 C5 80 10 C5 240 20 E5 240 20 G5 240 20 C6 480 0",
+                high_score: "C5 60 20 E5 60 20 G5 60 20 B5 60 20 C6 150 0",
+                game_over: "C5 150 40 G4 150 40 E4 300 0"
+            },
+            emotion: {
+                happy: {
+                    intro_sound: "C5 100 20 E5 100 20 G5 100 20 C6 300 0",
+                    notification_sound: "G5 80 20 C6 150 0",
+                    touch_sound: "E5 50 0",
+                    double_touch_sound: "E5 50 10 G5 100 0",
+                    long_touch_sound: "C5 80 10 E5 80 10 G5 150 0"
+                },
+                calm: {
+                    intro_sound: "F4 200 50 A4 200 50 C5 400 0",
+                    notification_sound: "A4 150 50 C5 250 0",
+                    touch_sound: "F4 100 0",
+                    double_touch_sound: "F4 100 50 A4 150 0",
+                    long_touch_sound: "F4 150 30 A4 150 30 C5 250 0"
+                },
+                epic: {
+                    intro_sound: "A4 120 40 E5 120 40 A5 240 40 E6 480 0",
+                    notification_sound: "E5 100 30 A5 250 0",
+                    touch_sound: "A4 80 0",
+                    double_touch_sound: "A4 80 20 E5 150 0",
+                    long_touch_sound: "A4 100 20 E5 100 20 A5 200 0"
+                },
+                mysterious: {
+                    intro_sound: "C4 150 30 D#4 150 30 F#4 150 30 B4 300 0",
+                    notification_sound: "F#4 120 30 B4 240 0",
+                    touch_sound: "C4 80 0",
+                    double_touch_sound: "C4 80 20 D#4 150 0",
+                    long_touch_sound: "C4 100 20 D#4 100 20 F#4 150 0"
+                },
+                emotional: {
+                    intro_sound: "D4 180 40 F4 180 40 A4 180 40 C5 360 0",
+                    notification_sound: "A4 150 30 C5 240 0",
+                    touch_sound: "D4 100 0",
+                    double_touch_sound: "D4 100 30 F4 150 0",
+                    long_touch_sound: "D4 120 20 F4 120 20 A4 200 0"
+                },
+                futuristic: {
+                    intro_sound: "C6 50 10 E6 50 10 F#6 50 10 A6 100 0",
+                    notification_sound: "F#6 60 10 A6 150 0",
+                    touch_sound: "C6 40 0",
+                    double_touch_sound: "C6 40 10 E6 80 0",
+                    long_touch_sound: "C6 50 10 E6 50 10 F#6 100 0"
+                },
+                relaxing: {
+                    intro_sound: "G4 200 80 B4 200 80 D5 400 0",
+                    notification_sound: "B4 150 50 D5 300 0",
+                    touch_sound: "G4 120 0",
+                    double_touch_sound: "G4 120 50 B4 200 0",
+                    long_touch_sound: "G4 150 40 B4 150 40 D5 250 0"
+                },
+                cute: {
+                    intro_sound: "C5 60 10 E5 60 10 G5 60 10 C6 100 10 E6 100 10",
+                    notification_sound: "G5 60 10 E6 120 0",
+                    touch_sound: "G5 40 0",
+                    double_touch_sound: "G5 40 10 C6 60 0",
+                    long_touch_sound: "E5 50 10 G5 50 10 C6 80 0"
+                },
+                heroic: {
+                    intro_sound: "C4 100 20 G4 100 20 C5 100 20 E5 200 0",
+                    notification_sound: "G4 100 20 E5 250 0",
+                    touch_sound: "C4 80 0",
+                    double_touch_sound: "C4 80 20 G4 150 0",
+                    long_touch_sound: "C4 100 20 G4 100 20 C5 200 0"
+                },
+                retro: {
+                    intro_sound: "C5 60 10 C4 60 10 G4 60 10 C5 120 0",
+                    notification_sound: "G4 60 10 C5 150 0",
+                    touch_sound: "C4 50 0",
+                    double_touch_sound: "C4 50 10 G4 100 0",
+                    long_touch_sound: "C4 60 10 G4 60 10 C5 120 0"
+                },
+                cyberpunk: {
+                    intro_sound: "D4 80 20 D4 80 20 G#4 150 20 D4 150 0",
+                    notification_sound: "G#4 80 20 D4 200 0",
+                    touch_sound: "D4 60 0",
+                    double_touch_sound: "D4 60 10 F4 100 0",
+                    long_touch_sound: "D4 80 20 F4 80 20 G#4 150 0"
+                },
+                fantasy: {
+                    intro_sound: "E4 120 40 A4 120 40 B4 120 40 C5 240 0",
+                    notification_sound: "B4 120 40 C5 240 0",
+                    touch_sound: "E4 80 0",
+                    double_touch_sound: "E4 80 20 A4 150 0",
+                    long_touch_sound: "E4 100 30 A4 100 30 B4 150 0"
+                }
+            }
+        };
+
+        async function previewPackSound(packType) {
+            const selectId = packType === 'boot' ? 'boot_pack_select' : 'alert_pack_select';
+            const value = document.getElementById(selectId).value;
+            const sequence = musicPacks[packType][value];
+            if (!sequence) return;
+
+            if (audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
+
+            const notes = parseNoteInput(sequence);
+            for (const item of notes) {
+                const freq = notesFreq[item.note];
+                if (freq) {
+                    await playNote(freq, item.duration, item.rest);
+                } else {
+                    await new Promise(res => setTimeout(res, item.duration + item.rest));
+                }
+            }
+        }
+
+        async function applyPackSound(packType) {
+            const selectId = packType === 'boot' ? 'boot_pack_select' : 'alert_pack_select';
+            const val = document.getElementById(selectId).value;
+            const sequence = musicPacks[packType][val];
+            if (!sequence) return;
+
+            if (packType === 'boot') {
+                const textarea = document.getElementById('intro_sound');
+                textarea.value = sequence;
+                await sendData('intro_sound', sequence);
+            } else {
+                const target = document.getElementById('alert_target_select').value;
+                const textarea = document.getElementById(target);
+                textarea.value = sequence;
+                await sendData(target, sequence);
+            }
+        }
+
+        async function previewEmotionPack() {
+            const val = document.getElementById('emotion_pack_select').value;
+            const pack = musicPacks.emotion[val];
+            if (!pack) return;
+
+            const sequence = pack.intro_sound;
+            if (!sequence) return;
+
+            if (audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
+
+            const notes = parseNoteInput(sequence);
+            for (const item of notes) {
+                const freq = notesFreq[item.note];
+                if (freq) {
+                    await playNote(freq, item.duration, item.rest);
+                } else {
+                    await new Promise(res => setTimeout(res, item.duration + item.rest));
+                }
+            }
+        }
+
+        async function applyEmotionPack() {
+            const val = document.getElementById('emotion_pack_select').value;
+            const pack = musicPacks.emotion[val];
+            if (!pack) return;
+
+            const fields = ['intro_sound', 'notification_sound', 'touch_sound', 'double_touch_sound', 'long_touch_sound'];
+            for (const field of fields) {
+                if (pack[field]) {
+                    const textarea = document.getElementById(field);
+                    textarea.value = pack[field];
+                    await sendData(field, pack[field]);
+                }
+            }
+        }
 
         document.getElementById('stopCanvasBtn').addEventListener('click', async () => {
             await sendData('canvas_trigger', '0');

@@ -1,0 +1,32 @@
+{
+  "name": "OLO Bit V2 SSD1306 Firmware",
+  "version": "1.0.0",
+  "builds": [
+    {
+      "chipFamily": "ESP32-C3",
+      "parts": [
+        {
+          "path": "firmware/ssd1306/bootloader.bin",
+          "offset": 0
+        },
+        {
+          "path": "firmware/ssd1306/partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "firmware/ssd1306/firmware.bin",
+          "offset": 65536
+        },
+        {
+          "path": "firmware/ssd1306/boot_app0.bin",
+          "offset": 57344
+        }
+      ],
+      "flashMode": "dio",
+      "flashFreq": "40m",
+      "flashSize": "4MB",
+      "baudRate": 115200,
+      "compress": true
+    }
+  ]
+}
