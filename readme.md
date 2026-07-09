@@ -6,22 +6,6 @@ Welcome to the **OLO Bit Web Controller & Flasher Hub**! This guide contains qui
 
 ## 1. User Quick Start Guide
 
-### Hardware Pin Connections (ESP32-C3 Super Mini)
-If you are building your own OLO Bit or troubleshooting hardware pins, connect the components to your **ESP32-C3 Super Mini** according to this layout:
-
-| Component | Pin Function | ESP32-C3 Super Mini GPIO Pin |
-|---|---|---|
-| **OLED Display** | I2C SDA (Data) | **GPIO 20** |
-| | I2C SCL (Clock) | **GPIO 21** |
-| | Power Supply | 3.3V / GND |
-| **Passive Buzzer** | Audio Output | **GPIO 2** |
-| | Ground | GND |
-| **Touch Button** | Capacitive Touch Input | **GPIO 1** |
-| **NeoPixel RGB LED** | RGB Data In (DIN) | **GPIO 6** |
-| | Power Supply | 5V (or 3.3V) / GND |
-
-*Note: All pins are dynamic. If your custom device uses different GPIO lines, you can remap them anytime via the **Hardware** tab in the controller.*
-
 ### Quick Launch
 1. Connect the OLO Bit hardware to your computer using a **USB-C Data Cable**.
 2. Open the `index.html` page in **Google Chrome**, **Microsoft Edge**, or **Opera** (these browsers support the Web Serial API).
