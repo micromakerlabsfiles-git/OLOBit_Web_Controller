@@ -1,112 +1,292 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-theme="dark" data-bs-theme="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OLO Bit Web Controller</title>
+    <title>OLO Bit Web Controller — Desk Companion OS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 
     <style>
-        /* --- GREY & ORANGE THEME --- */
+        /* --- GLASSMORPHISM DUAL THEME SYSTEM --- */
         :root {
-            --bg-gradient: linear-gradient(135deg, #2d3436 0%, #000000 100%);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --bg-gradient: radial-gradient(circle at 15% 15%, #1e1b4b 0%, #0f172a 45%, #020617 90%);
+            --glass-bg: rgba(15, 23, 42, 0.85);
+            --glass-card-bg: rgba(15, 23, 42, 0.88);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
             --accent: #ff793f;
-            /* Vibrant Orange */
-            --accent-hover: #cd6133;
-            --terminal-bg: #1e272e;
-            --terminal-text: #ff793f;
+            --accent-hover: #ff5252;
+            --accent-glow: rgba(255, 121, 63, 0.35);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: rgba(15, 23, 42, 0.75);
+            --input-border: rgba(255, 255, 255, 0.15);
+            --input-text: #f8fafc;
+            --input-option-bg: #1e293b;
+            --input-option-text: #f8fafc;
+            --terminal-bg: #070a12;
+            --terminal-text: #ff9d00;
+            --modal-bg: rgba(15, 23, 42, 0.94);
+            --badge-bg: rgba(255, 255, 255, 0.08);
+            --card-header-gradient: linear-gradient(90deg, rgba(255, 121, 63, 0.15) 0%, rgba(255, 121, 63, 0) 100%);
+            --matrix-color: #ff793f;
         }
+
+        [data-theme="light"] {
+            --bg-gradient: radial-gradient(circle at 15% 15%, #eff6ff 0%, #f1f5f9 50%, #e2e8f0 100%);
+            --glass-bg: rgba(255, 255, 255, 0.92);
+            --glass-card-bg: rgba(255, 255, 255, 0.94);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --glass-shadow: 0 16px 48px rgba(31, 38, 135, 0.12);
+            --accent: #e65100;
+            --accent-hover: #d84315;
+            --accent-glow: rgba(230, 81, 0, 0.22);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --input-bg: rgba(255, 255, 255, 0.94);
+            --input-border: rgba(0, 0, 0, 0.18);
+            --input-text: #0f172a;
+            --input-option-bg: #ffffff;
+            --input-option-text: #0f172a;
+            --terminal-bg: #1e293b;
+            --terminal-text: #ffb74d;
+            --modal-bg: rgba(255, 255, 255, 0.96);
+            --badge-bg: rgba(0, 0, 0, 0.06);
+            --card-header-gradient: linear-gradient(90deg, rgba(230, 81, 0, 0.1) 0%, rgba(230, 81, 0, 0) 100%);
+            --matrix-color: #e65100;
+        }
+
+
 
         body {
             background: var(--bg-gradient);
             min-height: 100vh;
-            color: #d1d8e0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: var(--text-main);
+            font-family: 'Outfit', 'Segoe UI', system-ui, sans-serif;
             padding-bottom: 50px;
+            transition: background 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
         }
 
+        /* SCREEN TRANSITION ANIMATIONS */
+        .screen-anim-enter {
+            animation: screenEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .screen-anim-exit {
+            animation: screenExit 0.35s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+        }
+
+        @keyframes screenEnter {
+            from { opacity: 0; transform: scale(0.96) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes screenExit {
+            from { opacity: 1; transform: scale(1) translateY(0); }
+            to { opacity: 0; transform: scale(0.96) translateY(-20px); }
+        }
+
+        /* TAB TRANSITION ANIMATION */
+        .tab-pane.fade {
+            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(12px) scale(0.99);
+        }
+
+        .tab-pane.fade.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* FLOATING DEVICE IMAGE */
+        .floating-device {
+            animation: floatDevice 4.5s ease-in-out infinite;
+            filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.4));
+        }
+
+        @keyframes floatDevice {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(1deg); }
+        }
+
+        /* CARD MODULES */
         .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
+            background: var(--glass-card-bg);
             border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
             margin-bottom: 20px;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255, 121, 63, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .card-header-banner {
+            background: var(--card-header-gradient);
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-header-title {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
         }
 
         .btn-elegant {
-            background: linear-gradient(45deg, #ff793f 0%, #ff5252 100%);
+            background: linear-gradient(135deg, var(--accent) 0%, #ff5252 100%);
             border: none;
             border-radius: 12px;
-            padding: 12px 30px;
+            padding: 12px 28px;
             font-weight: 600;
-            color: #fff;
+            color: #fff !important;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 121, 63, 0.3);
+            box-shadow: 0 4px 20px var(--accent-glow);
         }
 
         .btn-elegant:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 8px 25px var(--accent-glow);
+            filter: brightness(1.08);
+        }
+
+        .btn-coffee {
+            background: linear-gradient(135deg, #ffdd00 0%, #fbb034 100%);
+            color: #000 !important;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            padding: 9px 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(251, 176, 52, 0.4);
+            text-decoration: none;
+        }
+
+        .btn-coffee:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 121, 63, 0.5);
-            color: #fff;
+            box-shadow: 0 8px 25px rgba(251, 176, 52, 0.6);
+            color: #000 !important;
+        }
+
+        /* GLASS ACTION BUTTONS FOR PRODUCT PAGE, USER MANUAL & WARRANTY */
+        .btn-glass-action {
+            background: var(--badge-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main) !important;
+            border-radius: 12px;
+            padding: 9px 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-glass-action:hover {
+            border-color: var(--accent);
+            background: rgba(255, 121, 63, 0.18);
+            color: var(--accent) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 18px var(--accent-glow);
+        }
+
+        .theme-toggle-btn {
+            background: var(--badge-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            border-radius: 30px;
+            padding: 6px 16px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: scale(1.03);
         }
 
         .form-control,
         .form-select {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: white;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            color: var(--input-text) !important;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .form-control:focus,
         .form-select:focus {
+            background: var(--input-bg);
             border-color: var(--accent);
-            box-shadow: 0 0 0 0.25rem rgba(255, 121, 63, 0.25);
+            color: var(--input-text);
+            box-shadow: 0 0 0 0.25rem var(--accent-glow);
         }
 
-        .ecosystem-list::-webkit-scrollbar {
-            width: 6px;
+        .form-select option {
+            background-color: var(--input-option-bg) !important;
+            color: var(--input-option-text) !important;
         }
 
-        .ecosystem-list::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
+        .text-muted {
+            color: var(--text-muted) !important;
         }
 
-        .ecosystem-list::-webkit-scrollbar-thumb {
-            background: rgba(255, 121, 63, 0.4);
-            border-radius: 4px;
+        .text-accent {
+            color: var(--accent) !important;
         }
 
-        .ecosystem-list::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 121, 63, 0.7);
+        .text-main {
+            color: var(--text-main) !important;
         }
 
         .nav-pills .nav-link {
-            color: #d1d8e0;
-            border-radius: 10px;
-            margin: 0 5px;
+            color: var(--text-muted);
+            border-radius: 12px;
+            margin: 0 4px;
+            font-weight: 600;
+            padding: 10px 20px;
+            transition: all 0.25s ease;
+        }
+
+        .nav-pills .nav-link:hover {
+            color: var(--text-main);
+            background: rgba(255, 121, 63, 0.15);
         }
 
         .nav-pills .nav-link.active {
             background-color: var(--accent);
-            color: white;
+            color: white !important;
+            box-shadow: 0 4px 15px var(--accent-glow);
         }
 
         .form-check.image-bg {
             position: relative;
             background-size: cover;
             background-position: center;
-            border-radius: 10px;
-            padding: 6px;
-            margin: 5px 0;
-            transition: all 0.2s ease;
+            border-radius: 12px;
+            padding: 8px;
+            margin: 4px 0;
+            transition: all 0.25s ease;
             aspect-ratio: 2 / 1;
             display: flex;
             align-items: flex-end;
@@ -118,42 +298,38 @@
         .form-check.image-bg::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.15));
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.2) 100%);
             z-index: 1;
         }
 
         .form-check.image-bg:has(input:checked) {
             border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(255, 121, 63, 0.4);
+            box-shadow: 0 0 15px var(--accent-glow);
+            transform: scale(1.02);
         }
 
         .form-check.image-bg label {
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             z-index: 2;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             width: 100%;
             pointer-events: none;
+            color: #ffffff !important;
+            font-weight: 600;
         }
 
         .form-check.image-bg input {
             z-index: 2;
         }
 
-        .text-info {
-            color: var(--accent) !important;
-        }
-
         #loadingOverlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.88);
             z-index: 9999;
             align-items: center;
             justify-content: center;
@@ -162,9 +338,19 @@
 
         .log-container {
             background: var(--terminal-bg);
-            border-radius: 12px;
+            border-radius: 14px;
             overflow: hidden;
-            border: 1px solid #3d3d3d;
+            border: 1px solid var(--glass-border);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .log-header {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
         }
 
         .log-content {
@@ -172,460 +358,610 @@
             overflow-y: auto;
             padding: 15px;
             color: var(--terminal-text);
-            font-family: monospace;
+            font-family: 'Roboto Mono', monospace;
             font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-dot.connected {
+            background-color: #10b981;
+            box-shadow: 0 0 10px #10b981;
+        }
+
+        .badge-glass {
+            background: var(--badge-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 10px;
+        }
+
+        .feature-pill {
+            background: rgba(255, 121, 63, 0.12);
+            border: 1px solid rgba(255, 121, 63, 0.25);
+            color: var(--accent);
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-segment-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-segment-btn.active {
+            background: var(--accent);
+            color: #ffffff !important;
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px var(--accent-glow);
         }
     </style>
 </head>
 
 <body>
 
+
+
+    <!-- LOADING OVERLAY -->
     <div id="loadingOverlay">
-        <div class="spinner-border text-info" style="width: 3rem; height: 3rem;" role="status"></div>
-        <p class="mt-3 text-white">Connecting to OLO Bit...</p>
+        <div class="spinner-border text-accent" style="width: 3.5rem; height: 3.5rem;" role="status"></div>
+        <p class="mt-3 text-white fw-bold fs-5">Connecting to OLO Bit...</p>
     </div>
 
-    <div id="connectScreen" class="container d-flex align-items-center justify-content-center"
-        style="min-height: 100vh;">
-        <div class="row w-100 align-items-center">
-            <!-- LEFT COLUMN: CONTROLLER & CONNECTION -->
-            <div class="col-md-6 text-center text-md-start">
-                <h1 class="display-4 fw-bold mb-4" style="color: var(--accent);">OLO Bit <span
-                        style="font-size: 0.5em; opacity: 0.7; color: white;">Web Controller</span></h1>
-                <p class="lead text-secondary mb-4">Manage GIFs, Audio, Time, and Hardware settings directly from your
-                    browser via USB.</p>
+    <!-- INITIAL CONNECT SCREEN -->
+    <div id="connectScreen" class="container py-4 screen-anim-enter" style="min-height: 100vh;">
 
-                <div class="glass-card p-5 text-center mb-3">
-                    <button id="connectBtn" class="btn btn-elegant btn-lg w-100 mb-3">
-                        <i class="fas fa-plug me-2"></i> Control Device
-                    </button>
+        <!-- TOP BAR IDENTITY & THEME -->
+        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3 pb-3 border-bottom border-secondary border-opacity-25">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-gradient p-2 rounded-3 text-white shadow-sm" style="background: linear-gradient(135deg, var(--accent) 0%, #ff5252 100%);">
+                    <i class="fas fa-microchip fs-3"></i>
+                </div>
+                <div>
+                    <h1 class="h4 fw-extrabold mb-0 text-main" style="letter-spacing: -0.5px;">
+                        OLO Bit <span class="text-accent fs-6">Web Controller</span>
+                    </h1>
+                    <p class="small text-muted mb-0">Interactive Desk Companion & Micro-gadget Control Suite</p>
+                </div>
+            </div>
 
-                    <div class="mb-3 text-start">
-                        <label class="form-label small text-muted fw-bold" for="firmware_display_select">SELECT DISPLAY
-                            TYPE FOR FIRMWARE</label>
-                        <select class="form-select form-select-sm" id="firmware_display_select">
-                            <option value="sh1106">SH1106 OLED (128x64) - Default</option>
-                            <option value="ssd1306">SSD1306 OLED (128x64)</option>
-                        </select>
+            <div class="d-flex align-items-center gap-2">
+                <a href="https://buymeacoffee.com/micromakerlabs" target="_blank" class="btn-coffee">
+                    <i class="fas fa-mug-hot me-1"></i> Buy Me a Coffee
+                </a>
+                <button id="themeToggleBtn" onclick="toggleTheme()" class="theme-toggle-btn">
+                    <i class="fas fa-moon me-1"></i> Dark
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-4 align-items-stretch">
+            
+            <!-- LEFT COLUMN: UNIFIED FULL-HEIGHT ACTION CARD -->
+            <div class="col-lg-7">
+                <div class="glass-card h-100 mb-0 d-flex flex-column justify-content-between">
+                    
+                    <!-- CARD HEADER -->
+                    <div>
+                        <div class="card-header-banner">
+                            <div class="d-flex gap-2" id="actionSegmentPills">
+                                <button class="nav-segment-btn active" id="tabSegmentControl" onclick="switchLandingTab('control')">
+                                    <i class="fas fa-plug me-1"></i> Control Device
+                                </button>
+                                <button class="nav-segment-btn" id="tabSegmentFlash" onclick="switchLandingTab('flash')">
+                                    <i class="fas fa-bolt me-1"></i> Flash Firmware
+                                </button>
+                            </div>
+                            <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 px-3 py-1">Web Serial Ready</span>
+                        </div>
+
+                        <div class="p-4 text-center">
+                            <!-- SEGMENT 1: CONTROL DEVICE -->
+                            <div id="segmentControlView" class="text-center">
+                                <p class="text-muted small mb-4 mx-auto" style="line-height: 1.6; max-width: 540px;">Connect your OLO Bit device over USB to configure animated faces, melodies, watch faces, LED lights, and custom canvas text in real-time.</p>
+                                <button id="connectBtn" class="btn btn-elegant btn-lg w-100 py-3 mb-4 fs-5">
+                                    <i class="fas fa-link me-2"></i> Control Device
+                                </button>
+                            </div>
+
+                            <!-- SEGMENT 2: FLASH FIRMWARE -->
+                            <div id="segmentFlashView" style="display: none;" class="text-center">
+                                <div class="mb-3 text-start">
+                                    <label class="form-label small text-muted fw-bold" for="firmware_display_select">SELECT DISPLAY TYPE FOR FIRMWARE</label>
+                                    <select class="form-select" id="firmware_display_select">
+                                        <option value="sh1106">SH1106 OLED (128x64) - Default</option>
+                                        <option value="ssd1306">SSD1306 OLED (128x64)</option>
+                                    </select>
+                                </div>
+
+                                <esp-web-install-button id="firmwareFlashingButton" manifest="manifest_sh1106.json" class="d-block mb-3">
+                                    <button id="flashButtonSlot" slot="activate" class="btn btn-outline-warning btn-lg w-100 py-3 fw-bold">
+                                        <i class="fas fa-download me-2"></i> Install / Update Firmware
+                                    </button>
+                                    <span slot="unsupported" class="text-danger small d-block mt-2">
+                                        <i class="fas fa-exclamation-triangle me-1"></i> Web Serial not supported in this browser. Please use Chrome, Edge, or Opera.
+                                    </span>
+                                    <span slot="not-allowed" class="text-warning small d-block mt-2">
+                                        <i class="fas fa-exclamation-triangle me-1"></i> HTTPS connection required for Web Serial.
+                                    </span>
+                                </esp-web-install-button>
+                            </div>
+
+                            <!-- PROMINENT GLASS ACTION BUTTONS FOR PRODUCT PAGE, USER MANUAL & WARRANTY -->
+                            <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap mb-2 text-center">
+                                <a href="https://olobit.in" target="_blank" class="btn-glass-action">
+                                    <i class="fas fa-globe text-accent me-1"></i> Product Page
+                                </a>
+                                <a href="https://www.olobit.in/manual" target="_blank" class="btn-glass-action">
+                                    <i class="fas fa-book text-warning me-1"></i> User Manual
+                                </a>
+                                <a href="https://www.olobit.in/warranty" target="_blank" class="btn-glass-action">
+                                    <i class="fas fa-shield-alt text-info me-1"></i> Warranty Info
+                                </a>
+                            </div>
+                        </div>
                     </div>
 
-                    <esp-web-install-button id="firmwareFlashingButton" manifest="manifest_sh1106.json"
-                        class="d-block mb-3">
-                        <button id="flashButtonSlot" slot="activate" class="btn btn-elegant btn-lg w-100">
-                            <i class="fas fa-bolt me-2"></i> Install/Update Firmware
+                    <!-- INTEGRATED OLOVERSE ECOSYSTEM BANNER AT BOTTOM OF LEFT CARD -->
+                    <div class="p-3 mx-3 mb-3 rounded-4 bg-dark bg-opacity-20 border border-secondary border-opacity-10 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div>
+                            <h6 class="fw-bold text-main mb-1"><i class="fas fa-cubes text-info me-2"></i>OLOVerse Ecosystem</h6>
+                            <p class="small text-muted mb-0" style="font-size: 0.8rem;">Transform your device into flight trackers, finance dashboards, or mouse jigglers.</p>
+                        </div>
+                        <button onclick="openOloverseModal()" class="btn btn-sm btn-elegant px-3 py-2" style="background: linear-gradient(135deg, #0fbcf9 0%, #3498db 100%);">
+                            Explore Hub
                         </button>
-                        <span slot="unsupported" class="text-danger small d-block mt-2"><i
-                                class="fas fa-exclamation-triangle"></i> Browser Web Serial not supported. Please use
-                            Chrome, Edge, or Opera.</span>
-                        <span slot="not-allowed" class="text-warning small d-block mt-2"><i
-                                class="fas fa-exclamation-triangle"></i> HTTPS connection required for Web
-                            Serial.</span>
-                    </esp-web-install-button>
+                    </div>
 
-                    <small class="text-muted"><i class="fab fa-chrome"></i> Requires Chrome, Edge, or Opera</small>
-                </div>
-
-                <!-- OLOVERSE ECOSYSTEM TRIGGER BUTTON -->
-                <button onclick="openOloverseModal()" class="btn btn-elegant btn-sm w-100 mb-3 py-2"
-                    style="background: linear-gradient(45deg, #0fbcf9 0%, #3498db 100%); box-shadow: 0 4px 15px rgba(15, 188, 249, 0.3);">
-                    <i class="fas fa-cubes me-2"></i> Explore OLOVerse Ecosystem
-                </button>
-
-                <div class="glass-card p-3 d-flex justify-content-around align-items-center gap-2 mb-3">
-                    <a href="https://olobit.in" target="_blank" class="btn btn-outline-light btn-sm flex-grow-1 py-2">
-                        <i class="fas fa-globe me-2"></i>Product Page
-                    </a>
-                    <a href="https://www.olobit.in/manual" target="_blank"
-                        class="btn btn-outline-light btn-sm flex-grow-1 py-2">
-                        <i class="fas fa-book me-2"></i>Manual
-                    </a>
-                    <a href="https://www.olobit.in/warranty" target="_blank"
-                        class="btn btn-outline-light btn-sm flex-grow-1 py-2">
-                        <i class="fas fa-shield-alt me-2"></i>Warranty
-                    </a>
-                </div>
-
-                <div class="glass-card p-3 text-start">
-                    <p class="small text-white mb-1"><strong class="text-muted small fw-bold">Author</strong> <br>
-                        <a href="https://www.micromakerlabs.com" target="_blank"
-                            class="text-info text-decoration-none fw-bold" style="font-size: 0.9rem;">
-                            <i class="fas fa-flask me-1"></i>Micromaker Labs
-                        </a>
-                    </p>
-                    <p class="text-muted mb-0" style="font-size: 0.75rem; line-height: 1.3;">We build Interactive desk
-                        pets, smart gadgets, and workspace lighting solutions designed to help you enjoy technology with
-                        DIY.</p>
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: IMAGE -->
-            <div class="col-md-6 text-center">
-                <img src="assets/olobitplus.png" alt="OLO Logo" class="img-fluid">
+            <!-- RIGHT COLUMN: VISUAL SHOWCASE CARD -->
+            <div class="col-lg-5">
+                <div class="glass-card h-100 p-4 d-flex flex-column justify-content-between text-center mb-0">
+                    
+                    <div>
+                        <div class="d-flex justify-content-center flex-wrap gap-2 mb-3">
+                            <span class="feature-pill"><i class="fas fa-smile"></i> 50+ GIF Faces</span>
+                            <span class="feature-pill"><i class="fas fa-music"></i> Melody Synth</span>
+                            <span class="feature-pill"><i class="fas fa-clock"></i> Chronos Clock</span>
+                            <span class="feature-pill"><i class="fas fa-lightbulb"></i> RGB LED</span>
+                        </div>
+
+                        <div class="p-2 my-2">
+                            <img src="assets/olobitplus.png" alt="OLO Bit Plus" class="img-fluid rounded-4 floating-device" style="max-height: 270px; object-fit: contain;">
+                        </div>
+                    </div>
+
+                    <!-- AUTHOR BANNER -->
+                    <div class="p-3 rounded-4 bg-dark bg-opacity-20 border border-secondary border-opacity-10 text-start mt-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="small text-muted fw-bold d-block">Designed & Crafted by</span>
+                                <a href="https://www.micromakerlabs.com" target="_blank" class="text-accent text-decoration-none fw-bold">
+                                    <i class="fas fa-flask me-1"></i>Micromaker Labs
+                                </a>
+                            </div>
+                            <a href="https://buymeacoffee.com/micromakerlabs" target="_blank" class="btn btn-sm btn-coffee py-1 px-3">
+                                Support Us
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
             </div>
+
         </div>
     </div>
 
     <!-- OLOVERSE MODAL POPUP -->
-    <div id="oloverseModal"
-        style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 9999; display: none; align-items: center; justify-content: center;">
-        <div class="glass-card p-4 position-relative"
-            style="max-width: 950px; width: 95%; border: 1px solid rgba(255, 121, 63, 0.2);">
-            <!-- Close Button -->
+    <div id="oloverseModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.88); z-index: 9999; display: none; align-items: center; justify-content: center;">
+        <div class="glass-card p-4 position-relative" style="max-width: 950px; width: 95%; max-height: 90vh; overflow-y: auto;">
             <button onclick="closeOloverseModal()" class="btn btn-sm btn-outline-secondary position-absolute"
-                style="top: 15px; right: 15px; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+                style="top: 15px; right: 15px; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
                 <i class="fas fa-times"></i>
             </button>
 
             <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
-                <h4 class="mb-0 text-white fw-bold"><i class="fas fa-cubes me-2"
-                        style="color: var(--accent);"></i>OLOVerse Ecosystem</h4>
+                <h4 class="mb-0 text-main fw-bold"><i class="fas fa-cubes me-2 text-accent"></i>OLOVerse Ecosystem</h4>
                 <span class="badge bg-secondary text-white">Modular OS Platform</span>
             </div>
 
-            <p class="small text-secondary mb-3" style="line-height: 1.4;">OLOVerse positions OLO Bit as a dynamic
-                hardware platform that evolves. You can easily transform the device into different productivity, IoT,
-                and security tools by flashing different operating systems over USB.</p>
+            <p class="small text-muted mb-4" style="line-height: 1.5;">
+                OLOVerse positions OLO Bit as a dynamic hardware platform that evolves. You can easily transform the device into different productivity, IoT, and security tools by flashing different operating systems over USB.
+            </p>
 
-            <div class="row g-2 mb-4">
-                <!-- OS 1 -->
+            <div class="row g-3 mb-4">
                 <div class="col-lg-3 col-md-6">
-                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
-                        <span class="badge bg-info text-dark mb-1">OLO Bit OS</span>
-                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">The flagship
-                            default operating system featuring 50+ animated OLO faces, BLE map navigation, custom canvas
-                            text, phone alerts, alarms, weather updates & retro games.</p>
+                    <div class="p-3 rounded-4 border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-info text-dark mb-2">OLO Bit OS</span>
+                        <p class="small text-muted mb-0" style="font-size: 0.75rem; line-height: 1.4;">Flagship OS featuring 50+ animated OLO faces, BLE map navigation, custom canvas text, phone alerts, alarms, weather & games.</p>
                     </div>
                 </div>
-                <!-- OS 2 -->
                 <div class="col-lg-3 col-md-6">
-                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
-                        <span class="badge bg-warning text-dark mb-1">OLO Dash</span>
-                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">Daily finance
-                            dashboard gadget in OLOVerse ecosystem with 15 animated emotion faces (similar to Dasai
-                            Mochi).</p>
+                    <div class="p-3 rounded-4 border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-warning text-dark mb-2">OLO Dash</span>
+                        <p class="small text-muted mb-0" style="font-size: 0.75rem; line-height: 1.4;">Daily finance dashboard gadget in OLOVerse ecosystem with 15 animated emotion faces.</p>
                     </div>
                 </div>
-                <!-- OS 3 -->
                 <div class="col-lg-3 col-md-6">
-                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
-                        <span class="badge bg-success text-dark mb-1">OLO-Show</span>
-                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">A complete
-                            end-to-end toolchain for loading custom 1-bit animations onto a microcontroller-driven OLED
-                            display without OLO faces.</p>
+                    <div class="p-3 rounded-4 border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-success text-dark mb-2">OLO-Show</span>
+                        <p class="small text-muted mb-0" style="font-size: 0.75rem; line-height: 1.4;">Toolchain for loading custom 1-bit animations onto an OLED display without OLO faces.</p>
                     </div>
                 </div>
-                <!-- OS 4 -->
                 <div class="col-lg-3 col-md-6">
-                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
-                        <span class="badge bg-primary text-white mb-1">OLO-Aero</span>
-                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">Track
-                            commercial flights in real-time using Opensky APIs on cool custom OLO faces.</p>
+                    <div class="p-3 rounded-4 border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-primary text-white mb-2">OLO-Aero</span>
+                        <p class="small text-muted mb-0" style="font-size: 0.75rem; line-height: 1.4;">Track commercial flights in real-time using Opensky APIs on cool custom OLO faces.</p>
                     </div>
                 </div>
-                <!-- OS 5 -->
                 <div class="col-lg-3 col-md-6">
-                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
-                        <span class="badge bg-danger text-white mb-1">OLO-Jiggler</span>
-                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">BLE mouse
-                            jiggler workstation companion built on the ESP32-C3 Super Mini to keep your screen active.
-                        </p>
+                    <div class="p-3 rounded-4 border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-danger text-white mb-2">OLO-Jiggler</span>
+                        <p class="small text-muted mb-0" style="font-size: 0.75rem; line-height: 1.4;">BLE mouse jiggler workstation companion built on ESP32-C3 to keep screen active.</p>
                     </div>
                 </div>
-                <!-- OS 6 -->
                 <div class="col-lg-3 col-md-6">
-                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
-                        <span class="badge bg-light text-dark mb-1">OLO-Glyph</span>
-                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">An offline
-                            desk companion designed for text glyphy activities on your desk.</p>
+                    <div class="p-3 rounded-4 border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-light text-dark mb-2">OLO-Glyph</span>
+                        <p class="small text-muted mb-0" style="font-size: 0.75rem; line-height: 1.4;">An offline desk companion designed for text glyphy activities on your desk.</p>
                     </div>
                 </div>
-                <!-- OS 7 -->
                 <div class="col-lg-3 col-md-6">
-                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
-                        <span class="badge bg-secondary text-white mb-1">OLO-keystrokes</span>
-                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">Keystroke
-                            injector framework for security/educational use featuring 5 built-in OLO faces.</p>
+                    <div class="p-3 rounded-4 border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-secondary text-white mb-2">OLO-keystrokes</span>
+                        <p class="small text-muted mb-0" style="font-size: 0.75rem; line-height: 1.4;">Keystroke injector framework for security/educational use featuring 5 built-in OLO faces.</p>
                     </div>
                 </div>
-                <!-- OS 8 -->
                 <div class="col-lg-3 col-md-6">
-                    <div class="p-2 rounded border border-secondary bg-dark bg-opacity-20 h-100">
-                        <span class="badge bg-info text-dark mb-1">BOBO_OS</span>
-                        <p class="small text-secondary mb-0" style="font-size: 0.72rem; line-height: 1.3;">By PRTECH.
-                            Includes a configurable eye pet with daily technical controls and Web Serial support.</p>
+                    <div class="p-3 rounded-4 border border-secondary bg-dark bg-opacity-20 h-100">
+                        <span class="badge bg-info text-dark mb-2">BOBO_OS</span>
+                        <p class="small text-muted mb-0" style="font-size: 0.75rem; line-height: 1.4;">By PRTECH. Configurable eye pet with daily technical controls and Web Serial support.</p>
                     </div>
                 </div>
             </div>
 
             <div class="d-flex flex-wrap gap-2">
-                <a href="https://www.olobit.in/product-page/olo-bit-plus" target="_blank"
-                    class="btn btn-elegant btn-sm flex-grow-1 py-2">
+                <a href="https://www.olobit.in/product-page/olo-bit-plus" target="_blank" class="btn btn-elegant btn-sm flex-grow-1 py-2">
                     <i class="fas fa-shopping-cart me-1"></i> Buy OLO Bit Plus
                 </a>
-                <a href="https://olobit.in/oloverse" target="_blank"
-                    class="btn btn-outline-light btn-sm flex-grow-1 py-2">
+                <a href="https://olobit.in/oloverse" target="_blank" class="btn btn-outline-secondary btn-sm flex-grow-1 py-2 text-main">
                     <i class="fas fa-rocket me-1"></i> Explore OLOVerse Hub
                 </a>
             </div>
         </div>
     </div>
 
+    <!-- MAIN CONTROLLER SCREEN -->
     <div id="controllerScreen" style="display: none;" class="fade-in pt-3">
 
-        <nav class="navbar navbar-expand-lg glass-card mx-3 p-3 d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-                <span class="status-dot connected"></span>
-                <span class="fw-bold h5 mb-0">OLO Bit Connected</span>
+        <!-- STICKY NAVBAR -->
+        <nav class="navbar navbar-expand-lg glass-card mx-3 p-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center">
+                    <span class="status-dot connected"></span>
+                    <span class="fw-bold h5 mb-0 text-main">OLO Bit Connected</span>
+                </div>
             </div>
-            <div class="d-flex gap-3">
-                <span class="badge bg-secondary d-flex align-items-center"><i class="fas fa-microchip me-2"></i> MAC:
-                    <span id="macValue" class="ms-1">--:--:--</span></span>
-                <span class="badge bg-warning text-dark d-flex align-items-center"><i class="fas fa-tag me-2"></i> Ver:
-                    <span id="verValue" class="ms-1">1.0</span></span>
+
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="badge-glass d-flex align-items-center">
+                    <i class="fas fa-microchip me-2 text-accent"></i> MAC: <span id="macValue" class="ms-1 font-monospace">--:--:--</span>
+                </span>
+                <span class="badge-glass d-flex align-items-center">
+                    <i class="fas fa-tag me-2 text-warning"></i> Ver: <span id="verValue" class="ms-1 font-monospace">1.0</span>
+                </span>
+                <a href="https://buymeacoffee.com/micromakerlabs" target="_blank" class="btn-coffee">
+                    <i class="fas fa-mug-hot me-1"></i>Coffee
+                </a>
+                <button onclick="toggleTheme()" class="theme-toggle-btn ms-2">
+                    <i class="fas fa-moon me-1"></i> Theme
+                </button>
             </div>
         </nav>
 
         <div class="container-fluid px-4">
 
-            <ul class="nav nav-pills mb-4 justify-content-center" id="mainTabs" role="tablist">
-                <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-gifs"><i
-                            class="fas fa-images me-2"></i>GIFs</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-audio"><i
-                            class="fas fa-music me-2"></i>Audio</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-chronos"><i
-                            class="fas fa-clock me-2"></i>Chronos</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-canvas"><i
-                            class="fas fa-font me-2"></i>Canvas</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-hardware"><i
-                            class="fas fa-cogs me-2"></i>Hardware</button></li>
+            <!-- MAIN TABS -->
+            <ul class="nav nav-pills mb-4 justify-content-center flex-wrap gap-1" id="mainTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-gifs">
+                        <i class="fas fa-images me-2"></i>GIFs
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-audio">
+                        <i class="fas fa-music me-2"></i>Audio
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-chronos">
+                        <i class="fas fa-sliders-h me-2"></i>OLO Tweaks
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-canvas">
+                        <i class="fas fa-font me-2"></i>Canvas
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-hardware">
+                        <i class="fas fa-cogs me-2"></i>Hardware
+                    </button>
+                </li>
             </ul>
 
+            <!-- ACTION TOOLBAR -->
             <div class="row mb-4 justify-content-center">
-                <div class="col-auto">
-                    <button id="disconnectBtn" class="btn btn-secondary me-2"><i
-                            class="fas fa-unlink me-2"></i>Disconnect</button>
-                    <button id="resetBtn" class="btn btn-danger me-2"><i
-                            class="fas fa-power-off me-2"></i>Reboot</button>
-                    <button id="clearNvsBtn" class="btn btn-warning me-2 text-dark"><i
-                            class="fas fa-trash-alt me-2"></i>Clear NVS</button>
-                    <button id="saveBtn" class="btn btn-elegant"><i class="fas fa-save me-2"></i>Save All
-                        Settings</button>
+                <div class="col-auto d-flex flex-wrap gap-2 justify-content-center">
+                    <button id="disconnectBtn" class="btn btn-secondary px-3">
+                        <i class="fas fa-unlink me-2"></i>Disconnect
+                    </button>
+                    <button id="resetBtn" class="btn btn-danger px-3">
+                        <i class="fas fa-power-off me-2"></i>Reboot
+                    </button>
+                    <button id="clearNvsBtn" class="btn btn-warning px-3 text-dark fw-bold">
+                        <i class="fas fa-trash-alt me-2"></i>Clear NVS
+                    </button>
+                    <button id="saveBtn" class="btn btn-elegant px-4">
+                        <i class="fas fa-save me-2"></i>Save All Settings
+                    </button>
                 </div>
             </div>
 
+            <!-- TAB CONTENT -->
             <div class="tab-content">
 
-                <!-- GIFs TAB -->
+                <!-- 1. GIFs TAB -->
                 <div class="tab-pane fade show active" id="tab-gifs">
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="glass-card p-4">
-                                <h5 class="mb-3 text-info"><i class="fas fa-sliders-h me-2"></i>Playback Settings</h5>
-
-                                <label>Speed: <span id="gif_speedValue" class="text-accent">0</span></label>
-                                <input type="range" class="form-range" id="gif_speed" min="50" max="200" value="100">
-
-                                <label class="mt-3">Delay (Seconds): <span id="gif_delayValue"
-                                        class="text-accent">10</span></label>
-                                <input type="range" class="form-range" id="gif_delay" min="0" max="60" value="10">
-
-                                <div class="form-check form-switch mt-3">
-                                    <input class="form-check-input" type="checkbox" id="isInverted">
-                                    <label class="form-check-label">Negative Colors (Inverted)</label>
+                        <div class="col-lg-4 mb-4">
+                            <!-- Playback Card -->
+                            <div class="glass-card mb-4">
+                                <div class="card-header-banner">
+                                    <h5 class="card-header-title"><i class="fas fa-sliders-h"></i> Playback Settings</h5>
                                 </div>
+                                <div class="p-4">
+                                    <div class="mb-3">
+                                        <label class="form-label text-main">Speed: <span id="gif_speedValue" class="text-accent fw-bold">100</span></label>
+                                        <input type="range" class="form-range" id="gif_speed" min="50" max="200" value="100">
+                                    </div>
 
-                                <hr class="border-secondary">
+                                    <div class="mb-3">
+                                        <label class="form-label text-main">Delay (Seconds): <span id="gif_delayValue" class="text-accent fw-bold">10</span></label>
+                                        <input type="range" class="form-range" id="gif_delay" min="0" max="60" value="10">
+                                    </div>
 
-                                <h5 class="mb-3 text-info"><i class="fas fa-hand-pointer me-2"></i>Triggers</h5>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="isInverted">
+                                        <label class="form-check-label text-main">Negative Colors (Inverted)</label>
+                                    </div>
+                                </div>
+                            </div>
 
-                                <div class="mb-2">
-                                    <label class="small text-muted">DEFAULT GIF</label>
-                                    <select class="form-select" id="gif_default"></select>
+                            <!-- Game Difficulty Card -->
+                            <div class="glass-card mb-4">
+                                <div class="card-header-banner">
+                                    <h5 class="card-header-title"><i class="fas fa-gamepad"></i> Game Settings</h5>
                                 </div>
-                                <div class="mb-2">
-                                    <label class="small text-muted">STARTUP GIF</label>
-                                    <select class="form-select" id="gif_intro"></select>
+                                <div class="p-4">
+                                    <label class="small text-muted mb-1" for="game_difficulty">GAME DIFFICULTY</label>
+                                    <select class="form-select form-select-sm" id="game_difficulty">
+                                        <option value="0">Easy</option>
+                                        <option value="1">Medium</option>
+                                        <option value="2">Hard</option>
+                                    </select>
                                 </div>
-                                <div class="mb-2">
-                                    <label class="small text-muted">SINGLE TAP</label>
-                                    <select class="form-select trigger-select" id="gif_touch"></select>
+                            </div>
+
+                            <!-- Triggers Card -->
+                            <div class="glass-card mb-0">
+                                <div class="card-header-banner">
+                                    <h5 class="card-header-title"><i class="fas fa-hand-pointer"></i> Gesture Triggers</h5>
                                 </div>
-                                <div class="mb-2">
-                                    <label class="small text-muted">DOUBLE TAP</label>
-                                    <select class="form-select trigger-select" id="gif_double_touch"></select>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="small text-muted">LONG PRESS</label>
-                                    <select class="form-select trigger-select" id="gif_long_touch"></select>
+                                <div class="p-4">
+                                    <div class="mb-2">
+                                        <label class="small text-muted">DEFAULT GIF</label>
+                                        <select class="form-select" id="gif_default"></select>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="small text-muted">SINGLE TAP</label>
+                                        <select class="form-select trigger-select" id="gif_touch"></select>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="small text-muted">DOUBLE TAP</label>
+                                        <select class="form-select trigger-select" id="gif_double_touch"></select>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="small text-muted">LONG PRESS</label>
+                                        <select class="form-select trigger-select" id="gif_long_touch"></select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-md-8">
-                            <div class="glass-card p-4">
-                                <div class="d-flex justify-content-between mb-3">
-                                    <h5 class="text-info"><i class="fas fa-th me-2"></i>Gif Selector</h5>
+                        <!-- GIF Grid Card (NO NESTED SCROLLBAR) -->
+                        <div class="col-lg-8 mb-4">
+                            <div class="glass-card">
+                                <div class="card-header-banner">
+                                    <h5 class="card-header-title"><i class="fas fa-th"></i> Gif Selector Library</h5>
                                     <div>
-                                        <button class="btn btn-sm btn-outline-light me-1"
-                                            onclick="toggleAllGifs(true)">Select All</button>
-                                        <button class="btn btn-sm btn-outline-light"
-                                            onclick="toggleAllGifs(false)">Clear</button>
+                                        <button class="btn btn-sm btn-outline-secondary me-1 text-main" onclick="toggleAllGifs(true)">Select All</button>
+                                        <button class="btn btn-sm btn-outline-secondary text-main" onclick="toggleAllGifs(false)">Clear</button>
                                     </div>
                                 </div>
-                                <div class="row" id="gifGrid"></div>
+                                <div class="p-4">
+                                    <div class="row" id="gifGrid"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- AUDIO TAB -->
+                <!-- 2. AUDIO TAB -->
                 <div class="tab-pane fade" id="tab-audio">
                     <div class="row">
-                        <!-- Left Column: Sound Packs & Themes -->
-                        <div class="col-md-5 mb-4">
-                            <div class="glass-card p-4 h-100">
-                                <h5 class="text-info mb-4"><i class="fas fa-compact-disc me-2"></i>OLO Music Packs &
-                                    Themes</h5>
-
-                                <!-- OLO Music Pack Vol. 1 -->
-                                <div class="mb-4 pb-3 border-bottom border-secondary">
-                                    <label class="small text-muted fw-bold mb-2">OLO MUSIC PACK VOL. 1 (BOOT
-                                        CHIMES)</label>
-                                    <div class="d-flex gap-2">
-                                        <select class="form-select form-select-sm" id="boot_pack_select">
-                                            <option value="modern_startup">Modern Startup Chime</option>
-                                            <option value="scifi_boot">Sci-Fi AI Boot</option>
-                                            <option value="retro_computer">Retro Computer Boot</option>
-                                            <option value="cyberpunk_login">Cyberpunk Login</option>
-                                            <option value="soft_desktop">Soft Desktop Startup</option>
-                                        </select>
-                                        <button class="btn btn-sm btn-outline-warning"
-                                            onclick="previewPackSound('boot')"><i class="fas fa-play"></i></button>
-                                        <button class="btn btn-sm btn-elegant py-1 px-3"
-                                            onclick="applyPackSound('boot')">Apply</button>
-                                    </div>
+                        <!-- Sound Packs -->
+                        <div class="col-lg-5 mb-4">
+                            <div class="glass-card h-100">
+                                <div class="card-header-banner">
+                                    <h5 class="card-header-title"><i class="fas fa-compact-disc"></i> OLO Music Packs & Themes</h5>
                                 </div>
-
-                                <!-- OLO Music Pack Vol. 2 -->
-                                <div class="mb-4 pb-3 border-bottom border-secondary">
-                                    <label class="small text-muted fw-bold mb-2">OLO MUSIC PACK VOL. 2 (ALERTS &
-                                        GESTURES)</label>
-                                    <select class="form-select form-select-sm mb-2" id="alert_pack_select">
-                                        <option value="retro_platformer">Retro 8-bit Platformer</option>
-                                        <option value="rpg_village">Pixel RPG Village</option>
-                                        <option value="adventure_begins">Adventure Begins</option>
-                                        <option value="forest_journey">Forest Journey</option>
-                                        <option value="castle_exploration">Castle Exploration</option>
-                                        <option value="boss_battle">Boss Battle</option>
-                                        <option value="space_shooter">Space Shooter</option>
-                                        <option value="space_exploration">Space Exploration</option>
-                                        <option value="victory_fanfare">Victory Fanfare</option>
-                                        <option value="high_score">High Score</option>
-                                        <option value="game_over">Game Over</option>
-                                    </select>
-                                    <div class="d-flex gap-2 align-items-center">
-                                        <span class="small text-muted text-nowrap">Apply to:</span>
-                                        <select class="form-select form-select-sm" id="alert_target_select">
-                                            <option value="notification_sound">Notification</option>
-                                            <option value="touch_sound">Single Tap</option>
-                                            <option value="double_touch_sound">Double Tap</option>
-                                            <option value="long_touch_sound">Long Press</option>
-                                        </select>
-                                        <button class="btn btn-sm btn-outline-warning"
-                                            onclick="previewPackSound('alert')"><i class="fas fa-play"></i></button>
-                                        <button class="btn btn-sm btn-elegant py-1 px-3"
-                                            onclick="applyPackSound('alert')">Apply</button>
+                                <div class="p-4">
+                                    <!-- Boot Chimes -->
+                                    <div class="mb-4 pb-3 border-bottom border-secondary">
+                                        <label class="small text-muted fw-bold mb-2">OLO BOOT CHIMES</label>
+                                        <div class="d-flex gap-2">
+                                            <select class="form-select form-select-sm" id="boot_pack_select">
+                                                <option value="modern_startup">Modern Startup Chime</option>
+                                                <option value="scifi_boot">Sci-Fi AI Boot</option>
+                                                <option value="retro_computer">Retro Computer Boot</option>
+                                                <option value="cyberpunk_login">Cyberpunk Login</option>
+                                                <option value="soft_desktop">Soft Desktop Startup</option>
+                                            </select>
+                                            <button class="btn btn-sm btn-outline-warning" onclick="previewPackSound('boot')"><i class="fas fa-play"></i></button>
+                                            <button class="btn btn-sm btn-elegant py-1 px-3" onclick="applyPackSound('boot')">Apply</button>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- Emotion Style Theme -->
-                                <div class="mb-3">
-                                    <label class="small text-muted fw-bold mb-2">EMOTION STYLE SOUND PACKS</label>
-                                    <p class="small text-muted mb-2">Fills all sound slots with matching emotional
-                                        melodies.</p>
-                                    <div class="d-flex gap-2">
-                                        <select class="form-select form-select-sm" id="emotion_pack_select">
-                                            <option value="happy">▼ Happy</option>
-                                            <option value="calm">▼ Calm</option>
-                                            <option value="epic">▼ Epic</option>
-                                            <option value="mysterious">▼ Mysterious</option>
-                                            <option value="emotional">▼ Emotional</option>
-                                            <option value="futuristic">▼ Futuristic</option>
-                                            <option value="relaxing">▼ Relaxing</option>
-                                            <option value="cute">▼ Cute</option>
-                                            <option value="heroic">▼ Heroic</option>
-                                            <option value="retro">▼ Retro</option>
-                                            <option value="cyberpunk">▼ Cyberpunk</option>
-                                            <option value="fantasy">▼ Fantasy</option>
+                                    <!-- Alerts & Gestures -->
+                                    <div class="mb-4 pb-3 border-bottom border-secondary">
+                                        <label class="small text-muted fw-bold mb-2">OLO ALERTS & GESTURES</label>
+                                        <select class="form-select form-select-sm mb-2" id="alert_pack_select">
+                                            <option value="retro_platformer">Retro 8-bit Platformer</option>
+                                            <option value="rpg_village">Pixel RPG Village</option>
+                                            <option value="adventure_begins">Adventure Begins</option>
+                                            <option value="forest_journey">Forest Journey</option>
+                                            <option value="castle_exploration">Castle Exploration</option>
+                                            <option value="boss_battle">Boss Battle</option>
+                                            <option value="space_shooter">Space Shooter</option>
+                                            <option value="space_exploration">Space Exploration</option>
+                                            <option value="victory_fanfare">Victory Fanfare</option>
+                                            <option value="high_score">High Score</option>
+                                            <option value="game_over">Game Over</option>
                                         </select>
-                                        <button class="btn btn-sm btn-outline-warning" onclick="previewEmotionPack()"><i
-                                                class="fas fa-play-circle me-1"></i>Demo</button>
-                                        <button class="btn btn-sm btn-elegant py-1 px-3" onclick="applyEmotionPack()"><i
-                                                class="fas fa-wand-magic-sparkles me-1"></i>Apply</button>
+                                        <div class="d-flex gap-2 align-items-center">
+                                            <span class="small text-muted text-nowrap">Apply to:</span>
+                                            <select class="form-select form-select-sm" id="alert_target_select">
+                                                <option value="notification_sound">Notification</option>
+                                                <option value="touch_sound">Single Tap</option>
+                                                <option value="double_touch_sound">Double Tap</option>
+                                                <option value="long_touch_sound">Long Press</option>
+                                            </select>
+                                            <button class="btn btn-sm btn-outline-warning" onclick="previewPackSound('alert')"><i class="fas fa-play"></i></button>
+                                            <button class="btn btn-sm btn-elegant py-1 px-3" onclick="applyPackSound('alert')">Apply</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Emotion Style Theme -->
+                                    <div class="mb-0">
+                                        <label class="small text-muted fw-bold mb-2">EMOTION SOUND PACKS</label>
+                                        <p class="small text-muted mb-2">Fills all sound slots with matching emotional melodies.</p>
+                                        <div class="d-flex gap-2">
+                                            <select class="form-select form-select-sm" id="emotion_pack_select">
+                                                <option value="happy">▼ Happy</option>
+                                                <option value="calm">▼ Calm</option>
+                                                <option value="epic">▼ Epic</option>
+                                                <option value="mysterious">▼ Mysterious</option>
+                                                <option value="emotional">▼ Emotional</option>
+                                                <option value="futuristic">▼ Futuristic</option>
+                                                <option value="relaxing">▼ Relaxing</option>
+                                                <option value="cute">▼ Cute</option>
+                                                <option value="heroic">▼ Heroic</option>
+                                                <option value="retro">▼ Retro</option>
+                                                <option value="cyberpunk">▼ Cyberpunk</option>
+                                                <option value="fantasy">▼ Fantasy</option>
+                                            </select>
+                                            <button class="btn btn-sm btn-outline-warning" onclick="previewEmotionPack()"><i class="fas fa-play-circle me-1"></i>Demo</button>
+                                            <button class="btn btn-sm btn-elegant py-1 px-3" onclick="applyEmotionPack()"><i class="fas fa-wand-magic-sparkles me-1"></i>Apply</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Right Column: Sound Customization -->
-                        <div class="col-md-7 mb-4">
-                            <div class="glass-card p-4 h-100">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h5 class="text-info mb-0"><i class="fas fa-sliders-h me-2"></i>Sound Editor</h5>
-                                    <a href="music.html" class="btn btn-sm btn-outline-light" target="_blank">
+                        <!-- Sound Customization -->
+                        <div class="col-lg-7 mb-4">
+                            <div class="glass-card h-100">
+                                <div class="card-header-banner">
+                                    <h5 class="card-header-title"><i class="fas fa-sliders-h"></i> Sound Sequence Customizer</h5>
+                                    <a href="music.html" class="btn btn-sm btn-outline-secondary text-main" target="_blank">
                                         <i class="fas fa-music me-1"></i>Composing Tools
                                     </a>
                                 </div>
-
-                                <div class="mb-3">
-                                    <label class="small text-muted fw-bold">STARTUP MELODY</label>
-                                    <div class="input-group">
-                                        <textarea class="form-control font-monospace py-2" id="intro_sound" rows="2"
-                                            placeholder="e.g. C5 100 20 E5 100 20"></textarea>
-                                        <button class="btn btn-secondary" onclick="previewSound('intro_sound')"><i
-                                                class="fas fa-play"></i></button>
+                                <div class="p-4">
+                                    <div class="row g-3 mb-4 border-bottom border-secondary pb-3">
+                                        <div class="col-12">
+                                            <div class="form-check form-switch mt-2">
+                                                <input class="form-check-input" type="checkbox" id="system_sound" checked>
+                                                <label class="form-check-label fw-semibold text-main" for="system_sound">System Sound (Master)</label>
+                                            </div>
+                                            <div class="form-check form-switch mt-2">
+                                                <input class="form-check-input" type="checkbox" id="gif_sound" checked>
+                                                <label class="form-check-label fw-semibold text-main" for="gif_sound">Enable GIF Sound</label>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="mb-3">
-                                    <label class="small text-muted fw-bold">NOTIFICATION</label>
-                                    <div class="input-group">
-                                        <textarea class="form-control font-monospace py-2" id="notification_sound"
-                                            rows="2" placeholder="e.g. C5 100 20"></textarea>
-                                        <button class="btn btn-secondary"
-                                            onclick="previewSound('notification_sound')"><i
-                                                class="fas fa-play"></i></button>
+                                    <div class="mb-3">
+                                        <label class="small text-muted fw-bold">STARTUP MELODY</label>
+                                        <div class="input-group">
+                                            <textarea class="form-control font-monospace py-2" id="intro_sound" rows="2" placeholder="e.g. C5 100 20 E5 100 20"></textarea>
+                                            <button class="btn btn-secondary" onclick="previewSound('intro_sound')"><i class="fas fa-play"></i></button>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="mb-3">
-                                    <label class="small text-muted fw-bold">SINGLE TAP</label>
-                                    <div class="input-group">
-                                        <textarea class="form-control font-monospace py-2" id="touch_sound" rows="2"
-                                            placeholder="e.g. E5 50 10"></textarea>
-                                        <button class="btn btn-secondary" onclick="previewSound('touch_sound')"><i
-                                                class="fas fa-play"></i></button>
+                                    <div class="mb-3">
+                                        <label class="small text-muted fw-bold">NOTIFICATION</label>
+                                        <div class="input-group">
+                                            <textarea class="form-control font-monospace py-2" id="notification_sound" rows="2" placeholder="e.g. C5 100 20"></textarea>
+                                            <button class="btn btn-secondary" onclick="previewSound('notification_sound')"><i class="fas fa-play"></i></button>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="mb-3">
-                                    <label class="small text-muted fw-bold">DOUBLE TAP</label>
-                                    <div class="input-group">
-                                        <textarea class="form-control font-monospace py-2" id="double_touch_sound"
-                                            rows="2" placeholder="e.g. G5 50 10"></textarea>
-                                        <button class="btn btn-secondary"
-                                            onclick="previewSound('double_touch_sound')"><i
-                                                class="fas fa-play"></i></button>
+                                    <div class="mb-3">
+                                        <label class="small text-muted fw-bold">SINGLE TAP</label>
+                                        <div class="input-group">
+                                            <textarea class="form-control font-monospace py-2" id="touch_sound" rows="2" placeholder="e.g. E5 50 10"></textarea>
+                                            <button class="btn btn-secondary" onclick="previewSound('touch_sound')"><i class="fas fa-play"></i></button>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="mb-0">
-                                    <label class="small text-muted fw-bold">LONG PRESS</label>
-                                    <div class="input-group">
-                                        <textarea class="form-control font-monospace py-2" id="long_touch_sound"
-                                            rows="2" placeholder="e.g. C6 150 0"></textarea>
-                                        <button class="btn btn-secondary" onclick="previewSound('long_touch_sound')"><i
-                                                class="fas fa-play"></i></button>
+                                    <div class="mb-3">
+                                        <label class="small text-muted fw-bold">DOUBLE TAP</label>
+                                        <div class="input-group">
+                                            <textarea class="form-control font-monospace py-2" id="double_touch_sound" rows="2" placeholder="e.g. G5 50 10"></textarea>
+                                            <button class="btn btn-secondary" onclick="previewSound('double_touch_sound')"><i class="fas fa-play"></i></button>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-0">
+                                        <label class="small text-muted fw-bold">LONG PRESS</label>
+                                        <div class="input-group">
+                                            <textarea class="form-control font-monospace py-2" id="long_touch_sound" rows="2" placeholder="e.g. C6 150 0"></textarea>
+                                            <button class="btn btn-secondary" onclick="previewSound('long_touch_sound')"><i class="fas fa-play"></i></button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -633,265 +969,129 @@
                     </div>
                 </div>
 
-                <!-- CHRONOS & PERSONALIZATION TAB -->
+                <!-- 3. OLO TWEAKS TAB -->
                 <div class="tab-pane fade" id="tab-chronos">
                     <div class="row">
                         <!-- Column 1: Time & Bluetooth -->
-                        <div class="col-md-4 mb-4">
-                            <div class="glass-card p-4 h-100">
-                                <h5 class="text-info mb-4"><i class="fas fa-clock me-2"></i>Time & Bluetooth</h5>
-
-                                <div class="mb-4">
-                                    <label class="form-label" for="watch_face">Watch Face Style</label>
-                                    <select class="form-select" id="watch_face">
-                                        <option value="0">Classic Style</option>
-                                        <option value="1">Casio Retro Style</option>
-                                        <option value="2">Analog Style</option>
-                                        <option value="3">7-Segment Style</option>
-                                    </select>
+                        <div class="col-lg-4 mb-4">
+                            <div class="glass-card h-100">
+                                <div class="card-header-banner">
+                                    <h5 class="card-header-title"><i class="fas fa-clock"></i> Time & Bluetooth</h5>
                                 </div>
+                                <div class="p-4">
+                                    <div class="mb-4">
+                                        <label class="form-label text-main" for="watch_face">Watch Face Style</label>
+                                        <select class="form-select" id="watch_face">
+                                            <option value="0">Classic Style</option>
+                                            <option value="1">Casio Retro Style</option>
+                                            <option value="2">Analog Style</option>
+                                            <option value="3">Modern Split Style</option>
+                                        </select>
+                                    </div>
 
-                                <div class="form-check form-switch mb-4">
-                                    <input class="form-check-input" type="checkbox" id="is_24h" checked>
-                                    <label class="form-check-label" for="is_24h">24-Hour Time Format</label>
-                                </div>
+                                    <div class="form-check form-switch mb-4">
+                                        <input class="form-check-input" type="checkbox" id="is_24h" checked>
+                                        <label class="form-check-label text-main" for="is_24h">24-Hour Time Format</label>
+                                    </div>
 
-                                <hr class="border-secondary my-4">
+                                    <hr class="border-secondary my-4">
 
-                                <h5 class="text-info mb-3"><i class="fas fa-bluetooth me-2"></i>Bluetooth Settings</h5>
+                                    <h5 class="text-accent mb-3 fs-6 fw-bold"><i class="fas fa-bluetooth me-2"></i>Bluetooth Settings</h5>
 
-                                <div class="mb-3">
-                                    <label class="form-label">Bluetooth Name</label>
-                                    <input type="text" class="form-control" id="bluetoothName" value="OLO Bit">
-                                </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-main">Bluetooth Name</label>
+                                        <input type="text" class="form-control" id="bluetoothName" value="OLO Bit">
+                                    </div>
 
-                                <div class="mb-3">
-                                    <label>Auto-off Delay: <span id="bluetooth_auto_offValue">5</span> min</label>
-                                    <input type="range" class="form-range" id="bluetooth_auto_off" min="0" max="30"
-                                        value="5">
-                                    <small class="text-muted d-block">Set to 0 to keep Bluetooth always on.</small>
+                                    <div class="mb-0">
+                                        <label class="text-main">Auto-off Delay: <span id="bluetooth_auto_offValue" class="text-accent fw-bold">5</span> min</label>
+                                        <input type="range" class="form-range" id="bluetooth_auto_off" min="0" max="30" value="5">
+                                        <small class="text-muted d-block">Set to 0 to keep Bluetooth always on.</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Column 2: Alarms & Alerts -->
-                        <div class="col-md-4 mb-4">
-                            <div class="glass-card p-4 h-100">
-                                <h5 class="text-info mb-4"><i class="fas fa-bell me-2"></i>Alarms & Alerts</h5>
+                        <div class="col-lg-4 mb-4">
+                            <div class="glass-card h-100">
+                                <div class="card-header-banner">
+                                    <h5 class="card-header-title"><i class="fas fa-bell"></i> Alarms & Alerts</h5>
+                                </div>
+                                <div class="p-4">
+                                    <div class="form-check form-switch mb-2">
+                                        <input class="form-check-input" type="checkbox" id="alarm_enabled">
+                                        <label class="form-check-label text-main" for="alarm_enabled">Enable Alarm</label>
+                                    </div>
+                                    <div class="mb-4 ms-4" id="alarm_time_container">
+                                        <label class="form-label small text-muted">Alarm Time</label>
+                                        <input type="time" class="form-control form-control-sm" id="alarm_time" value="07:00">
+                                    </div>
 
-                                <div class="form-check form-switch mb-2">
-                                    <input class="form-check-input" type="checkbox" id="alarm_enabled">
-                                    <label class="form-check-label" for="alarm_enabled">Enable Alarm</label>
-                                </div>
-                                <div class="mb-4 ms-4" id="alarm_time_container">
-                                    <label class="form-label small text-muted">Alarm Time</label>
-                                    <input type="time" class="form-control form-control-sm" id="alarm_time"
-                                        value="07:00">
-                                </div>
-
-                                <div class="form-check form-switch mb-2 border-top pt-3">
-                                    <input class="form-check-input" type="checkbox" id="hourly_chime">
-                                    <label class="form-check-label" for="hourly_chime">Enable Hourly Chime</label>
-                                </div>
-                                <div class="mb-4 ms-4" id="hourly_chime_style_container">
-                                    <label class="form-label small text-muted">Chime Sound Style</label>
-                                    <select class="form-select form-select-sm" id="chime_style">
-                                        <option value="0">Classic Westminster Chime</option>
-                                        <option value="1">Casio Retro Double-Beep</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-check form-switch mb-2 border-top pt-3">
-                                    <input class="form-check-input" type="checkbox" id="water_reminder" checked>
-                                    <label class="form-check-label" for="water_reminder">Enable Water Reminder</label>
-                                </div>
-                                <div class="mb-4 ms-4" id="water_reminder_interval_container">
-                                    <label class="form-label small text-muted">Reminder Interval</label>
-                                    <select class="form-select form-select-sm" id="water_reminder_interval">
-                                        <option value="15">15 Minutes</option>
-                                        <option value="30">30 Minutes</option>
-                                        <option value="45">45 Minutes</option>
-                                        <option value="60" selected>1 Hour</option>
-                                        <option value="90">1.5 Hours</option>
-                                        <option value="120">2 Hours</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-check form-switch mb-2 border-top pt-3">
-                                    <input class="form-check-input" type="checkbox" id="dnd_enabled">
-                                    <label class="form-check-label" for="dnd_enabled">Enable Do Not Disturb</label>
-                                </div>
-                                <div class="row g-2 mb-3 ms-2" id="dnd_time_container">
-                                    <div class="col">
-                                        <label class="form-label small text-muted">Start Hour</label>
-                                        <select class="form-select form-select-sm" id="dnd_start_hour">
-                                            <option value="0">00:00</option>
-                                            <option value="1">01:00</option>
-                                            <option value="2">02:00</option>
-                                            <option value="3">03:00</option>
-                                            <option value="4">04:00</option>
-                                            <option value="5">05:00</option>
-                                            <option value="6">06:00</option>
-                                            <option value="7">07:00</option>
-                                            <option value="8">08:00</option>
-                                            <option value="9">09:00</option>
-                                            <option value="10">10:00</option>
-                                            <option value="11">11:00</option>
-                                            <option value="12">12:00</option>
-                                            <option value="13">13:00</option>
-                                            <option value="14">14:00</option>
-                                            <option value="15">15:00</option>
-                                            <option value="16">16:00</option>
-                                            <option value="17">17:00</option>
-                                            <option value="18">18:00</option>
-                                            <option value="19">19:00</option>
-                                            <option value="20">20:00</option>
-                                            <option value="21">21:00</option>
-                                            <option value="22" selected>22:00</option>
-                                            <option value="23">23:00</option>
+                                    <div class="form-check form-switch mb-2 border-top border-secondary pt-3">
+                                        <input class="form-check-input" type="checkbox" id="hourly_chime">
+                                        <label class="form-check-label text-main" for="hourly_chime">Enable Hourly Chime</label>
+                                    </div>
+                                    <div class="mb-4 ms-4" id="hourly_chime_style_container">
+                                        <label class="form-label small text-muted">Chime Sound Style</label>
+                                        <select class="form-select form-select-sm" id="chime_style">
+                                            <option value="0">Classic Westminster Chime</option>
+                                            <option value="1">Casio Retro Double-Beep</option>
                                         </select>
                                     </div>
-                                    <div class="col">
-                                        <label class="form-label small text-muted">End Hour</label>
-                                        <select class="form-select form-select-sm" id="dnd_end_hour">
-                                            <option value="0">00:00</option>
-                                            <option value="1">01:00</option>
-                                            <option value="2">02:00</option>
-                                            <option value="3">03:00</option>
-                                            <option value="4">04:00</option>
-                                            <option value="5">05:00</option>
-                                            <option value="6">06:00</option>
-                                            <option value="7" selected>07:00</option>
-                                            <option value="8">08:00</option>
-                                            <option value="9">09:00</option>
-                                            <option value="10">10:00</option>
-                                            <option value="11">11:00</option>
-                                            <option value="12">12:00</option>
-                                            <option value="13">13:00</option>
-                                            <option value="14">14:00</option>
-                                            <option value="15">15:00</option>
-                                            <option value="16">16:00</option>
-                                            <option value="17">17:00</option>
-                                            <option value="18">18:00</option>
-                                            <option value="19">19:00</option>
-                                            <option value="20">20:00</option>
-                                            <option value="21">21:00</option>
-                                            <option value="22">22:00</option>
-                                            <option value="23">23:00</option>
+
+                                    <div class="form-check form-switch mb-2 border-top border-secondary pt-3">
+                                        <input class="form-check-input" type="checkbox" id="water_reminder" checked>
+                                        <label class="form-check-label text-main" for="water_reminder">Enable Water Reminder</label>
+                                    </div>
+                                    <div class="mb-4 ms-4" id="water_reminder_interval_container">
+                                        <label class="form-label small text-muted">Reminder Interval</label>
+                                        <select class="form-select form-select-sm" id="water_reminder_interval">
+                                            <option value="15">15 Minutes</option>
+                                            <option value="30">30 Minutes</option>
+                                            <option value="45">45 Minutes</option>
+                                            <option value="60" selected>1 Hour</option>
+                                            <option value="90">1.5 Hours</option>
+                                            <option value="120">2 Hours</option>
                                         </select>
+                                    </div>
+
+                                    <div class="form-check form-switch mb-2 border-top border-secondary pt-3">
+                                        <input class="form-check-input" type="checkbox" id="dnd_enabled">
+                                        <label class="form-check-label text-main" for="dnd_enabled">Enable Do Not Disturb</label>
+                                    </div>
+                                    <div class="row g-2 mb-0 ms-2" id="dnd_time_container">
+                                        <div class="col">
+                                            <label class="form-label small text-muted">Start Hour</label>
+                                            <select class="form-select form-select-sm" id="dnd_start_hour">
+                                                <option value="0">00:00</option><option value="1">01:00</option><option value="2">02:00</option><option value="3">03:00</option><option value="4">04:00</option><option value="5">05:00</option><option value="6">06:00</option><option value="7">07:00</option><option value="8">08:00</option><option value="9">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option><option value="22" selected>22:00</option><option value="23">23:00</option>
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <label class="form-label small text-muted">End Hour</label>
+                                            <select class="form-select form-select-sm" id="dnd_end_hour">
+                                                <option value="0">00:00</option><option value="1">01:00</option><option value="2">02:00</option><option value="3">03:00</option><option value="4">04:00</option><option value="5">05:00</option><option value="6">06:00</option><option value="7" selected>07:00</option><option value="8">08:00</option><option value="9">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option><option value="22">22:00</option><option value="23">23:00</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Column 3: Personalization & System -->
-                        <div class="col-md-4 mb-4">
-                            <div class="glass-card p-4 h-100">
-                                <h5 class="text-info mb-4"><i class="fas fa-paint-brush me-2"></i>Personalization</h5>
-                                <div class="mb-3">
-                                    <label class="small text-muted">BOOTING TEXT</label>
-                                    <input type="text" class="form-control" id="custom_title" maxlength="32"
-                                        placeholder="e.g., OLO BIT STARTING...">
-                                    <small class="text-muted d-block mt-2">Text displayed during device boot
-                                        animation.</small>
+                        <div class="col-lg-4 mb-4">
+                            <div class="glass-card h-100">
+                                <div class="card-header-banner">
+                                    <h5 class="card-header-title"><i class="fas fa-paint-brush"></i> Personalization & System</h5>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="small text-muted" for="boot_font">BOOT TEXT FONT</label>
-                                    <select class="form-select form-select-sm" id="boot_font">
-                                        <option value="0">Helvetica Bold</option>
-                                        <option value="1">Times Bold</option>
-                                        <option value="2">Courier Bold</option>
-                                        <option value="3">New Century Bold</option>
-                                        <option value="4">Lucida Regular</option>
-                                    </select>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="small text-muted" for="boot_size">BOOT TEXT SIZE</label>
-                                    <select class="form-select form-select-sm" id="boot_size">
-                                        <option value="0">8px</option>
-                                        <option value="1">12px</option>
-                                        <option value="2">14px</option>
-                                        <option value="3">18px</option>
-                                        <option value="4">24px</option>
-                                    </select>
-                                </div>
-
-                                <hr class="border-secondary my-4">
-
-                                <h5 class="text-info mb-4"><i class="fas fa-sliders-h me-2"></i>System Settings</h5>
-                                <div class="mb-4">
-                                    <label>Notification Duration: <span id="notifDurationValue">5</span>s</label>
-                                    <input type="range" class="form-range" id="notifDuration" min="1" max="10"
-                                        value="5">
-                                </div>
-
-                                <div class="mb-3">
-                                    <label>Focus Timer Duration: <span id="timer_durationValue">20</span> min</label>
-                                    <input type="range" class="form-range" id="timer_duration" min="1" max="60"
-                                        value="20">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- HARDWARE CONFIG TAB -->
-                <div class="tab-pane fade" id="tab-hardware">
-                    <div class="row">
-                        <!-- Screen Settings -->
-                        <div class="col-md-6">
-                            <div class="glass-card p-4 h-100">
-                                <h5 class="text-info mb-3"><i class="fas fa-desktop me-2"></i>Display (I2C)</h5>
-                                <div class="mb-2">
-                                    <label>Driver</label>
-                                    <select class="form-select" id="display_type">
-                                        <option value="ssd1306">SSD1306</option>
-                                        <option value="sh1106">SH1106</option>
-                                    </select>
-                                </div>
-                                <div class="mb-2"><label>SCL Pin</label><input type="number" class="form-control"
-                                        id="scl_pin"></div>
-                                <div class="mb-2"><label>SDA Pin</label><input type="number" class="form-control"
-                                        id="sda_pin"></div>
-                                <div class="mb-2">
-                                    <label>Orientation</label>
-                                    <select class="form-select" id="is_flip_mode">
-                                        <option value="0">Normal</option>
-                                        <option value="1">Flipped 180°</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- System Pins -->
-                        <div class="col-md-6">
-                            <div class="glass-card p-4 h-100">
-                                <h5 class="text-info mb-3"><i class="fas fa-microchip me-2"></i>System Pins</h5>
-                                <div class="mb-3"><label>Buzzer Pin (Passive)</label><input type="number"
-                                        class="form-control" id="buzzer_pin"></div>
-                                <div class="mb-3"><label>Touch Button Pin</label><input type="number"
-                                        class="form-control" id="touch_pin"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CANVAS TAB -->
-                <div class="tab-pane fade" id="tab-canvas">
-                    <div class="row justify-content-center">
-                        <div class="col-md-8">
-                            <div class="glass-card p-4">
-                                <h5 class="text-info mb-4"><i class="fas fa-font me-2"></i>Canvas Text Mode</h5>
-
-                                <div class="mb-3">
-                                    <label class="form-label" for="canvas_text">Custom Text</label>
-                                    <input type="text" class="form-control" id="canvas_text" value="Hello!">
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="canvas_font">Font Family</label>
-                                        <select class="form-select" id="canvas_font">
+                                <div class="p-4">
+                                    <div class="mb-3">
+                                        <label class="small text-muted">BOOTING TEXT</label>
+                                        <input type="text" class="form-control" id="custom_title" maxlength="32" placeholder="e.g., OLO BIT STARTING...">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="small text-muted" for="boot_font">BOOT TEXT FONT</label>
+                                        <select class="form-select form-select-sm" id="boot_font">
                                             <option value="0">Helvetica Bold</option>
                                             <option value="1">Times Bold</option>
                                             <option value="2">Courier Bold</option>
@@ -899,71 +1099,396 @@
                                             <option value="4">Lucida Regular</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label" for="canvas_size">Font Size</label>
-                                        <select class="form-select" id="canvas_size">
+                                    <div class="mb-3">
+                                        <label class="small text-muted" for="boot_size">BOOT TEXT SIZE</label>
+                                        <select class="form-select form-select-sm" id="boot_size">
                                             <option value="0">8px</option>
                                             <option value="1">12px</option>
-                                            <option value="2" selected>14px</option>
+                                            <option value="2">14px</option>
                                             <option value="3">18px</option>
                                             <option value="4">24px</option>
                                         </select>
                                     </div>
-                                </div>
+                                    <div class="mb-3">
+                                        <label class="small text-muted fw-bold" for="quote_category">QUOTE CATEGORY</label>
+                                        <select class="form-select form-select-sm" id="quote_category" onchange="sendData('quote_category', this.value)">
+                                            <option value="8">All Categories (Random)</option>
+                                            <option value="0">Bible Quotes</option>
+                                            <option value="1">Mahabharatham Quotes</option>
+                                            <option value="2">Quran Quotes</option>
+                                            <option value="3">Buddhist Quotes</option>
+                                            <option value="4">Work Related Quotes</option>
+                                            <option value="5">IT / Tech Quotes</option>
+                                            <option value="6">Artisan Related Quotes</option>
+                                            <option value="7">Positive Quotes (Non-Religious)</option>
+                                        </select>
+                                    </div>
 
-                                <div class="mb-4">
-                                    <label class="form-label" for="canvas_anim">Animation Style</label>
-                                    <select class="form-select" id="canvas_anim">
-                                        <option value="0">Scroll Left</option>
-                                        <option value="1">Scroll Right</option>
-                                        <option value="2">Bounce Scroll</option>
-                                        <option value="3">Typewriter Effect</option>
-                                        <option value="4">Blinking / Flash</option>
-                                        <option value="5">Fixed (No Animation)</option>
-                                    </select>
-                                </div>
+                                    <hr class="border-secondary my-3">
 
-                                <div class="d-flex gap-2">
-                                    <button id="pushCanvasBtn" class="btn btn-elegant flex-grow-1">
-                                        <i class="fas fa-paper-plane me-2"></i>Push to Device
-                                    </button>
-                                    <button id="stopCanvasBtn" class="btn btn-danger">
-                                        <i class="fas fa-stop me-2"></i>Stop
-                                    </button>
+                                    <div class="mb-3">
+                                        <label class="text-main small">Notification Duration: <span id="notifDurationValue" class="text-accent fw-bold">5</span>s</label>
+                                        <input type="range" class="form-range" id="notifDuration" min="1" max="10" value="5">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="text-main small">Focus Timer Duration: <span id="timer_durationValue" class="text-accent fw-bold">20</span> min</label>
+                                        <input type="range" class="form-range" id="timer_duration" min="1" max="60" value="20">
+                                    </div>
+
+                                    <hr class="border-secondary my-3">
+
+                                    <div class="mb-2">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="screensaver_enabled" onchange="sendData('screensaver_enabled', this.checked ? '1' : '0')">
+                                            <label class="form-check-label fw-semibold text-main small" for="screensaver_enabled">Enable Sleep Mode</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-0">
+                                        <label class="small text-muted fw-bold" for="screensaver_timeout">SLEEP TIMEOUT</label>
+                                        <select class="form-select form-select-sm" id="screensaver_timeout" onchange="sendData('screensaver_timeout', this.value)">
+                                            <option value="5">5 minutes</option>
+                                            <option value="10">10 minutes</option>
+                                            <option value="30">30 minutes</option>
+                                            <option value="60">1 hour</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LED Settings Card -->
+                        <div class="col-12 mb-4">
+                            <div class="glass-card">
+                                <div class="card-header-banner">
+                                    <h5 class="card-header-title"><i class="fas fa-lightbulb"></i> LED Light Suite Settings</h5>
+                                </div>
+                                <div class="p-4">
+                                    <div class="row g-4">
+                                        <div class="col-12">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="led_enabled">
+                                                <label class="form-check-label fw-semibold text-main" for="led_enabled">Enable LED Light</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label small text-muted" for="led_effect">EFFECT</label>
+                                            <select class="form-select" id="led_effect">
+                                                <option value="0">Solid</option>
+                                                <option value="1">Breathing</option>
+                                                <option value="2">Blinking</option>
+                                                <option value="3">Heartbeat / Pulse</option>
+                                                <option value="4">Rainbow</option>
+                                                <option value="5">Shimmer / Sparkle</option>
+                                                <option value="6">Candle Flicker</option>
+                                                <option value="7">Slow Smooth Cycle</option>
+                                                <option value="8">Double Flash Strobe</option>
+                                                <option value="9">Neon Pulse</option>
+                                                <option value="10">Police Patrol</option>
+                                                <option value="11">Firefly</option>
+                                                <option value="12" selected>🌈 7-Color Breathing Cycle (Default)</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label small text-muted" for="led_color">COLOR</label>
+                                            <select class="form-select" id="led_color">
+                                                <option value="0">🔴 Red</option>
+                                                <option value="1">🟠 Orange</option>
+                                                <option value="2">🟡 Yellow</option>
+                                                <option value="3">🟢 Green</option>
+                                                <option value="4">🔵 Blue</option>
+                                                <option value="5">🟣 Indigo</option>
+                                                <option value="6">💜 Violet</option>
+                                                <option value="7">🤍 Warm White</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label small text-muted">BRIGHTNESS: <span id="led_brightnessValue" class="text-accent fw-bold">5</span>/10</label>
+                                            <input type="range" class="form-range" id="led_brightness" min="0" max="10" value="5">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 4. HARDWARE CONFIG TAB -->
+                <div class="tab-pane fade" id="tab-hardware">
+                    <div class="row">
+                        <!-- Screen Settings -->
+                        <div class="col-md-6 mb-4">
+                            <div class="glass-card h-100">
+                                <div class="card-header-banner">
+                                    <h5 class="card-header-title"><i class="fas fa-desktop"></i> Display (I2C)</h5>
+                                </div>
+                                <div class="p-4">
+                                    <div class="mb-3">
+                                        <label class="form-label text-main">Driver</label>
+                                        <select class="form-select" id="display_type">
+                                            <option value="ssd1306">SSD1306</option>
+                                            <option value="sh1106">SH1106</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3"><label class="form-label text-main">SCL Pin</label><input type="number" class="form-control" id="scl_pin"></div>
+                                    <div class="mb-3"><label class="form-label text-main">SDA Pin</label><input type="number" class="form-control" id="sda_pin"></div>
+                                    <div class="mb-0">
+                                        <label class="form-label text-main">Orientation</label>
+                                        <select class="form-select" id="is_flip_mode">
+                                            <option value="0">Normal</option>
+                                            <option value="1">Flipped 180°</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Pins -->
+                        <div class="col-md-6 mb-4">
+                            <div class="glass-card h-100">
+                                <div class="card-header-banner">
+                                    <h5 class="card-header-title"><i class="fas fa-microchip"></i> System Pins</h5>
+                                </div>
+                                <div class="p-4">
+                                    <div class="mb-3"><label class="form-label text-main">Buzzer Pin (Passive)</label><input type="number" class="form-control" id="buzzer_pin"></div>
+                                    <div class="mb-0"><label class="form-label text-main">Touch Button Pin</label><input type="number" class="form-control" id="touch_pin"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- 5. CANVAS TAB -->
+                <div class="tab-pane fade" id="tab-canvas">
+                    <div class="row justify-content-center g-4">
+                        <!-- CANVAS TEXT MODE CARD -->
+                        <div class="col-lg-6 col-md-8">
+                            <div class="glass-card">
+                                <div class="card-header-banner">
+                                     <h5 class="card-header-title"><i class="fas fa-font me-2"></i>Canvas Text Mode</h5>
+                                 </div>
+                                 <div class="p-4">
+                                     <div class="mb-3">
+                                         <label class="form-label fw-semibold text-main mb-1" for="canvas_text">Display Text</label>
+                                         <input type="text" class="form-control" id="canvas_text" placeholder="e.g. Hello World!" value="Hello!">
+                                     </div>
 
+                                     <div class="row g-2 mb-3">
+                                         <div class="col-6">
+                                             <label class="form-label small text-muted mb-1" for="canvas_font">FONT FAMILY</label>
+                                             <select class="form-select form-select-sm" id="canvas_font">
+                                                 <option value="0" selected>Helvetica Bold</option>
+                                                 <option value="1">Times Bold</option>
+                                                 <option value="2">Courier Bold</option>
+                                                 <option value="3">New Century Bold</option>
+                                                 <option value="4">Lucida Regular</option>
+                                                 <option value="5">Helvetica Regular</option>
+                                                 <option value="6">Times Regular</option>
+                                                 <option value="7">Courier Regular</option>
+                                                 <option value="8">Lucida Bold</option>
+                                                 <option value="9">New Century Regular</option>
+                                             </select>
+                                         </div>
+                                         <div class="col-6">
+                                             <label class="form-label small text-muted mb-1" for="canvas_size">FONT SIZE</label>
+                                             <select class="form-select form-select-sm" id="canvas_size">
+                                                 <option value="0">8px — Tiny</option>
+                                                 <option value="1">12px — Small</option>
+                                                 <option value="2" selected>14px — Medium</option>
+                                                 <option value="3">18px — Large</option>
+                                                 <option value="4">24px — Extra Large</option>
+                                             </select>
+                                         </div>
+                                     </div>
+
+                                     <div class="mb-4">
+                                         <label class="form-label small text-muted mb-1" for="canvas_anim">ANIMATION STYLE</label>
+                                         <select class="form-select form-select-sm" id="canvas_anim">
+                                             <option value="0">Scroll Left</option>
+                                             <option value="1">Scroll Right</option>
+                                             <option value="2">Bounce Scroll</option>
+                                             <option value="3">Typewriter Effect</option>
+                                             <option value="4">Blinking / Flash</option>
+                                             <option value="5">Fixed (No Animation)</option>
+                                         </select>
+                                     </div>
+
+                                     <div class="d-flex gap-2 pt-2">
+                                         <button id="pushCanvasTextBtn" class="btn btn-elegant flex-grow-1">
+                                             <i class="fas fa-paper-plane me-2"></i>Push Text to Device
+                                         </button>
+                                         <button id="stopCanvasTextBtn" class="btn btn-outline-danger" style="min-width: 100px;">
+                                             <i class="fas fa-stop me-2"></i>Stop Text
+                                         </button>
+                                     </div>
+                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- CANVAS QR CODE CARD -->
+                        <div class="col-lg-6 col-md-8">
+                            <div class="glass-card">
+                                <div class="card-header-banner">
+                                     <h5 class="card-header-title"><i class="fas fa-qrcode me-2"></i>Canvas QR Code Page</h5>
+                                 </div>
+                                 <div class="p-4">
+                                     <div class="mb-3"> </div>
+
+                                     <div class="mb-3">
+                                         <label class="form-label small text-muted mb-1" for="canvas_qr_type">QR PAYLOAD TYPE</label>
+                                         <select class="form-select form-select-sm" id="canvas_qr_type">
+                                             <option value="0" selected>🌐 Website URL (Link)</option>
+                                             <option value="1">📝 Plain Text Message</option>
+                                             <option value="2">📞 Phone Number Call</option>
+                                             <option value="3">📶 WiFi Network Credentials (SSID / Password)</option>
+                                         </select>
+                                     </div>
+
+                                     <!-- DYNAMIC PAYLOAD FIELDS -->
+                                     <div id="qr_field_url" class="qr-payload-group mb-3">
+                                         <label class="form-label small text-muted mb-1" for="canvas_qr_url">WEBSITE URL</label>
+                                         <input type="url" class="form-control form-control-sm" id="canvas_qr_url" placeholder="e.g. https://www.olobit.in" value="www.olobit.in">
+                                     </div>
+
+                                     <div id="qr_field_text" class="qr-payload-group mb-3" style="display:none;">
+                                         <label class="form-label small text-muted mb-1" for="canvas_qr_plain">PLAIN TEXT CONTENT</label>
+                                         <input type="text" class="form-control form-control-sm" id="canvas_qr_plain" placeholder="Enter custom text message...">
+                                     </div>
+
+                                     <div id="qr_field_phone" class="qr-payload-group mb-3" style="display:none;">
+                                         <label class="form-label small text-muted mb-1" for="canvas_qr_phone">PHONE NUMBER</label>
+                                         <input type="tel" class="form-control form-control-sm" id="canvas_qr_phone" placeholder="e.g. +919876543210">
+                                     </div>
+
+                                     <!-- SEPARATE WIFI INPUTS -->
+                                     <div id="qr_field_wifi" class="qr-payload-group mb-3" style="display:none;">
+                                         <div class="row g-2">
+                                             <div class="col-6">
+                                                 <label class="form-label small text-muted mb-1" for="canvas_wifi_ssid">WIFI SSID (Network Name)</label>
+                                                 <input type="text" class="form-control form-control-sm" id="canvas_wifi_ssid" placeholder="e.g. MyHomeWiFi">
+                                             </div>
+                                             <div class="col-6">
+                                                 <label class="form-label small text-muted mb-1" for="canvas_wifi_pass">WIFI PASSWORD</label>
+                                                 <input type="password" class="form-control form-control-sm" id="canvas_wifi_pass" placeholder="Password">
+                                             </div>
+                                         </div>
+                                     </div>
+
+                                     <!-- Hidden input storing generated payload string -->
+                                     <input type="hidden" id="canvas_qr_text" value="www.olobit.in">
+
+                                     <small class="text-muted d-block mb-3"><i class="fas fa-info-circle me-1"></i> Double-tap touch sensor on device while in Canvas Mode to switch to QR page. (~64-78 chars recommended).</small>
+
+                                     <div class="d-flex gap-2 pt-2">
+                                         <button id="pushCanvasQrBtn" class="btn btn-elegant flex-grow-1">
+                                             <i class="fas fa-qrcode me-2"></i>Push QR to Device
+                                         </button>
+                                         <button id="stopCanvasQrBtn" class="btn btn-outline-danger" style="min-width: 100px;">
+                                             <i class="fas fa-stop me-2"></i>Stop QR
+                                         </button>
+                                     </div>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
 
             <!-- SERIAL MONITOR -->
-            <div class="card mt-4 mb-5 border-0 bg-transparent">
-                <h5 class="text-light mb-2"><i class="fas fa-terminal me-2"></i>Serial Monitor</h5>
-                <div class="log-container">
-                    <div class="log-header">
-                        <span class="text-muted small">BAUD: 115200</span>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="clearLog()">Clear Log</button>
-                    </div>
-                    <div class="log-content" id="serialLog">
-                        <div class="log-line log-sys">Ready to connect...</div>
-                    </div>
+            <div class="glass-card p-0 mt-4 mb-5">
+                <div class="card-header-banner">
+                    <h5 class="card-header-title"><i class="fas fa-terminal"></i> Serial Monitor Output Stream</h5>
+                    <span class="badge bg-secondary font-monospace">BAUD: 115200</span>
                 </div>
-                <div class="mt-2 d-flex">
-                    <input type="text" id="manualCmd" class="form-control me-2" placeholder="Send manual command..."
-                        onkeypress="if(event.key==='Enter') sendManual()">
-                    <button class="btn btn-secondary" onclick="sendManual()">Send</button>
+                <div class="p-4">
+                    <div class="log-container mb-3">
+                        <div class="log-header">
+                            <span class="text-muted small">Live Serial Data</span>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="clearLog()">Clear Log</button>
+                        </div>
+                        <div class="log-content" id="serialLog">
+                            <div class="log-line log-sys">Ready to connect...</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <input type="text" id="manualCmd" class="form-control" placeholder="Send manual command..." onkeypress="if(event.key==='Enter') sendManual()">
+                        <button class="btn btn-secondary px-4" onclick="sendManual()">Send</button>
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
 
+    <!-- FOOTER -->
+    <footer class="text-center py-4 text-muted small border-top border-secondary border-opacity-10 mt-5">
+        <div class="container">
+            <p class="mb-1">OLO Bit Web Controller &copy; 2026 Micromaker Labs. All rights reserved.</p>
+            <div class="d-flex justify-content-center gap-3 mt-2">
+                <a href="https://buymeacoffee.com/micromakerlabs" target="_blank" class="text-warning text-decoration-none fw-bold">
+                    <i class="fas fa-mug-hot me-1"></i>Support Project
+                </a>
+                <a href="https://olobit.in" target="_blank" class="text-muted text-decoration-none">Website</a>
+                <a href="https://www.olobit.in/manual" target="_blank" class="text-muted text-decoration-none">Manual</a>
+                <a href="https://www.olobit.in/warranty" target="_blank" class="text-muted text-decoration-none">Warranty</a>
+            </div>
+        </div>
+    </footer>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script>
+
+
+        // --- THEME SWITCHER LOGIC ---
+        function initTheme() {
+            const savedTheme = localStorage.getItem('olo_theme') || 'dark';
+            applyTheme(savedTheme);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.setAttribute('data-bs-theme', theme === 'light' ? 'light' : 'dark');
+            localStorage.setItem('olo_theme', theme);
+            const themeBtn = document.getElementById('themeToggleBtn');
+            if (themeBtn) {
+                themeBtn.innerHTML = theme === 'light' 
+                    ? '<i class="fas fa-sun text-warning me-1"></i> Light' 
+                    : '<i class="fas fa-moon me-1"></i> Dark';
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(nextTheme);
+        }
+
+        // --- LANDING TAB SEGMENT SWITCHER ---
+        function switchLandingTab(tab) {
+            const btnCtrl = document.getElementById('tabSegmentControl');
+            const btnFlash = document.getElementById('tabSegmentFlash');
+            const viewCtrl = document.getElementById('segmentControlView');
+            const viewFlash = document.getElementById('segmentFlashView');
+
+            if (tab === 'control') {
+                btnCtrl.classList.add('active');
+                btnFlash.classList.remove('active');
+                viewCtrl.style.display = 'block';
+                viewFlash.style.display = 'none';
+            } else {
+                btnFlash.classList.add('active');
+                btnCtrl.classList.remove('active');
+                viewFlash.style.display = 'block';
+                viewCtrl.style.display = 'none';
+            }
+        }
+
         // --- 1. CONFIGURATION DATA ---
         const gifData = {
             "custom1": "Custom 1", "custom2": "Custom 2", "angry": "Tanjiro", "angry2": "Pretentious", "angry3": "Purple Flame",
@@ -994,6 +1519,7 @@
 
         // --- 3. INIT UI ---
         window.onload = function () {
+            initTheme();
             initGifUI();
 
             // Listeners for ranges
@@ -1013,7 +1539,6 @@
             document.getElementById('oloverseModal').style.setProperty('display', 'none', 'important');
         }
 
-        // Close modal when clicking outside content area
         window.addEventListener('click', (event) => {
             const modal = document.getElementById('oloverseModal');
             if (modal && event.target === modal) {
@@ -1049,7 +1574,7 @@
 
                 let opt = new Option(label, key);
                 defaultSel.add(opt.cloneNode(true));
-                introSel.add(opt.cloneNode(true));
+                if (introSel) introSel.add(opt.cloneNode(true));
                 triggerSels.forEach(sel => sel.add(opt.cloneNode(true)));
                 index++;
             }
@@ -1173,7 +1698,7 @@
         // --- 5. SERIAL LOGIC ---
         async function connect() {
             if (!navigator.serial) {
-                alert("Web Serial not supported. Please use Chrome/Edge.");
+                alert("Web Serial not supported. Please use Chrome, Edge, or Opera.");
                 return;
             }
 
@@ -1199,27 +1724,25 @@
                     const screen = document.getElementById('controllerScreen');
                     const connectScreen = document.getElementById('connectScreen');
 
-                    // Show controllerScreen below connectScreen
-                    screen.style.display = 'block';
+                    connectScreen.classList.remove('screen-anim-enter');
+                    connectScreen.classList.add('screen-anim-exit');
 
-                    // Smooth scroll down to detailed settings area
-                    screen.scrollIntoView({ behavior: 'smooth' });
-
-                    // Once smooth scroll finishes, hide connectScreen and lock scroll inside controllerScreen
                     setTimeout(() => {
                         connectScreen.style.setProperty('display', 'none', 'important');
-                        screen.style.height = '100vh';
-                        screen.style.overflowY = 'auto';
-                        document.body.style.overflow = 'hidden';
+                        connectScreen.classList.remove('screen-anim-exit');
+
+                        screen.style.display = 'block';
+                        screen.classList.add('screen-anim-enter');
+                        document.body.style.overflow = 'auto';
                         window.scrollTo(0, 0);
-                    }, 1000);
+                    }, 350);
                 }, 3000);
 
             } catch (e) {
                 console.error(e);
                 alert("Connection Failed: " + e);
                 document.getElementById('loadingOverlay').style.display = 'none';
-                document.getElementById('connectScreen').style.setProperty('display', 'flex', 'important');
+                document.getElementById('connectScreen').style.setProperty('display', 'block', 'important');
                 document.body.style.overflow = 'auto';
                 window.scrollTo({ top: 0, behavior: 'instant' });
             }
@@ -1250,28 +1773,20 @@
 
             document.getElementById('loadingOverlay').style.display = 'none';
 
-            // Restore default scrollable behavior for body
-            document.body.style.overflow = 'auto';
-            controllerScreen.style.height = '';
-            controllerScreen.style.overflowY = '';
+            controllerScreen.classList.remove('screen-anim-enter');
+            controllerScreen.classList.add('screen-anim-exit');
 
-            // Show connectScreen
-            connectScreen.style.setProperty('display', 'flex', 'important');
-
-            // Set scroll position to match the height of connectScreen so it doesn't jump
-            const connectHeight = connectScreen.offsetHeight || window.innerHeight;
-            window.scrollTo(0, connectHeight);
-
-            // Smoothly scroll back up to connect screen
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            // After transition finishes, hide controller screen
             setTimeout(() => {
                 controllerScreen.style.display = 'none';
-                window.scrollTo(0, 0);
-            }, 1000);
+                controllerScreen.classList.remove('screen-anim-exit');
 
-            log("Disconnected. Connect option is available.", "sys");
+                connectScreen.style.setProperty('display', 'block', 'important');
+                connectScreen.classList.add('screen-anim-enter');
+                document.body.style.overflow = 'auto';
+                window.scrollTo(0, 0);
+
+                log("Disconnected. Connect option is available.", "sys");
+            }, 350);
         }
 
         async function readLoop() {
@@ -1316,94 +1831,125 @@
 
         let serialBuffer = "";
         function handleSerialData(text) {
-            log(text, "rx");
             serialBuffer += text;
             const lines = serialBuffer.split('\n');
             serialBuffer = lines.pop();
 
             for (const line of lines) {
-                if (line.trim()) parseCommand(line.trim());
+                const trimmed = line.trim();
+                if (trimmed) {
+                    log(trimmed, "rx");
+                    parseCommand(trimmed);
+                }
             }
         }
 
         function parseCommand(line) {
-            const parts = line.split(':');
-            if (parts.length < 2) return;
+            try {
+                const parts = line.split(':');
+                if (parts.length < 2) return;
 
-            const key = parts[0].trim();
-            const val = parts.slice(1).join(':').trim();
+                const key = parts[0].trim();
+                const val = parts.slice(1).join(':').trim();
 
-            switch (key) {
-                case 'MAC': document.getElementById('macValue').innerText = val; break;
-                case 'version': document.getElementById('verValue').innerText = val; break;
-                case 'hourly_chime': document.getElementById('hourly_chime').checked = (val === '1'); break;
+                switch (key) {
+                    case 'MAC': setText('macValue', val); break;
+                    case 'version': setText('verValue', val); break;
+                    case 'hourly_chime': setVal('hourly_chime', val); break;
 
-                // GIF
-                case 'gif_speed': setVal('gif_speed', val); setText('gif_speedValue', val); break;
-                case 'gif_delay':
-                    const sec = Math.floor(parseInt(val) / 1000);
-                    setVal('gif_delay', sec);
-                    setText('gif_delayValue', sec);
-                    break;
-                case 'isInverted': document.getElementById('isInverted').checked = (val === '1' || val === 'true'); break;
-                case 'gif_default': setVal('gif_default', val); break;
-                case 'gif_intro': setVal('gif_intro', val); break;
-                case 'gif_touch': setVal('gif_touch', val); break;
-                case 'gif_double_touch': setVal('gif_double_touch', val); break;
-                case 'gif_long_touch': setVal('gif_long_touch', val); break;
-                case 'custom_title': setVal('custom_title', val); break;
-                case 'gif_selected':
-                    const cbs = document.querySelectorAll('.gif-checkbox');
-                    for (let i = 0; i < cbs.length; i++) {
-                        if (val[i]) cbs[i].checked = (val[i] === '1');
+                    // GIF
+                    case 'gif_speed': setVal('gif_speed', val); setText('gif_speedValue', val); break;
+                    case 'gif_delay':
+                        const sec = Math.floor(parseInt(val) / 1000);
+                        setVal('gif_delay', sec);
+                        setText('gif_delayValue', sec);
+                        break;
+                    case 'isInverted': setVal('isInverted', val); break;
+                    case 'gif_default': setVal('gif_default', val); break;
+                    case 'gif_intro': setVal('gif_intro', val); break;
+                    case 'gif_touch': setVal('gif_touch', val); break;
+                    case 'gif_double_touch': setVal('gif_double_touch', val); break;
+                    case 'gif_long_touch': setVal('gif_long_touch', val); break;
+                    case 'custom_title': setVal('custom_title', val); break;
+                    case 'gif_selected':
+                        const cbs = document.querySelectorAll('.gif-checkbox');
+                        for (let i = 0; i < cbs.length; i++) {
+                            if (val[i]) cbs[i].checked = (val[i] === '1');
+                        }
+                        break;
+
+                    // Audio
+                    case 'intro_sound': setVal('intro_sound', val); break;
+                    case 'notification_sound': setVal('notification_sound', val); break;
+                    case 'touch_sound': setVal('touch_sound', val); break;
+                    case 'double_touch_sound': setVal('double_touch_sound', val); break;
+                    case 'long_touch_sound': setVal('long_touch_sound', val); break;
+                    case 'system_sound': setVal('system_sound', val); break;
+                    case 'gif_sound': setVal('gif_sound', val); break;
+                    case 'game_difficulty': setVal('game_difficulty', val); break;
+
+                    // Chronos / OLO Tweaks
+                    case 'notifDuration': setVal('notifDuration', val); setText('notifDurationValue', val); break;
+                    case 'bluetooth_auto_off': setVal('bluetooth_auto_off', val); setText('bluetooth_auto_offValue', val); break;
+                    case 'bluetoothName': setVal('bluetoothName', val); break;
+                    case 'timer_duration': setVal('timer_duration', val); setText('timer_durationValue', val); break;
+                    case 'is_24h': setVal('is_24h', val); break;
+                    case 'watch_face': setVal('watch_face', val); break;
+                    case 'boot_font': setVal('boot_font', val); updateBootTitleMaxLength(); break;
+                    case 'boot_size': setVal('boot_size', val); updateBootTitleMaxLength(); break;
+                    case 'water_reminder': setVal('water_reminder', val); break;
+                    case 'alarm_enabled': setVal('alarm_enabled', val); break;
+                    case 'alarm_hour': {
+                        let alarmTimeInput = document.getElementById('alarm_time');
+                        if (alarmTimeInput) {
+                            let parts = alarmTimeInput.value.split(':');
+                            let mm = parts[1] || '00';
+                            alarmTimeInput.value = `${val.padStart(2, '0')}:${mm}`;
+                        }
+                        break;
                     }
-                    break;
+                    case 'alarm_minute': {
+                        let alarmTimeInput = document.getElementById('alarm_time');
+                        if (alarmTimeInput) {
+                            let parts = alarmTimeInput.value.split(':');
+                            let hh = parts[0] || '07';
+                            alarmTimeInput.value = `${hh}:${val.padStart(2, '0')}`;
+                        }
+                        break;
+                    }
+                    case 'water_reminder_interval': setVal('water_reminder_interval', val); break;
+                    case 'chime_style': setVal('chime_style', val); break;
+                    case 'dnd_enabled': setVal('dnd_enabled', val); break;
+                    case 'dnd_start_hour': setVal('dnd_start_hour', val); break;
+                    case 'dnd_end_hour': setVal('dnd_end_hour', val); break;
 
-                // Audio
-                case 'intro_sound': setVal('intro_sound', val); break;
-                case 'notification_sound': setVal('notification_sound', val); break;
-                case 'touch_sound': setVal('touch_sound', val); break;
-                case 'double_touch_sound': setVal('double_touch_sound', val); break;
-                case 'long_touch_sound': setVal('long_touch_sound', val); break;
+                    // Hardware
+                    case 'led_enabled': setVal('led_enabled', val); break;
+                    case 'led_effect': setVal('led_effect', val); break;
+                    case 'led_color': setVal('led_color', val); break;
+                    case 'led_brightness': setVal('led_brightness', val); setText('led_brightnessValue', val); break;
 
-                // Chronos
-                case 'notifDuration': setVal('notifDuration', val); setText('notifDurationValue', val); break;
-                case 'bluetooth_auto_off': setVal('bluetooth_auto_off', val); setText('bluetooth_auto_offValue', val); break;
-                case 'bluetoothName': setVal('bluetoothName', val); break;
-                case 'timer_duration': setVal('timer_duration', val); setText('timer_durationValue', val); break;
-                case 'is_24h': document.getElementById('is_24h').checked = (val === 'true'); break;
-                case 'watch_face': setVal('watch_face', val); break;
-                case 'boot_font': setVal('boot_font', val); updateBootTitleMaxLength(); break;
-                case 'boot_size': setVal('boot_size', val); updateBootTitleMaxLength(); break;
-                case 'water_reminder': document.getElementById('water_reminder').checked = (val === '1' || val === 'true'); break;
-                case 'alarm_enabled': document.getElementById('alarm_enabled').checked = (val === '1' || val === 'true'); break;
-                case 'alarm_hour': {
-                    let alarmTimeInput = document.getElementById('alarm_time');
-                    let parts = alarmTimeInput.value.split(':');
-                    let mm = parts[1] || '00';
-                    alarmTimeInput.value = `${val.padStart(2, '0')}:${mm}`;
-                    break;
+                    case 'display_type': setVal('display_type', val); break;
+                    case 'scl_pin': setVal('scl_pin', val); break;
+                    case 'sda_pin': setVal('sda_pin', val); break;
+                    case 'is_flip_mode': setVal('is_flip_mode', val); break;
+                    case 'buzzer_pin': setVal('buzzer_pin', val); break;
+                    case 'touch_pin': setVal('touch_pin', val); break;
+
+                    // Screensaver & Canvas Mode
+                    case 'screensaver_enabled': setVal('screensaver_enabled', val); break;
+                    case 'screensaver_timeout': setVal('screensaver_timeout', val); break;
+                    case 'quote_category': setVal('quote_category', val); break;
+                    case 'canvas_text': setVal('canvas_text', val); break;
+                    case 'canvas_anim': setVal('canvas_anim', val); break;
+                    case 'canvas_font': setVal('canvas_font', val); break;
+                    case 'canvas_size': setVal('canvas_size', val); break;
+                    case 'canvas_qr_text': setVal('canvas_qr_text', val); parseQrPayloadToInputs(val); break;
+                    case 'canvas_qr_type': setVal('canvas_qr_type', val); updateQrFieldsVisibility(); break;
+                    case 'canvas_qr_enabled': setVal('canvas_qr_enabled', val); break;
                 }
-                case 'alarm_minute': {
-                    let alarmTimeInput = document.getElementById('alarm_time');
-                    let parts = alarmTimeInput.value.split(':');
-                    let hh = parts[0] || '07';
-                    alarmTimeInput.value = `${hh}:${val.padStart(2, '0')}`;
-                    break;
-                }
-                case 'water_reminder_interval': document.getElementById('water_reminder_interval').value = val; break;
-                case 'chime_style': document.getElementById('chime_style').value = val; break;
-                case 'dnd_enabled': document.getElementById('dnd_enabled').checked = (val === '1' || val === 'true'); break;
-                case 'dnd_start_hour': document.getElementById('dnd_start_hour').value = val; break;
-                case 'dnd_end_hour': document.getElementById('dnd_end_hour').value = val; break;
-
-                // Hardware
-                case 'display_type': setVal('display_type', val); break;
-                case 'scl_pin': setVal('scl_pin', val); break;
-                case 'sda_pin': setVal('sda_pin', val); break;
-                case 'is_flip_mode': setVal('is_flip_mode', val); break;
-                case 'buzzer_pin': setVal('buzzer_pin', val); break;
-                case 'touch_pin': setVal('touch_pin', val); break;
+            } catch (err) {
+                console.warn("parseCommand error:", err);
             }
         }
 
@@ -1480,20 +2026,17 @@
             }
         }
 
-        // --- 7. WEB SERIAL FIRMWARE FLASHER (ESP Web Tools integration) ---
-        // Handle closing the settings serial connection before ESP Web Tools attempts to flash
+        // --- 7. WEB SERIAL FIRMWARE FLASHER ---
         const flashButton = document.getElementById('flashButtonSlot');
         if (flashButton) {
             flashButton.addEventListener('click', async (e) => {
                 if (port) {
-                    // Prevent event from bubbling up to esp-web-install-button immediately
                     e.stopPropagation();
                     e.preventDefault();
 
                     log("Releasing Web Serial connection before flashing...", "sys");
                     await disconnect();
 
-                    // Wait a short moment and then trigger the click on the custom element itself
                     const installBtn = document.querySelector('esp-web-install-button');
                     if (installBtn) {
                         setTimeout(() => {
@@ -1544,7 +2087,8 @@
         document.getElementById('gif_delay').onchange = (e) => sendData('gif_delay', e.target.value * 1000);
         document.getElementById('isInverted').onchange = (e) => sendData('isInverted', e.target.checked);
         document.getElementById('gif_default').onchange = (e) => sendData('gif_default', e.target.value);
-        document.getElementById('gif_intro').onchange = (e) => sendData('gif_intro', e.target.value);
+        const gifIntroEl = document.getElementById('gif_intro');
+        if (gifIntroEl) gifIntroEl.onchange = (e) => sendData('gif_intro', e.target.value);
         document.getElementById('gif_touch').onchange = (e) => sendData('gif_touch', e.target.value);
         document.getElementById('gif_double_touch').onchange = (e) => sendData('gif_double_touch', e.target.value);
         document.getElementById('gif_long_touch').onchange = (e) => sendData('gif_long_touch', e.target.value);
@@ -1552,6 +2096,10 @@
         ['intro_sound', 'notification_sound', 'touch_sound', 'double_touch_sound', 'long_touch_sound'].forEach(id => {
             document.getElementById(id).addEventListener('blur', (e) => sendData(id, e.target.value));
         });
+
+        document.getElementById('system_sound').onchange = (e) => sendData('system_sound', e.target.checked ? '1' : '0');
+        document.getElementById('gif_sound').onchange = (e) => sendData('gif_sound', e.target.checked ? '1' : '0');
+        document.getElementById('game_difficulty').onchange = (e) => sendData('game_difficulty', e.target.value);
 
         document.getElementById('notifDuration').onchange = (e) => sendData('notifDuration', e.target.value);
         document.getElementById('bluetooth_auto_off').onchange = (e) => sendData('bluetooth_auto_off', e.target.value);
@@ -1577,11 +2125,11 @@
         const customTitleEl = document.getElementById('custom_title');
         function updateBootTitleMaxLength() {
             const size = parseInt(bootSizeEl.value);
-            if (size === 4) { // 24px
+            if (size === 4) {
                 customTitleEl.maxLength = 8;
-            } else if (size === 3) { // 18px
+            } else if (size === 3) {
                 customTitleEl.maxLength = 12;
-            } else if (size === 2) { // 14px
+            } else if (size === 2) {
                 customTitleEl.maxLength = 16;
             } else {
                 customTitleEl.maxLength = 32;
@@ -1611,17 +2159,122 @@
         document.getElementById('dnd_start_hour').onchange = (e) => sendData('dnd_start_hour', e.target.value);
         document.getElementById('dnd_end_hour').onchange = (e) => sendData('dnd_end_hour', e.target.value);
 
-        document.getElementById('pushCanvasBtn').addEventListener('click', async () => {
+        // LED
+        document.getElementById('led_enabled').onchange = (e) => sendData('led_enabled', e.target.checked ? '1' : '0');
+        document.getElementById('led_effect').onchange = (e) => sendData('led_effect', e.target.value);
+        document.getElementById('led_color').onchange = (e) => sendData('led_color', e.target.value);
+        document.getElementById('led_brightness').oninput = (e) => {
+            document.getElementById('led_brightnessValue').innerText = e.target.value;
+        };
+        document.getElementById('led_brightness').onchange = (e) => sendData('led_brightness', e.target.value);
+
+        // DYNAMIC QR PAYLOAD GENERATOR & VISIBILITY SWITCHER
+        function updateQrFieldsVisibility() {
+            const type = document.getElementById('canvas_qr_type').value;
+            const groups = ['qr_field_url', 'qr_field_text', 'qr_field_phone', 'qr_field_wifi'];
+            groups.forEach((g, idx) => {
+                const el = document.getElementById(g);
+                if (el) el.style.display = (idx == type) ? 'block' : 'none';
+            });
+        }
+
+        function buildAndSyncQrPayload(shouldSend = true) {
+            const type = document.getElementById('canvas_qr_type').value;
+            let payload = "www.olobit.in";
+
+            if (type == 0) { // URL
+                payload = document.getElementById('canvas_qr_url').value || "www.olobit.in";
+            } else if (type == 1) { // Plain Text
+                payload = document.getElementById('canvas_qr_plain').value || "Hello!";
+            } else if (type == 2) { // Phone Call
+                const num = document.getElementById('canvas_qr_phone').value || "";
+                payload = num ? (num.startsWith("tel:") ? num : ("tel:" + num)) : "tel:www.olobit.in";
+            } else if (type == 3) { // WiFi (SSID + Password)
+                const ssid = document.getElementById('canvas_wifi_ssid').value || "";
+                const pass = document.getElementById('canvas_wifi_pass').value || "";
+                payload = `WIFI:S:${ssid};T:WPA;P:${pass};;`;
+            }
+
+            document.getElementById('canvas_qr_text').value = payload;
+            if (shouldSend) {
+                sendData('canvas_qr_text', payload);
+            }
+        }
+
+        function parseQrPayloadToInputs(payload) {
+            if (!payload) return;
+            if (payload.startsWith("WIFI:")) {
+                const ssidMatch = payload.match(/S:([^;]+)/);
+                const passMatch = payload.match(/P:([^;]*)/);
+                if (ssidMatch) document.getElementById('canvas_wifi_ssid').value = ssidMatch[1];
+                if (passMatch) document.getElementById('canvas_wifi_pass').value = passMatch[1];
+                document.getElementById('canvas_qr_type').value = "3";
+            } else if (payload.startsWith("tel:")) {
+                document.getElementById('canvas_qr_phone').value = payload.replace("tel:", "");
+                document.getElementById('canvas_qr_type').value = "2";
+            } else {
+                document.getElementById('canvas_qr_url').value = payload;
+                document.getElementById('canvas_qr_plain').value = payload;
+            }
+            updateQrFieldsVisibility();
+        }
+
+        document.getElementById('canvas_qr_type').onchange = (e) => {
+            sendData('canvas_qr_type', e.target.value);
+            updateQrFieldsVisibility();
+            buildAndSyncQrPayload(true);
+        };
+
+        ['canvas_qr_url', 'canvas_qr_plain', 'canvas_qr_phone', 'canvas_wifi_ssid', 'canvas_wifi_pass'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.onchange = () => buildAndSyncQrPayload(true);
+                el.oninput = () => buildAndSyncQrPayload(false);
+            }
+        });
+
+        // Initialize QR payload fields visibility on page load
+        updateQrFieldsVisibility();
+
+        // PUSH CANVAS TEXT TO DEVICE
+        document.getElementById('pushCanvasTextBtn').addEventListener('click', async () => {
             const text = document.getElementById('canvas_text').value;
             const anim = document.getElementById('canvas_anim').value;
             const font = document.getElementById('canvas_font').value;
             const size = document.getElementById('canvas_size').value;
 
             await sendData('canvas_text', text);
+            await new Promise(r => setTimeout(r, 50));
             await sendData('canvas_anim', anim);
+            await new Promise(r => setTimeout(r, 50));
             await sendData('canvas_font', font);
+            await new Promise(r => setTimeout(r, 50));
             await sendData('canvas_size', size);
+            await new Promise(r => setTimeout(r, 50));
             await sendData('canvas_trigger', '1');
+        });
+
+        // STOP CANVAS TEXT
+        document.getElementById('stopCanvasTextBtn').addEventListener('click', async () => {
+            await sendData('canvas_trigger', '0');
+        });
+
+        // PUSH CANVAS QR CODE TO DEVICE
+        document.getElementById('pushCanvasQrBtn').addEventListener('click', async () => {
+            buildAndSyncQrPayload(false);
+            const qrText = document.getElementById('canvas_qr_text').value;
+            const qrType = document.getElementById('canvas_qr_type').value;
+
+            await sendData('canvas_qr_text', qrText);
+            await new Promise(r => setTimeout(r, 60));
+            await sendData('canvas_qr_type', qrType);
+            await new Promise(r => setTimeout(r, 60));
+            await sendData('canvas_qr_trigger', '1');
+        });
+
+        // STOP CANVAS QR CODE
+        document.getElementById('stopCanvasQrBtn').addEventListener('click', async () => {
+            await sendData('canvas_qr_trigger', '0');
         });
 
         // --- 9. OLO MUSIC PACKS & EMOTION THEMES ---

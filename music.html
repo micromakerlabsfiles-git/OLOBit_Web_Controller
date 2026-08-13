@@ -1,270 +1,533 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-bs-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OLO Bit | MIDI Composer</title>
+    <title>OLO Bit Sound Sequence Studio — Music Studio</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Tone.js for MIDI parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/build/Midi.js"></script>
+
     <style>
-        /* --- GREY & ORANGE THEME --- */
+        /* --- GLASSMORPHISM DUAL THEME SYSTEM --- */
         :root {
-            --bg-gradient: linear-gradient(135deg, #2d3436 0%, #000000 100%);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --accent: #ff793f; 
-            --terminal-bg: #1e272e;
-            --terminal-text: #ff793f;
+            --bg-gradient: radial-gradient(circle at 15% 15%, #1e1b4b 0%, #0f172a 45%, #020617 90%);
+            --glass-bg: rgba(15, 23, 42, 0.85);
+            --glass-card-bg: rgba(15, 23, 42, 0.88);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+            --accent: #ff793f;
+            --accent-hover: #ff5252;
+            --accent-glow: rgba(255, 121, 63, 0.35);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: rgba(15, 23, 42, 0.75);
+            --input-border: rgba(255, 255, 255, 0.15);
+            --input-text: #f8fafc;
+            --input-option-bg: #1e293b;
+            --input-option-text: #f8fafc;
+            --terminal-bg: #070a12;
+            --terminal-text: #ff9d00;
+            --card-header-gradient: linear-gradient(90deg, rgba(255, 121, 63, 0.15) 0%, rgba(255, 121, 63, 0) 100%);
+            --badge-bg: rgba(255, 255, 255, 0.08);
         }
+
+        [data-theme="light"] {
+            --bg-gradient: radial-gradient(circle at 15% 15%, #eff6ff 0%, #f1f5f9 50%, #e2e8f0 100%);
+            --glass-bg: rgba(255, 255, 255, 0.92);
+            --glass-card-bg: rgba(255, 255, 255, 0.94);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --glass-shadow: 0 16px 48px rgba(31, 38, 135, 0.12);
+            --accent: #e65100;
+            --accent-hover: #d84315;
+            --accent-glow: rgba(230, 81, 0, 0.22);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --input-bg: rgba(255, 255, 255, 0.94);
+            --input-border: rgba(0, 0, 0, 0.18);
+            --input-text: #0f172a;
+            --input-option-bg: #ffffff;
+            --input-option-text: #0f172a;
+            --terminal-bg: #1e293b;
+            --terminal-text: #ffb74d;
+            --card-header-gradient: linear-gradient(90deg, rgba(230, 81, 0, 0.1) 0%, rgba(230, 81, 0, 0) 100%);
+            --badge-bg: rgba(0, 0, 0, 0.06);
+        }
+
+
 
         body {
             background: var(--bg-gradient);
             min-height: 100vh;
-            color: #d1d8e0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: var(--text-main);
+            font-family: 'Outfit', 'Segoe UI', system-ui, sans-serif;
             padding-bottom: 50px;
+            transition: background 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
         }
 
         .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
+            background: var(--glass-card-bg);
             border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
             margin-bottom: 20px;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
         }
 
-        .card-header {
-            background: transparent;
+        .glass-card:hover {
+            border-color: rgba(255, 121, 63, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .card-header-banner {
+            background: var(--card-header-gradient);
+            padding: 14px 20px;
             border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-header-title {
             color: var(--accent);
-            font-weight: 600;
-            padding: 15px 20px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
         }
 
         .btn-elegant {
-            background: linear-gradient(45deg, #ff793f 0%, #ff5252 100%);
+            background: linear-gradient(135deg, var(--accent) 0%, #ff5252 100%);
             border: none;
             border-radius: 12px;
-            padding: 12px 25px;
+            padding: 10px 24px;
             font-weight: 600;
             color: #fff !important;
-            box-shadow: 0 4px 15px rgba(255, 121, 63, 0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px var(--accent-glow);
         }
 
-        /* PIANO STYLING */
-        .piano-container { position: relative; padding: 40px 0; overflow-x: auto; text-align: center;}
-        .piano-keys { display: inline-flex; position: relative; }
-        .piano-key {
-            width: 45px;
-            height: 180px;
-            margin: 1px;
-            border: 1px solid #000;
+        .btn-elegant:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--accent-glow);
+        }
+
+        .btn-coffee {
+            background: linear-gradient(135deg, #ffdd00 0%, #fbb034 100%);
+            color: #000 !important;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            padding: 8px 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(251, 176, 52, 0.4);
+            text-decoration: none;
+        }
+
+        .btn-coffee:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(251, 176, 52, 0.6);
+            color: #000 !important;
+        }
+
+        .theme-toggle-btn {
+            background: var(--badge-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            border-radius: 30px;
+            padding: 6px 16px;
+            font-weight: 600;
+            font-size: 0.85rem;
             cursor: pointer;
-            border-radius: 0 0 8px 8px;
+            transition: all 0.25s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: scale(1.03);
+        }
+
+        .form-control,
+        .form-select {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            color: var(--input-text) !important;
+        }
+
+        .form-select option {
+            background-color: var(--input-option-bg) !important;
+            color: var(--input-option-text) !important;
+        }
+
+        .piano-wrapper {
             display: flex;
-            align-items: flex-end;
             justify-content: center;
-            padding-bottom: 10px;
-            transition: 0.1s;
+            overflow-x: auto;
+            padding: 20px 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
         }
-        .white-key { background: #f8f9fa; color: #333; z-index: 1; }
-        .black-key { 
-            background: #1e272e; 
-            color: #fff; 
-            width: 32px; 
-            height: 110px; 
-            margin-left: -17px; 
-            margin-right: -17px; 
-            z-index: 2; 
-            font-size: 10px;
+
+        .piano {
+            display: flex;
+            position: relative;
+            user-select: none;
         }
-        .piano-key.active {
-            background: var(--accent) !important;
-            box-shadow: 0 0 20px var(--accent);
+
+        .key {
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.1s ease, transform 0.1s ease;
+        }
+
+        .key.white {
+            width: 44px;
+            height: 160px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 0 0 8px 8px;
+            z-index: 1;
+        }
+
+        .key.white:hover {
+            background: #e2e8f0;
+        }
+
+        .key.white.active {
+            background: var(--accent);
             transform: translateY(2px);
         }
 
-        .output-area {
-            background: var(--terminal-bg) !important;
-            border: 1px solid #3d3d3d;
-            color: var(--terminal-text) !important;
-            font-family: 'Courier New', monospace;
-            font-weight: 600;
+        .key.black {
+            width: 28px;
+            height: 100px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 0 0 6px 6px;
+            margin-left: -14px;
+            margin-right: -14px;
+            z-index: 2;
         }
 
-        .note-display {
-            background: var(--accent);
-            color: #000;
-            padding: 5px 20px;
-            border-radius: 20px;
-            font-weight: bold;
+        .key.black:hover {
+            background: #1e293b;
+        }
+
+        .key.black.active {
+            background: #ff5252;
+            transform: translateY(2px);
+        }
+
+        .key-label {
             position: absolute;
-            top: 0;
+            bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 10;
-            display: none;
+            font-size: 0.7rem;
+            font-weight: 700;
+            pointer-events: none;
         }
+
+        .key.white .key-label { color: #334155; }
+        .key.black .key-label { color: #94a3b8; }
+        .key.active .key-label { color: #ffffff; }
+
+        .text-accent { color: var(--accent) !important; }
+        .text-main { color: var(--text-main) !important; }
     </style>
 </head>
+
 <body>
 
-<div class="container py-5">
-    <div class="row mb-5 text-center">
-        <div class="col-12">
-            <h1 class="display-5 fw-bold" style="color: var(--accent);">OLO Bit MIDI <span class="text-white">Composer</span></h1>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-lg-12 mb-4">
-            <div class="glass-card">
-                <div class="card-header"><i class="fas fa-piano me-2"></i>Virtual Piano</div>
-                <div class="piano-container">
-                    <div class="note-display" id="noteDisplay">--</div>
-                    <div class="piano-keys" id="pianoKeys"></div>
+
+    <div class="container py-4">
+
+        <!-- HEADER BAR -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 pb-3 border-bottom border-secondary border-opacity-25">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-gradient p-2 rounded-3 text-white shadow-sm" style="background: linear-gradient(135deg, var(--accent) 0%, #ff5252 100%);">
+                    <i class="fas fa-music fs-3"></i>
+                </div>
+                <div>
+                    <h1 class="h4 fw-extrabold mb-0 text-main">
+                        OLO Bit <span class="text-accent fs-6">Music & Melody Studio</span>
+                    </h1>
+                    <p class="small text-muted mb-0">Virtual Synthesizer, MIDI Converter & ESP32 Buzzer Sequence Generator</p>
                 </div>
             </div>
-        </div>
 
-        <div class="col-lg-6 mb-4">
-            <div class="glass-card p-4">
-                <h5 class="text-info mb-3">Controls</h5>
-                <button class="btn btn-elegant w-100 mb-3" onclick="$('#midiFileInput').click()">
-                    <i class="fas fa-file-upload me-2"></i>Upload MIDI File
+            <div class="d-flex align-items-center gap-2">
+                <a href="index.html" class="btn btn-outline-secondary btn-sm rounded-pill text-main">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Controller
+                </a>
+                <a href="https://buymeacoffee.com/micromakerlabs" target="_blank" class="btn-coffee">
+                    <i class="fas fa-mug-hot me-1"></i> Coffee
+                </a>
+                <button id="themeToggleBtn" onclick="toggleTheme()" class="theme-toggle-btn">
+                    <i class="fas fa-moon me-1"></i> Dark
                 </button>
-                <input type="file" id="midiFileInput" class="d-none" accept=".mid,.midi">
-                
-                <label class="small text-muted">Playback Speed: <span id="speedValue" class="text-white">100%</span></label>
-                <input type="range" class="form-range mb-3" id="speedSlider" min="50" max="250" value="100">
+            </div>
+        </div>
 
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-warning w-100" id="playBtn">Preview</button>
-                    <button class="btn btn-outline-danger w-100" id="stopBtn">Stop</button>
-                    <button class="btn btn-outline-light w-100" id="clearBtn">Clear</button>
+        <!-- PIANO SYNTH MODULE -->
+        <div class="glass-card mb-4">
+            <div class="card-header-banner">
+                <h5 class="card-header-title"><i class="fas fa-keyboard"></i> Virtual Piano Synthesizer (Octaves 3 - 6)</h5>
+                <span class="badge bg-secondary">Live Key Output</span>
+            </div>
+            <div class="p-4 text-center">
+                <p class="small text-muted mb-3">Click keys or use mouse to play. Notes will automatically record into the sequence box below.</p>
+                
+                <div class="piano-wrapper mb-3">
+                    <div class="piano" id="pianoKeyboard"></div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-2">
+                    <button class="btn btn-sm btn-outline-secondary text-main" onclick="clearSequence()"><i class="fas fa-trash me-1"></i>Clear Notes</button>
+                    <button class="btn btn-sm btn-accent btn-elegant" onclick="copySequence()"><i class="fas fa-copy me-1"></i>Copy Sequence</button>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-6 mb-4">
-            <div class="glass-card p-4">
-                <h5 class="text-info mb-3">ESP32 Code</h5>
-                <textarea class="form-control output-area" id="outputArea" rows="6" readonly></textarea>
-                <button class="btn btn-elegant w-100 mt-3" id="copyBtn">Copy Sequence</button>
+        <div class="row">
+            <!-- MIDI CONVERTER -->
+            <div class="col-lg-6 mb-4">
+                <div class="glass-card h-100">
+                    <div class="card-header-banner">
+                        <h5 class="card-header-title"><i class="fas fa-file-audio"></i> MIDI File Converter</h5>
+                    </div>
+                    <div class="p-4">
+                        <p class="small text-muted mb-3">Upload a standard <code>.mid</code> file to automatically convert its track melody into an OLO Bit sequence.</p>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-main small">Select MIDI File</label>
+                            <input type="file" class="form-control" id="midiInput" accept=".mid,.midi">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-main small">Select Track</label>
+                            <select class="form-select" id="midiTrackSelect" disabled>
+                                <option>Upload MIDI file first...</option>
+                            </select>
+                        </div>
+
+                        <button id="convertMidiBtn" class="btn btn-elegant w-100 py-2" disabled onclick="convertMidiTrack()">
+                            <i class="fas fa-wand-magic-sparkles me-2"></i>Convert MIDI Track
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEQUENCE OUTPUT -->
+            <div class="col-lg-6 mb-4">
+                <div class="glass-card h-100">
+                    <div class="card-header-banner">
+                        <h5 class="card-header-title"><i class="fas fa-code"></i> Live Sequence Output</h5>
+                    </div>
+                    <div class="p-4">
+                        <label class="small text-muted fw-bold mb-2">FORMATTED SEQUENCE STRING</label>
+                        <textarea class="form-control font-monospace mb-3" id="sequenceOutput" rows="6" placeholder="e.g. C5 100 20 E5 100 20 G5 100 20 C6 300 0"></textarea>
+
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-warning flex-grow-1" onclick="previewStudioSequence()"><i class="fas fa-play me-2"></i>Play Preview</button>
+                            <button class="btn btn-elegant flex-grow-1" onclick="copySequence()"><i class="fas fa-copy me-2"></i>Copy String</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
     </div>
-</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.27/build/Midi.min.js"></script>
-<script>
-    const freqs = {
-        'C3':130,'CS3':138,'D3':146,'DS3':155,'E3':164,'F3':174,'FS3':185,'G3':196,'GS3':207,'A3':220,'AS3':233,'B3':246,
-        'C4':261,'CS4':277,'D4':293,'DS4':311,'E4':329,'F4':349,'FS4':369,'G4':392,'GS4':415,'A4':440,'AS4':466,'B4':493,
-        'C5':523,'CS5':554,'D5':587,'DS5':622,'E5':659,'F5':698,'FS5':740,'G5':783,'GS5':830,'A5':880,'AS5':932,'B5':987,
-        'C6':1046,'CS6':1108,'D6':1174,'DS6':1244,'E6':1318,'F6':1396,'FS6':1479,'G6':1567,'GS6':1661,'A6':1760,'AS6':1864,'B6':1975
-    };
+    <script>
 
-    let audioCtx = null;
-    let currentNotes = [];
-    let isPlaying = false;
-    let playTimeout;
 
-    function initPiano() {
-        const whiteNotes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-        const blackNotes = ['CS', 'DS', null, 'FS', 'GS', 'AS', null];
-        const container = $('#pianoKeys');
-
-        [3, 4, 5, 6].forEach(octave => {
-            const group = $('<div class="d-flex position-relative"></div>');
-            whiteNotes.forEach(n => {
-                group.append(`<div class="piano-key white-key" data-note="${n}${octave}"><small>${n}${octave}</small></div>`);
-            });
-            const blacks = $('<div class="position-absolute d-flex" style="top:0; left:28px;"></div>');
-            blackNotes.forEach(n => {
-                if(n) blacks.append(`<div class="piano-key black-key" data-note="${n}${octave}"><small>${n}</small></div>`);
-                else blacks.append('<div style="width:47px"></div>');
-            });
-            group.append(blacks);
-            container.append(group);
-        });
-    }
-
-    function playTone(note, dur) {
-        // Unlock Audio Context on first click
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(freqs[note] || 440, audioCtx.currentTime);
-        
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur/1000);
-        
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + dur/1000);
-
-        const key = $(`.piano-key[data-note="${note}"]`);
-        key.addClass('active');
-        setTimeout(() => key.removeClass('active'), dur);
-        $('#noteDisplay').text(note).fadeIn(100).fadeOut(500);
-    }
-
-    $(document).ready(function() {
-        initPiano();
-
-        $(document).on('click', '.piano-key', function() {
-            const note = $(this).data('note');
-            playTone(note, 200);
-            currentNotes.push({note: note, duration: 200, rest: 50});
-            updateOutput();
-        });
-
-        $('#midiFileInput').change(function(e) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const midi = new Midi(e.target.result);
-                currentNotes = [];
-                midi.tracks[0].notes.forEach(n => {
-                    currentNotes.push({note: n.name.replace('#','S'), duration: Math.round(n.duration*1000), rest: 20});
-                });
-                updateOutput();
-            };
-            reader.readAsArrayBuffer(e.target.files[0]);
-        });
-
-        function updateOutput() {
-            const speed = $('#speedSlider').val() / 100;
-            let out = currentNotes.map(n => `${n.note} ${Math.round(n.duration/speed)} ${Math.round(n.rest/speed)}`).join(' ');
-            $('#outputArea').val(out);
+        // --- THEME SWITCHER LOGIC ---
+        function initTheme() {
+            const savedTheme = localStorage.getItem('olo_theme') || 'dark';
+            applyTheme(savedTheme);
         }
 
-        $('#playBtn').click(function() {
-            if(isPlaying) return;
-            isPlaying = true;
-            let i = 0;
-            const speed = $('#speedSlider').val() / 100;
-            function step() {
-                if(i >= currentNotes.length || !isPlaying) { isPlaying = false; return; }
-                const n = currentNotes[i];
-                playTone(n.note, n.duration/speed);
-                playTimeout = setTimeout(step, (n.duration + n.rest)/speed);
-                i++;
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.setAttribute('data-bs-theme', theme === 'light' ? 'light' : 'dark');
+            localStorage.setItem('olo_theme', theme);
+            const themeBtn = document.getElementById('themeToggleBtn');
+            if (themeBtn) {
+                themeBtn.innerHTML = theme === 'light' 
+                    ? '<i class="fas fa-sun text-warning me-1"></i> Light' 
+                    : '<i class="fas fa-moon me-1"></i> Dark';
             }
-            step();
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(nextTheme);
+        }
+        initTheme();
+
+        // --- PIANO SYNTH GENERATOR ---
+        const octaves = [3, 4, 5, 6];
+        const notesPattern = [
+            { note: 'C', isBlack: false }, { note: 'CS', isBlack: true },
+            { note: 'D', isBlack: false }, { note: 'DS', isBlack: true },
+            { note: 'E', isBlack: false }, { note: 'F', isBlack: false },
+            { note: 'FS', isBlack: true }, { note: 'G', isBlack: false },
+            { note: 'GS', isBlack: true }, { note: 'A', isBlack: false },
+            { note: 'AS', isBlack: true }, { note: 'B', isBlack: false }
+        ];
+
+        const pianoContainer = document.getElementById('pianoKeyboard');
+        const notesFreq = {
+            "C3": 131, "CS3": 139, "D3": 147, "DS3": 156, "E3": 165, "F3": 175, "FS3": 185, "G3": 196, "GS3": 208, "A3": 220, "AS3": 233, "B3": 247,
+            "C4": 262, "CS4": 277, "D4": 294, "DS4": 311, "E4": 330, "F4": 349, "FS4": 370, "G4": 392, "GS4": 415, "A4": 440, "AS4": 466, "B4": 494,
+            "C5": 523, "CS5": 554, "D5": 587, "DS5": 622, "E5": 659, "F5": 698, "FS5": 740, "G5": 784, "GS5": 831, "A5": 880, "AS5": 932, "B5": 988,
+            "C6": 1047, "CS6": 1109, "D6": 1175, "DS6": 1245, "E6": 1319, "F6": 1397, "FS6": 1480, "G6": 1568, "GS6": 1661, "A6": 1760, "AS6": 1865, "B6": 1976
+        };
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        octaves.forEach(oct => {
+            notesPattern.forEach(item => {
+                const keyName = `${item.note}${oct}`;
+                const keyDiv = document.createElement('div');
+                keyDiv.className = `key ${item.isBlack ? 'black' : 'white'}`;
+                keyDiv.dataset.note = keyName;
+
+                const label = document.createElement('span');
+                label.className = 'key-label';
+                label.innerText = keyName.replace('S', '#');
+                keyDiv.appendChild(label);
+
+                keyDiv.addEventListener('mousedown', () => pressKey(keyName, keyDiv));
+                pianoContainer.appendChild(keyDiv);
+            });
         });
 
-        $('#stopBtn').click(() => { isPlaying = false; clearTimeout(playTimeout); });
-        $('#clearBtn').click(() => { currentNotes = []; $('#outputArea').val(''); });
-        $('#speedSlider').on('input', function() { $('#speedValue').text($(this).val()+'%'); updateOutput(); });
-        $('#copyBtn').click(() => { navigator.clipboard.writeText($('#outputArea').val()); alert('Copied!'); });
-    });
-</script>
+        function pressKey(noteName, element) {
+            element.classList.add('active');
+            setTimeout(() => element.classList.remove('active'), 150);
+
+            const freq = notesFreq[noteName];
+            if (freq) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                setTimeout(() => osc.stop(), 120);
+            }
+
+            const output = document.getElementById('sequenceOutput');
+            output.value += (output.value ? ' ' : '') + `${noteName} 100 20`;
+        }
+
+        function clearSequence() {
+            document.getElementById('sequenceOutput').value = '';
+        }
+
+        function copySequence() {
+            const output = document.getElementById('sequenceOutput');
+            output.select();
+            navigator.clipboard.writeText(output.value);
+            alert("Sequence copied to clipboard!");
+        }
+
+        async function previewStudioSequence() {
+            if (audioCtx.state === 'suspended') await audioCtx.resume();
+            const raw = document.getElementById('sequenceOutput').value.trim();
+            if (!raw) return;
+
+            const parts = raw.split(/\s+/);
+            let i = 0;
+            while (i < parts.length) {
+                const note = parts[i];
+                const duration = parseInt(parts[i + 1]) || 100;
+                const rest = parseInt(parts[i + 2]) || 20;
+
+                const freq = notesFreq[note];
+                if (freq) {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    await new Promise(r => setTimeout(r, duration));
+                    osc.stop();
+                    await new Promise(r => setTimeout(r, rest));
+                }
+                i += 3;
+            }
+        }
+
+        // --- MIDI FILE PARSER ---
+        let loadedMidi = null;
+        document.getElementById('midiInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    loadedMidi = new Midi(event.target.result);
+                    const select = document.getElementById('midiTrackSelect');
+                    select.innerHTML = '';
+                    loadedMidi.tracks.forEach((track, idx) => {
+                        if (track.notes.length > 0) {
+                            select.add(new Option(`Track ${idx + 1}: ${track.name || 'Instrument'} (${track.notes.length} notes)`, idx));
+                        }
+                    });
+                    select.disabled = false;
+                    document.getElementById('convertMidiBtn').disabled = false;
+                } catch (err) {
+                    alert("Error parsing MIDI file: " + err);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function convertMidiTrack() {
+            if (!loadedMidi) return;
+            const trackIdx = document.getElementById('midiTrackSelect').value;
+            const track = loadedMidi.tracks[trackIdx];
+            if (!track) return;
+
+            let result = [];
+            track.notes.forEach((n, idx) => {
+                const noteName = n.name.replace('#', 'S');
+                const dur = Math.round(n.duration * 1000);
+                const nextNote = track.notes[idx + 1];
+                let rest = 0;
+                if (nextNote) {
+                    rest = Math.max(0, Math.round((nextNote.time - (n.time + n.duration)) * 1000));
+                }
+                if (notesFreq[noteName]) {
+                    result.push(`${noteName} ${dur} ${rest}`);
+                }
+            });
+
+            document.getElementById('sequenceOutput').value = result.join(' ');
+            alert(`Converted ${result.length} notes into sequence!`);
+        }
+    </script>
 </body>
+
 </html>
