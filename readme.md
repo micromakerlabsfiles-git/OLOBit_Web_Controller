@@ -1,102 +1,182 @@
-# OLO Bit - User Quick Start, Flasher & Web Controller Guide
+# 📘 OLO Bit OS V3 — Complete User Manual & Reference Guide
 
-Welcome to the **OLO Bit Web Controller & Flasher Hub**! This guide contains quick-start setup instructions, I2C pin layout schematics, flashing instructions, and a detailed reference to the device's internal setting keywords.
-
----
-
-## 1. User Quick Start Guide
-
-### Quick Launch
-1. Connect the OLO Bit hardware to your computer using a **USB-C Data Cable**.
-2. Open the [`OLO Bit Web Controller`](https://micromakerlabsfiles-git.github.io/OLOBit_Web_Controller/) page in **Google Chrome**, **Microsoft Edge**, or **Opera** (these browsers support the Web Serial API).
-3. Connect and manage settings directly from the dashboard!
+Welcome to **OLO Bit OS V3**, the flagship operating system for your **OLOBit** desk companion! This manual provides comprehensive user instructions for operating your device via capacitive touch gestures, navigating the on-device menu system, launching built-in retro games and productivity apps, pairing with your smartphone for notifications and Google Maps turn-by-turn navigation, and customizing every feature using the official Online Web Controller.
 
 ---
 
-## 2. Web Serial Flasher Guide
+## 🌐 1. Online Web Controller (No Installation Needed)
 
-If you need to install or update the device operating system, you can flash it directly from this web page without installing Arduino IDE or PlatformIO.
+You can configure and customize your OLOBit directly from your web browser without installing any software or drivers:
 
-1. Locate the **SELECT DISPLAY TYPE FOR FIRMWARE** dropdown on the connect screen.
-2. Select your OLED display type:
-   * **SH1106 OLED (128x64)** - Default display driver.
-   * **SSD1306 OLED (128x64)** - Alternate display driver.
-3. Click the red **Install/Update Firmware** button (powered by ESP Web Tools).
-4. Select the serial port labeled *USB JTAG/serial debug unit* or *ESP32-C3* and click **Connect**.
-5. The installer will automatically flash the partition tables, bootloader, and default OLO Bit OS firmware binary, then reset the device.
+👉 **Official Web Controller:** [https://micromakerlabsfiles-git.github.io/OLOBit_Web_Controller](https://micromakerlabsfiles-git.github.io/OLOBit_Web_Controller)
 
----
-
-## 3. Web Controller Tab walkthrough
-
-Once connected, the screen scrolls down to show the full dashboard control panel. Always click **Save All Settings** at the top after making modifications to write settings to persistent flash memory (NVS).
-
-*   **🖼️ GIFs Tab**: Set default/idle animations, upload custom animations, customize touch gestures, select active startup animations, and set positive or inverted pixel color modes.
-*   **🎵 Audio Tab**: Customize tap sounds, melody notifications, boot-up startup chimes, and compose custom RTTTL melodies.
-*   **⏰ Chronos Tab**: Configure time formatting (12H/24H), sync timezone, set focus timers, enable hydration alerts, configure daily alarms, adjust hourly chimes, set Do Not Disturb (DND) silences, and customize boot screen text.
-*   **📝 Canvas Tab**: Type a custom text message, select a font size and layout style, and slide/scroll/blink live announcements onto your display instantly.
-*   **⚙️ Hardware Tab**: Map internal pins to match customized boards, select driver modes, and invert the display orientation.
+### 🔌 How to Connect:
+1. Connect your OLOBit to your computer using a standard **USB-C Data Cable**.
+2. Open the [Online Web Controller](https://micromakerlabsfiles-git.github.io/OLOBit_Web_Controller) in **Google Chrome**, **Microsoft Edge**, or **Opera** (browsers supporting the Web Serial API).
+3. Click **"Connect Device"** and select your OLOBit serial port (e.g. `USB-Enhanced-SERIAL CH343`, `CP2102`, or `USB JTAG/serial debug unit`).
+4. The dashboard automatically syncs all saved preferences from your device's flash memory and synchronizes your device's clock to your exact local computer timezone.
 
 ---
 
-## 4. Useful Settings Keywords & Value Reference
+## 🕹️ 2. On-Device Touch Gestures & Navigation
 
-The settings on OLO Bit can be modified either via the physical device screen menu or over USB Serial. Below is a list of all useful configuration keywords, ranges, and index values:
+Your OLOBit is operated using a smart capacitive touch sensor positioned on the top/front of the casing.
 
-### LED Settings
-| Setting Menu Name | Internal Variable / Key | Value Options | Description |
-|---|---|---|---|
-| **LED Power** | `led_enabled` | `0` = Disabled<br>`1` = Enabled | Turns the NeoPixel RGB LED on or off |
-| **LED Effect** | `led_effect` | `0` = Static Color<br>`1` = Breathing animation<br>`2` = Rainbow Wave<br>`3` = Color Cycle animation<br>`4` = Blink/Flash | Sets the RGB animation pattern |
-| **LED Color** | `led_color` | **0** = Red<br>**1** = Green<br>**2** = Blue<br>**3** = Yellow<br>**4** = Cyan<br>**5** = Magenta<br>**6** = White<br>**7** = Orange | Sets the default active RGB color |
-| **Brightness** | `led_brightness` | `0` to `10` | Adjusts brightness level (0 = dimmest, 10 = brightest) |
-
-### Watch Face Styles
-| Key | Value Options | Watch Face Layout Style |
-|---|---|---|
-| `watch_face` | `0` | **Classic Digital** (Standard font) |
-| | `1` | **Casio Retro** (Segmented digital font layout) |
-| | `2` | **Analog** (Analog hand clock layout) |
-| | `3` | **7-Segment** (Big block clock digits) |
-
-### Hourly Chime Styles
-| Key | Value Options | Chime Audio Melody Style |
-|---|---|---|
-| `chime_style` | `0` | **Classic Westminster** chime chimes |
-| | `1` | **Casio Retro Double-Beep** tone chimes |
-
-### Water Reminder Intervals
-| Key | Value Options (in minutes) | Water Intake Periodic Alert Interval |
-|---|---|---|
-| `water_reminder_interval` | `15` \| `30` \| `45` \| `60` \| `90` \| `120` | Reminds the user to drink water at set interval |
-
-### Font Configurations (Canvas & Boot Title)
-| Font Key | Value Options | Font Family Style |
-|---|---|---|
-| `boot_font`<br>`canvas_font` | `0` | **Helvetica Bold** |
-| | `1` | **Times Bold** |
-| | `2` | **Courier Bold** |
-| | `3` | **New Century Bold** |
-| | `4` | **Lucida Regular** |
-
-### Canvas Layout Styles
-| Key | Value Options | Live Scroll Direction / Animation |
-|---|---|---|
-| `canvas_anim` | `0` | **Scroll Left** (standard scroll) |
-| | `1` | **Scroll Right** |
-| | `2` | **Bounce Scroll** (bounces side to side) |
-| | `3` | **Typewriter Effect** (characters appear one by one) |
-| | `4` | **Blinking / Flash** (text blinks continuously) |
-| | `5` | **Fixed** (static text layout) |
+### 👆 Gesture Reference Table
+| Gesture | Context | Action Performed |
+| :--- | :--- | :--- |
+| **Single Tap** | **Idle Face View** | Cycle through enabled face animations and status clock pages. |
+| | **Notification Active** | **Dismiss & Next**: Pops current message and loads next queued alert (e.g. `WHATSAPP (1/3)` $\rightarrow$ `(2/3)`). |
+| | **Canvas Mode** | **Toggle QR Screen**: Switches between live Canvas Text and Canvas QR Code Page (when QR is enabled). |
+| | **Menu Navigation** | Scroll downward to the next menu item. |
+| | **Stopwatch / Timer** | Start or Pause timer countdown / stopwatch elapsed time. |
+| | **Retro Games** | Jump (Dino / Flappy) or Change Direction (Snake). |
+| **Double Tap** | **Idle Face View** | Trigger interactive expressive reaction animations. |
+| | **Canvas Mode** | **Toggle QR View**: Fast-switch between Canvas Text and QR code screen. |
+| | **Menu Navigation** | **Enter / Toggle**: Open selected submenu or toggle setting value. |
+| | **Stopwatch** | **Reset**: Resets stopwatch time counter back to `00:00:00`. |
+| | **Dice Roller App** | Re-roll the dice with rolling animation. |
+| **Triple Tap** | **Any Screen** | Open on-device **Apps & Settings Menu**. |
+| **Long Press (>0.6s)** | **Menu / Any App** | **Exit Mode**: Immediately exits the active game, app, menu, Canvas Mode, or QR Page back to home faces. |
+| | **Navigation Overlay** | **Force-Exit Maps**: Dismisses turn-by-turn navigation and restores normal face animations. |
+| | **Active Alarm** | **Snooze / Dismiss**: Silences active alarm buzzer immediately. |
 
 ---
 
-## 5. Serial Communication Protocol
+## 📱 3. Built-In On-Device Apps & Menu System
 
-The OLO Bit communicates via plain-text messages over standard UART USB serial at **115200 baud**. 
+Triple-tap the touch sensor from any screen to access the on-device **Menu System**.
 
-*   Commands sent to the device are formatted as: `key:value` (e.g., `watch_face:1`).
-*   To fetch settings, send: `set:get`.
-*   To save modifications to NVS flash, send: `set:save`.
-*   To restart the device, send: `set:reset`.
-*   To restore default factory state, send: `set:clear_nvs`.
+### 📲 A. Productivity & Utility Apps
+- **🎲 Dice Roller (`Apps → Dice Roll`)**: Digital 6-sided random dice. Single-tap or double-tap rolls the dice with real-time rolling physics animation.
+- **⏱️ Focus Pomodoro Timer (`Apps → Focus Timer`)**: Countdown productivity timer (default 5–120 min configurable via Web Controller). Single-tap starts/pauses; alarm chimes when finished.
+- **⏱️ Stopwatch (`Apps → Stopwatch`)**: Centisecond precision elapsed timer. Single-tap starts/pauses; double-tap resets back to zero.
+- **📱 Standalone QR Code (`Apps → QR Code`)**: Full-screen, high-contrast QR code display optimized for phone camera scanning.
+- **💻 Hardware Monitor (`Apps → Hardware / CPU-Z`)**: Live companion stats monitor displaying CPU temperature, GPU usage, and RAM consumption when connected to your PC companion app.
+
+### 🎮 B. Built-In Retro Games
+- **🐍 Snake Game (`Apps → Snake`)**: Classic retro snake game. Tap to turn 90° clockwise, eat food pellets, grow longer, and beat your high score.
+- **🦖 Chrome Dino Runner (`Apps → Dino Run`)**: Endless desert obstacle runner. Tap to jump over oncoming cacti and flying obstacles.
+- **🐤 Flappy OLO (`Apps → Flappy`)**: One-touch flight physics. Tap to flap wings and navigate through obstacle pipes.
+
+### ⚙️ C. On-Device Settings Submenus
+- **Watch Face Style**: Switch between **Classic Digital** (clean digital time with battery indicator) and **Casio Retro** (retro digital style with seconds counter, day, and date).
+- **Time Format**: Switch between 12-Hour (`AM/PM`) and 24-Hour clock formats.
+- **Hourly Chime**: Toggle hourly audio chime (`Westminster Abbey` or `Casio Double-Beep`).
+- **System Sound**: Enable or mute all touch clicks and interface audio.
+- **Screen Flip**: Invert OLED display orientation 180° for upside-down mounting.
+- **Bluetooth Power**: Toggle BLE radio ON/OFF to conserve power.
+- **About Device**: View firmware version, uptime, and hardware MAC address.
+
+---
+
+## 🧭 4. Smartphone Integration & Google Maps Navigation
+
+Your OLOBit connects via Bluetooth Low Energy (BLE) to the **Chronos ESP32** companion app (available on iOS and Android).
+
+### 🚀 Setup Steps:
+1. Install **Chronos ESP32** from Google Play Store or Apple App Store.
+2. Turn on Bluetooth on your phone and open the app.
+3. Tap **Connect** and select your OLOBit (default name: `OLO-Bit-XXXX`, where `XXXX` is your unique MAC ID).
+4. **Time & Weather Synchronization**: The app automatically syncs your phone's time, date, local city weather, and temperature forecasts.
+
+### 🗺️ Google Maps Turn-by-Turn HUD Mode:
+When you start driving, walking, or cycling navigation in Google Maps:
+- OLOBit instantly transitions to **Navigation Overlay Mode**.
+- Displays dynamic direction turn arrows (Left, Right, Straight, U-Turn, Roundabouts).
+- Shows live remaining distance to your next turn (with visual progress bar) and total destination distance/ETA.
+- When navigation ends, OLOBit automatically returns to your idle face animations.
+
+---
+
+## 💬 5. Smart Notifications & Queue System
+
+- **Multi-App Support**: Streams incoming Phone Calls, SMS, WhatsApp messages, Instagram alerts, Telegram, Emails, and calendar reminders.
+- **FIFO Message Queue**: Stores up to 10 incoming notifications. Displays queue index badge (e.g. `WHATSAPP (1/3)`, `MESSAGES (2/3)`).
+- **Interactive Browsing**:
+  - **Single-tap** to dismiss the current message and instantly load the next alert in the queue.
+  - Messages auto-advance after a configurable duration (default: 4 seconds).
+  - Incoming phone calls ring with live caller ID display.
+
+---
+
+## 🖥️ 6. Web Controller Feature Guide
+
+The [Online Web Controller](https://micromakerlabsfiles-git.github.io/OLOBit_Web_Controller) provides visual controls across 6 comprehensive categories:
+
+### 🖼️ A. Face Animations & GIFs Tab
+- **Idle Face Animation Library**: Choose from 16+ built-in visual expressions (Default, Angry, UwU, Demon Slayer, Road Rage, Headlights, Sleepy, Heart, Laughing, Yelling, Car, Speed, etc.).
+- **Cycle Selection**: Pick which face animations are included in the random idle rotation cycle.
+- **Gesture Reaction GIFs**: Assign unique animations triggered by single-tap, double-tap, or long-press.
+- **Playback Speed & Delays**: Adjust frame playback speed (1 to 200ms per frame) and cycle pause duration (500ms to 60s).
+- **Pixel Inversion**: Toggle Positive Dark mode (black background) or Negative Light mode (white background).
+
+### 🎵 B. Sound & Melodies Tab
+- **Master Volume**: Set piezo buzzer output level from `0` (Mute) to `10` (Maximum volume).
+- **Audio Toggles**: Enable or disable system feedback clicks and emotion sound effects.
+- **Melody Packs**: 1-click apply themed startup audio packs (Modern Startup, Sci-Fi Boot, Retro Computer, Cyberpunk Login, Soft Desktop).
+- **Emotion Audio Themes**: Apply sound styles (Cute Robot, Retro Arcade, Cyber Mech, 8-Bit Pip).
+- **RTTTL Melody Composer & Studio**: Compose, preview, and assign custom musical ringtones and gesture chimes.
+
+### ⏰ C. Time, Alarms & Chronos Tab
+- **Time Format**: 12-Hour (`AM/PM`) or 24-Hour digital clock display.
+- **Daily Alarm**: Set alarm time (`00:00` to `23:59`) and toggle alarm active. Silenced with a single tap.
+- **Hourly Chimes**: Choose between `Westminster Classic` melodic chimes or `Casio Retro` double-beeps.
+- **Do Not Disturb (DND)**: Schedule quiet hours (e.g. `22:00` to `07:00`) to silence all audio alerts automatically during sleep.
+- **Hydration Reminders**: Set periodic water drink alerts (`15`, `30`, `45`, `60`, `90`, `120` minutes).
+- **Focus Pomodoro Timer**: Set default countdown work sessions (1 to 120 minutes).
+- **Screensaver / Sleep Mode**: Automatically dims and puts the device to sleep during inactivity (5, 10, 30, or 60 min timeouts). Wakes up instantly on touch.
+- **Custom Bluetooth Name**: Rename your device to your personal handle (e.g. `Robin-OLOBit`).
+- **Quote Categories**: Choose motivational quote libraries (All, Bible, Mahabharatham, Quran, Buddhist, Hustle/Work, IT/Coding, Craftsmanship, Positive).
+
+### 📝 D. Canvas Mode & QR Code Tab
+- **Live Canvas Text Overlay**:
+  - Type custom announcement or desk status messages (up to 128 characters).
+  - Choose from 10 typography fonts (Helvetica Bold/Regular, Times, Courier, Lucida, New Century).
+  - Select Font Size (Tiny 8px, Small 12px, Medium 14px, Large 18px, XL 24px).
+  - Choose Animation Styles: Scroll Left, Scroll Right, Bounce, Typewriter, Blinking, or Fixed Center.
+- **Dynamic QR Code Generator**:
+  - Select payload type: **🌐 Website URL**, **📝 Plain Text Message**, **📞 Phone Call**, or **📶 WiFi Network Credentials (SSID + Password)**.
+  - Generates high-contrast, full-screen QR codes with maximized module scaling and broad quiet zones for instant camera scanning.
+  - Push QR directly to the screen or toggle on-device page flipping via double-tap.
+
+### 💡 E. Status NeoPixel RGB LED Tab
+- **Power & Brightness**: Toggle RGB LED power and adjust illumination brightness (levels 0 to 10).
+- **Color Palette**: Pick from vibrant preset colors (Red, Orange, Yellow, Green, Blue, Indigo, Violet, Warm White).
+- **12 Dynamic Lighting Effects**: Solid, Breathing, Blinking, Heartbeat, Rainbow, Shimmer, Candle, Color Cycle, Strobe, Neon Pulse, Police, Firefly.
+
+---
+
+## 👑 7. Display Priority & UI Flow Hierarchy
+
+OLOBit OS V3 features an intelligent priority overlay engine. Lower priority screens pause automatically and resume immediately when higher priority events are dismissed:
+
+```
+[ LEVEL 1 (Highest) ] 🚨 Active Alarms / Emergency Alerts
+          ↓
+[ LEVEL 2 ]           📞 Incoming Phone Calls & Notifications (FIFO Queue)
+          ↓
+[ LEVEL 3 ]           🗺️ Google Maps Turn-by-Turn Navigation HUD
+          ↓
+[ LEVEL 4 ]           🕹️ Active Apps / Retro Games / Menu System
+          ↓
+[ LEVEL 5 ]           📝 Live Canvas Text / Canvas QR Code Display
+          ↓
+[ LEVEL 6 ]           ⏰ Clock Faces / Weather Screens / Quotes
+          ↓
+[ LEVEL 7 (Lowest) ]  😴 Screensaver / Idle Face Animation Loop
+```
+
+---
+
+## ❓ 8. Frequently Asked Questions (FAQ)
+
+- **Q: Which web browsers support the Online Web Controller?**
+  - *Answer*: Use **Google Chrome**, **Microsoft Edge**, or **Opera** on Windows, macOS, Linux, or ChromeOS. Safari and Firefox do not currently support the Web Serial API.
+- **Q: How do I sync time accurately with my computer?**
+  - *Answer*: Connecting to the [Online Web Controller](https://micromakerlabsfiles-git.github.io/OLOBit_Web_Controller) automatically detects your computer's local timezone (e.g. IST UTC+5:30) and sets the device clock instantly.
+- **Q: How do I switch between Canvas Text and the QR Code on my desk?**
+  - *Answer*: While in Canvas Mode, **single-tap or double-tap** the touch sensor to flip between your text message and the full-screen QR code page.
+- **Q: How do I exit any app or game back to face animations?**
+  - *Answer*: **Long-press (>0.6s)** the capacitive touch sensor at any time to exit immediately.
+
